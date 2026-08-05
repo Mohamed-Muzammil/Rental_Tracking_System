@@ -16,8 +16,12 @@ export default function Companies() {
   const today = useAppStore((s) => s.today)
 
   const [searchQuery, setSearchQuery] = useState('')
-  const [filterMode, setFilterMode] = useState('all') // 'all' | 'atRisk' | 'highVolume'
+  const [filterMode, setFilterMode] = useState('all') // 'all' | 'atRisk' | 'filterBy'
   const [viewMode, setViewMode] = useState('grid') // 'grid' | 'table'
+
+  // Machine deployment filter state
+  const [minDeploymentInput, setMinDeploymentInput] = useState('3')
+  const [appliedMinDeployment, setAppliedMinDeployment] = useState(null)
 
   const active = useMemo(() => equipment.filter((e) => e.status === 'active'), [equipment])
   const TOTAL_UNITS = equipment.length // 40 total units in fleet
@@ -70,10 +74,15 @@ export default function Companies() {
       if (!matchesSearch) return false
 
       if (filterMode === 'atRisk') return g.atRisk > 0
-      if (filterMode === 'highVolume') return g.units.length >= 3
+      if (filterMode === 'filterBy') {
+        if (appliedMinDeployment !== null && appliedMinDeployment !== '') {
+          return g.units.length >= Number(appliedMinDeployment)
+        }
+        return true
+      }
       return true
     })
-  }, [groups, searchQuery, filterMode])
+  }, [groups, searchQuery, filterMode, appliedMinDeployment])
 
   // Overall Fleet Summary Stats
   const totalRentedUnits = active.length
@@ -139,31 +148,39 @@ export default function Companies() {
             />
           </div>
 
-          {/* Account Filter Segmented Control (Height h-9 = 36px) */}
+          {/* Account Filter Tabs (1st: All Accounts, 2nd: At Risk, 3rd: Filter By) */}
           <div className="flex h-9 items-center gap-1 rounded-lg bg-slate-100 p-1 border border-slate-200 text-xs">
             <button
-              onClick={() => setFilterMode('all')}
+              onClick={() => {
+                setFilterMode('all')
+                setAppliedMinDeployment(null)
+              }}
               className={`flex h-7 items-center rounded-md px-3 text-xs font-bold transition-all ${
                 filterMode === 'all' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               All Accounts ({groups.length})
             </button>
+
             <button
-              onClick={() => setFilterMode('highVolume')}
-              className={`flex h-7 items-center rounded-md px-3 text-xs font-bold transition-all ${
-                filterMode === 'highVolume' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              High Volume (3+ units)
-            </button>
-            <button
-              onClick={() => setFilterMode('atRisk')}
+              onClick={() => {
+                setFilterMode('atRisk')
+                setAppliedMinDeployment(null)
+              }}
               className={`flex h-7 items-center rounded-md px-3 text-xs font-bold transition-all ${
                 filterMode === 'atRisk' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               At Risk ({groups.filter((g) => g.atRisk > 0).length})
+            </button>
+
+            <button
+              onClick={() => setFilterMode('filterBy')}
+              className={`flex h-7 items-center rounded-md px-3 text-xs font-bold transition-all ${
+                filterMode === 'filterBy' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Filter By
             </button>
           </div>
         </div>
@@ -188,6 +205,52 @@ export default function Companies() {
           </button>
         </div>
       </div>
+
+      {/* Next Line Drawer for 'Filter By' Machine Deployment */}
+      {filterMode === 'filterBy' && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-slate-50 p-3 shadow-xs border-slate-200">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-xs font-bold text-slate-800">
+              Show companies based on machine deployment:
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-500 font-medium">Minimum units:</span>
+              <input
+                type="number"
+                min="0"
+                max="40"
+                placeholder="e.g. 3"
+                value={minDeploymentInput}
+                onChange={(e) => setMinDeploymentInput(e.target.value)}
+                className="h-8 w-20 rounded-md border border-slate-300 bg-white px-2.5 text-xs font-mono font-bold outline-hidden focus:border-blue-500"
+              />
+              <button
+                onClick={() => setAppliedMinDeployment(minDeploymentInput)}
+                className="h-8 rounded-md bg-blue-600 px-4 text-xs font-bold text-white hover:bg-blue-700 transition-colors shadow-xs"
+              >
+                Apply
+              </button>
+              {appliedMinDeployment !== null && (
+                <button
+                  onClick={() => {
+                    setAppliedMinDeployment(null)
+                    setMinDeploymentInput('3')
+                  }}
+                  className="h-8 rounded-md bg-slate-200 px-3 text-xs font-semibold text-slate-700 hover:bg-slate-300 transition-colors"
+                >
+                  Reset
+                </button>
+              )}
+            </div>
+          </div>
+
+          {appliedMinDeployment !== null && (
+            <span className="text-xs font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-md border border-blue-200">
+              Filtering: Companies with ≥ {appliedMinDeployment} machines deployed ({filteredGroups.length} matching)
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Grid Cards View */}
       {viewMode === 'grid' ? (
