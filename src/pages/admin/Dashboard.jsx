@@ -95,7 +95,7 @@ export default function Dashboard() {
       {/* ① KPI hero */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <StatTile
-          label="Fleet Utilization"
+          label="Asset Utilization"
           value={kpis.utilization}
           unit="%"
           hint={`${kpis.rented} of ${kpis.total} units earning`}
