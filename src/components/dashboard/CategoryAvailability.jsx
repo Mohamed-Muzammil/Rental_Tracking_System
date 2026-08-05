@@ -19,7 +19,7 @@ export default function CategoryAvailability({ categories }) {
           const meta = ASSET_META[cat.type]
           const pct  = cat.total ? Math.round((cat.rented / cat.total) * 100) : 0
           const barColor =
-            pct >= 80 ? '#15803d' : pct >= 50 ? '#1d4ed8' : '#9ca3af'
+            pct >= 80 ? 'var(--good)' : pct >= 50 ? 'var(--accent)' : 'var(--ink-faint)'
 
           return (
             <Link
@@ -27,15 +27,15 @@ export default function CategoryAvailability({ categories }) {
               to={`/admin/equipment?type=${cat.type}`}
               className="group flex flex-col"
               style={{
-                background: '#ffffff',
-                borderRadius: '8px',
-                border: '1px solid #e5e7eb',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                background: 'var(--bg-surface)',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border)',
+                boxShadow: 'var(--shadow-card)',
                 padding: '12px',
                 transition: 'box-shadow 0.15s',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.10)' }}
-              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)' }}
+              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lifted)' }}
+              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-card)' }}
             >
               {/* Image — white bg + multiply blend = transparent background effect */}
               <div
@@ -64,26 +64,26 @@ export default function CategoryAvailability({ categories }) {
                     className="group-hover:scale-105"
                   />
                 ) : (
-                  <div style={{ width: 40, height: 40, background: '#f3f4f6', borderRadius: 4 }} />
+                  <div style={{ width: 40, height: 40, background: 'var(--bg-surface-raised)', borderRadius: 'var(--radius-sm)' }} />
                 )}
               </div>
 
               {/* Label */}
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#6b7280' }}>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'var(--ink-muted)' }}>
                 {cat.type}
               </div>
 
               {/* Count */}
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', marginTop: 2, fontVariantNumeric: 'tabular-nums' }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink-primary)', marginTop: 2, fontVariantNumeric: 'tabular-nums' }}>
                 {cat.rented}
-                <span style={{ fontSize: 11, fontWeight: 400, color: '#6b7280' }}> / {cat.total} rented</span>
+                <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--ink-muted)' }}> / {cat.total} rented</span>
               </div>
 
               {/* Bar */}
-              <div style={{ marginTop: 8, height: 4, width: '100%', borderRadius: 9999, background: '#f1f5f9' }}>
+              <div style={{ marginTop: 8, height: 4, width: '100%', borderRadius: 9999, background: 'var(--bg-surface-raised)' }}>
                 <div style={{ height: '100%', width: `${pct}%`, borderRadius: 9999, background: barColor, transition: 'width 0.4s' }} />
               </div>
-              <div style={{ fontSize: 10, color: '#9ca3af', marginTop: 4 }}>{pct}% deployed</div>
+              <div style={{ fontSize: 10, color: 'var(--ink-faint)', marginTop: 4 }}>{pct}% deployed</div>
             </Link>
           )
         })}
@@ -99,16 +99,16 @@ export default function CategoryAvailability({ categories }) {
             gap: '6px',
             fontSize: 12,
             fontWeight: 600,
-            color: '#1d4ed8',
-            background: '#eff6ff',
-            border: '1px solid #bfdbfe',
-            borderRadius: '6px',
+            color: 'var(--accent)',
+            background: 'var(--accent-wash)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius-sm)',
             padding: '6px 20px',
             textDecoration: 'none',
-            transition: 'background 0.15s',
+            transition: 'opacity 0.15s',
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = '#dbeafe' }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = '#eff6ff' }}
+          onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.75' }}
+          onMouseLeave={(e) => { e.currentTarget.style.opacity = '1' }}
         >
           View All Categories →
         </Link>

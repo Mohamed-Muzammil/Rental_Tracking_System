@@ -1,15 +1,15 @@
 import Icon from './Icon'
 
 const CONFIG = {
-  good:     { bg: '#dcfce7', fg: '#15803d', icon: 'checkCircle' },
-  warning:  { bg: '#fef3c7', fg: '#b45309', icon: 'clock' },
-  serious:  { bg: '#ffedd5', fg: '#c2410c', icon: 'alertTriangle' },
-  high:     { bg: '#fee2e2', fg: '#b91c1c', icon: 'alertTriangle' },
-  critical: { bg: '#fee2e2', fg: '#b91c1c', icon: 'alertTriangle' },
-  hold:     { bg: '#fef3c7', fg: '#b45309', icon: 'clock' },
-  info:     { bg: '#eff6ff', fg: '#1d4ed8', icon: 'bulb' },
-  neutral:  { bg: '#f3f4f6', fg: '#6b7280', icon: null },
-  medium:   { bg: '#fef3c7', fg: '#b45309', icon: 'clock' },
+  good:     { bg: 'var(--good-wash)',     fg: 'var(--good)',     icon: 'checkCircle' },
+  warning:  { bg: 'var(--warning-wash)',  fg: 'var(--warning)',  icon: 'clock' },
+  serious:  { bg: 'var(--serious-wash)',  fg: 'var(--serious)',  icon: 'alertTriangle' },
+  high:     { bg: 'var(--critical-wash)', fg: 'var(--critical)', icon: 'alertTriangle' },
+  critical: { bg: 'var(--critical-wash)', fg: 'var(--critical)', icon: 'alertTriangle' },
+  hold:     { bg: 'var(--warning-wash)',  fg: 'var(--warning)',  icon: 'clock' },
+  info:     { bg: 'var(--accent-wash)',   fg: 'var(--accent)',   icon: 'bulb' },
+  neutral:  { bg: 'var(--bg-surface-raised)', fg: 'var(--ink-muted)', icon: null },
+  medium:   { bg: 'var(--warning-wash)',  fg: 'var(--warning)',  icon: 'clock' },
 }
 
 export default function StatusChip({ severity = 'neutral', children, icon }) {

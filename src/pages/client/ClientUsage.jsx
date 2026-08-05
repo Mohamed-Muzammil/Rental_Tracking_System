@@ -71,7 +71,7 @@ export default function ClientUsage() {
       </div>
 
       {/* Active Fleet Telemetry Roster */}
-      <Card title="Live Equipment Telemetry Feed" action={<span className="text-xs text-slate-500">{activeFleet.length} Machines Active</span>}>
+      <Card title="Live Equipment Telemetry Feed" action={<span className="text-xs" style={{ color: 'var(--ink-muted)' }}>{activeFleet.length} Machines Active</span>}>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[700px] text-xs">
             <thead>
@@ -91,7 +91,7 @@ export default function ClientUsage() {
                 const eff = total > 0 ? Math.round(((eq.avgEngineHoursPerDay || 0) / total) * 100) : 0
 
                 return (
-                  <tr key={eq.id} className="border-b transition-colors hover:bg-slate-50/50" style={{ borderColor: 'var(--border)' }}>
+                  <tr key={eq.id} className="border-b transition-colors hover:opacity-90" style={{ borderColor: 'var(--border)' }}>
                     <td className="px-4 py-3">
                       <div className="font-bold" style={{ color: 'var(--ink-primary)' }}>{eq.id}</div>
                       <div className="text-[11px]" style={{ color: 'var(--ink-muted)' }}>{eq.tier} {eq.type}</div>
@@ -114,7 +114,10 @@ export default function ClientUsage() {
                       <UtilizationBar engineHours={eq.avgEngineHoursPerDay} idleHours={eq.avgIdleHoursPerDay} />
                     </td>
                     <td className="px-3 py-3">
-                      <span className={`inline-block rounded px-2 py-0.5 font-bold ${eff >= 60 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
+                      <span
+                        className="inline-block rounded px-2 py-0.5 font-bold"
+                        style={{ background: eff >= 60 ? 'var(--good-wash)' : 'var(--warning-wash)', color: eff >= 60 ? 'var(--good)' : 'var(--warning)' }}
+                      >
                         {eff}%
                       </span>
                     </td>
@@ -128,7 +131,7 @@ export default function ClientUsage() {
               })}
               {activeFleet.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-500">
+                  <td colSpan={6} className="py-8 text-center" style={{ color: 'var(--ink-muted)' }}>
                     No active equipment matches the selected site filter.
                   </td>
                 </tr>

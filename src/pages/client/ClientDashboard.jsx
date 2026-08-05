@@ -104,7 +104,10 @@ export default function ClientDashboard() {
             <h1 className="font-display text-2xl font-extrabold tracking-tight" style={{ color: 'var(--ink-primary)' }}>
               {client?.name}
             </h1>
-            <span className="rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-bold text-slate-700">
+            <span
+              className="rounded-full px-2.5 py-0.5 text-xs font-bold"
+              style={{ background: 'var(--bg-surface-raised)', border: '1px solid var(--border)', color: 'var(--ink-secondary)' }}
+            >
               {selectedSiteId === 'ALL' ? 'All Active Sites' : siteById[selectedSiteId]?.name}
             </span>
           </div>
@@ -125,46 +128,60 @@ export default function ClientDashboard() {
 
       {/* Idle Waste & Rightsizing Intelligence Alert Banner */}
       {underutilizedUnits.length > 0 && (
-        <div className="rounded-2xl border border-amber-300 bg-amber-50/80 p-5 shadow-xs">
+        <div
+          className="border p-5"
+          style={{ borderRadius: 'var(--radius-lg)', borderColor: 'var(--border)', background: 'var(--warning-wash)', boxShadow: 'var(--shadow-card)' }}
+        >
           <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-slate-950 font-bold">
+            <div
+              className="flex h-10 w-10 shrink-0 items-center justify-center font-bold"
+              style={{ borderRadius: 'var(--radius-md)', background: 'var(--warning)', color: '#ffffff' }}
+            >
               <Icon name="bell" size={20} />
             </div>
             <div className="flex-1">
               <div className="flex items-center justify-between">
-                <h3 className="font-display text-sm font-bold text-amber-950">
+                <h3 className="font-display text-sm font-bold" style={{ color: 'var(--warning)' }}>
                   Anomaly Detected: High Idle Waste & Rightsizing Opportunities ({underutilizedUnits.length} Machines Flagged)
                 </h3>
-                <span className="rounded bg-amber-200 px-2 py-0.5 text-[11px] font-bold text-amber-900">
+                <span
+                  className="px-2 py-0.5 text-[11px] font-bold"
+                  style={{ borderRadius: 'var(--radius-sm)', background: 'var(--bg-surface)', color: 'var(--warning)', border: '1px solid var(--border)' }}
+                >
                   Potential Waste: ${kpis.dailyIdleWaste}/day
                 </span>
               </div>
-              <p className="mt-1 text-xs text-amber-800">
+              <p className="mt-1 text-xs" style={{ color: 'var(--ink-secondary)' }}>
                 The IoT telemetry engine detected machinery sitting idle for extended periods (e.g. up to 10 hrs/day). Rightsizing to compact models or reassigning can eliminate unnecessary rental overhead.
               </p>
 
               <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {underutilizedUnits.map(({ eq, ratio, rec }) => (
-                  <div key={eq.id} className="flex items-center justify-between rounded-xl border border-amber-200 bg-white p-3 shadow-xs">
+                  <div
+                    key={eq.id}
+                    className="flex items-center justify-between border p-3"
+                    style={{ borderRadius: 'var(--radius-md)', borderColor: 'var(--border)', background: 'var(--bg-surface)', boxShadow: 'var(--shadow-card)' }}
+                  >
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-xs text-slate-900">{eq.id}</span>
-                        <span className="text-[11px] text-slate-500">{eq.tier} {eq.type}</span>
+                        <span className="font-bold text-xs" style={{ color: 'var(--ink-primary)' }}>{eq.id}</span>
+                        <span className="text-[11px]" style={{ color: 'var(--ink-muted)' }}>{eq.tier} {eq.type}</span>
                       </div>
-                      <div className="mt-1 text-[11px] text-amber-900">
-                        Utilization: <strong className="text-amber-700">{ratio}%</strong> ({eq.avgIdleHoursPerDay}h idle/day)
+                      <div className="mt-1 text-[11px]" style={{ color: 'var(--ink-secondary)' }}>
+                        Utilization: <strong style={{ color: 'var(--warning)' }}>{ratio}%</strong> ({eq.avgIdleHoursPerDay}h idle/day)
                       </div>
                     </div>
                     {rec ? (
                       <Button
                         variant="primary"
                         onClick={() => acceptRecommendation(eq.id, rec)}
-                        className="text-xs bg-amber-500 hover:bg-amber-600 text-slate-950 border-none font-bold"
+                        className="text-xs font-bold"
+                        style={{ background: 'var(--warning)', borderColor: 'var(--warning)' }}
                       >
                         Swap to {rec.catalog.tier} (Save ${rec.dailySavings}/d)
                       </Button>
                     ) : (
-                      <span className="text-[11px] font-semibold text-amber-700">Flagged for Review</span>
+                      <span className="text-[11px] font-semibold" style={{ color: 'var(--warning)' }}>Flagged for Review</span>
                     )}
                   </div>
                 ))}
@@ -198,12 +215,12 @@ export default function ClientDashboard() {
                 const cost = catalogById[eq.catalogId]?.dailyCost ?? 0
 
                 return (
-                  <tr key={eq.id} className="border-b transition-colors hover:bg-slate-50/50" style={{ borderColor: 'var(--border)' }}>
+                  <tr key={eq.id} className="border-b transition-colors hover:opacity-90" style={{ borderColor: 'var(--border)' }}>
                     <td className="px-4 py-3 font-medium" style={{ borderLeft: `4px solid var(--${health})` }}>
-                      <div className="font-bold text-slate-900">{eq.id}</div>
-                      <div className="text-[11px] text-slate-500">{eq.tier} {eq.type}</div>
+                      <div className="font-bold" style={{ color: 'var(--ink-primary)' }}>{eq.id}</div>
+                      <div className="text-[11px]" style={{ color: 'var(--ink-muted)' }}>{eq.tier} {eq.type}</div>
                     </td>
-                    <td className="px-3 py-3 text-slate-700 font-medium">
+                    <td className="px-3 py-3 font-medium" style={{ color: 'var(--ink-secondary)' }}>
                       <span className="inline-flex items-center gap-1">
                         <Icon name="mapPin" size={13} /> {site}
                       </span>
@@ -217,7 +234,7 @@ export default function ClientDashboard() {
                         </span>
                       )}
                     </td>
-                    <td className="px-3 py-3 font-data font-bold text-slate-900">${cost}</td>
+                    <td className="px-3 py-3 font-data font-bold" style={{ color: 'var(--ink-primary)' }}>${cost}</td>
                     <td className="px-3 py-3">
                       <UtilizationBar engineHours={eq.avgEngineHoursPerDay} idleHours={eq.avgIdleHoursPerDay} />
                     </td>
@@ -241,7 +258,7 @@ export default function ClientDashboard() {
               })}
               {activeFleet.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="py-10 text-center text-slate-500">
+                  <td colSpan={7} className="py-10 text-center" style={{ color: 'var(--ink-muted)' }}>
                     No deployed equipment found for the selected filter.
                   </td>
                 </tr>
@@ -257,16 +274,19 @@ export default function ClientDashboard() {
               {siteDistribution.map((s) => (
                 <div key={s.name} className="flex items-center justify-between border-b pb-2 text-xs" style={{ borderColor: 'var(--border)' }}>
                   <div>
-                    <div className="font-bold text-slate-900">{s.name}</div>
-                    <div className="text-[11px] text-slate-500">{s.engineHrs.toFixed(1)} hrs active/day</div>
+                    <div className="font-bold" style={{ color: 'var(--ink-primary)' }}>{s.name}</div>
+                    <div className="text-[11px]" style={{ color: 'var(--ink-muted)' }}>{s.engineHrs.toFixed(1)} hrs active/day</div>
                   </div>
-                  <span className="rounded-full bg-slate-100 px-2.5 py-1 font-data font-bold text-slate-800">
+                  <span
+                    className="rounded-full px-2.5 py-1 font-data font-bold"
+                    style={{ background: 'var(--bg-surface-raised)', color: 'var(--ink-secondary)' }}
+                  >
                     {s.count} Machine{s.count === 1 ? '' : 's'}
                   </span>
                 </div>
               ))}
               {siteDistribution.length === 0 && (
-                <p className="text-xs text-slate-500">No active sites.</p>
+                <p className="text-xs" style={{ color: 'var(--ink-muted)' }}>No active sites.</p>
               )}
             </div>
           </Card>

@@ -44,10 +44,10 @@ export default function LogTelemetryModal({ equipment, onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(2px)' }}>
       <div
-        className="w-full max-w-md rounded-2xl border p-6 shadow-2xl"
-        style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)' }}
+        className="w-full max-w-md border p-6"
+        style={{ borderRadius: 'var(--radius-lg)', background: 'var(--bg-surface)', borderColor: 'var(--border)', boxShadow: 'var(--shadow-lifted)' }}
       >
         <div className="flex items-center justify-between border-b pb-4" style={{ borderColor: 'var(--border)' }}>
           <div>
@@ -93,8 +93,8 @@ export default function LogTelemetryModal({ equipment, onClose }) {
         </div>
 
         {mode === 'qr' ? (
-          <div className="my-6 flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 text-center" style={{ borderColor: 'var(--border-strong)' }}>
-            <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-2xl" style={{ background: 'var(--accent-wash)', color: 'var(--accent)' }}>
+          <div className="my-6 flex flex-col items-center justify-center border-2 border-dashed p-6 text-center" style={{ borderRadius: 'var(--radius-md)', borderColor: 'var(--border-strong)' }}>
+            <div className="mb-3 flex h-16 w-16 items-center justify-center" style={{ borderRadius: 'var(--radius-md)', background: 'var(--accent-wash)', color: 'var(--accent)' }}>
               <Icon name="swap" size={32} />
             </div>
             <p className="text-sm font-medium" style={{ color: 'var(--ink-primary)' }}>

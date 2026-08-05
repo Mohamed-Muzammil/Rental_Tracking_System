@@ -103,21 +103,27 @@ export default function Equipment() {
 
       {/* Equipment Registration Modal */}
       {showRegisterModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl border border-slate-200">
-            <div className="flex items-center justify-between border-b pb-3 mb-4">
-              <h3 className="font-bold text-base text-slate-900">Register New Equipment Unit</h3>
-              <button onClick={() => setShowRegisterModal(false)} className="text-slate-400 hover:text-slate-600">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(2px)' }}
+        >
+          <div
+            className="w-full max-w-md p-6"
+            style={{ borderRadius: 'var(--radius-lg)', background: 'var(--bg-surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-lifted)' }}
+          >
+            <div className="flex items-center justify-between border-b pb-3 mb-4" style={{ borderColor: 'var(--border)' }}>
+              <h3 className="font-bold text-base" style={{ color: 'var(--ink-primary)' }}>Register New Equipment Unit</h3>
+              <button onClick={() => setShowRegisterModal(false)} style={{ color: 'var(--ink-muted)' }}>
                 <Icon name="x" size={18} />
               </button>
             </div>
             <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-4 text-xs font-medium">
               <div>
-                <label className="block text-slate-500 uppercase text-[10px] font-bold mb-1">Equipment Category</label>
+                <label className="block uppercase text-[10px] font-bold mb-1" style={{ color: 'var(--ink-muted)' }}>Equipment Category</label>
                 <select
                   value={regType}
                   onChange={(e) => setRegType(e.target.value)}
-                  className="w-full rounded-lg border p-2 text-sm outline-hidden"
+                  className="w-full rounded-[var(--radius-sm)] border p-2 text-sm outline-hidden"
                   style={inputStyle}
                 >
                   {equipmentTypes.map((t) => (
@@ -127,12 +133,12 @@ export default function Equipment() {
               </div>
 
               <div>
-                <label className="block text-slate-500 uppercase text-[10px] font-bold mb-1">Tier / Specification</label>
+                <label className="block uppercase text-[10px] font-bold mb-1" style={{ color: 'var(--ink-muted)' }}>Tier / Specification</label>
                 <input
                   type="text"
                   value={regTier}
                   onChange={(e) => setRegTier(e.target.value)}
-                  className="w-full rounded-lg border p-2 text-sm outline-hidden"
+                  className="w-full rounded-[var(--radius-sm)] border p-2 text-sm outline-hidden"
                   style={inputStyle}
                   placeholder="e.g. Heavy Duty / Compact / Standard"
                   required
@@ -140,22 +146,25 @@ export default function Equipment() {
               </div>
 
               <div>
-                <label className="block text-slate-500 uppercase text-[10px] font-bold mb-1">Daily Billing Rate ($/day)</label>
+                <label className="block uppercase text-[10px] font-bold mb-1" style={{ color: 'var(--ink-muted)' }}>Daily Billing Rate ($/day)</label>
                 <input
                   type="number"
                   value={regCost}
                   onChange={(e) => setRegCost(e.target.value)}
-                  className="w-full rounded-lg border p-2 text-sm outline-hidden"
+                  className="w-full rounded-[var(--radius-sm)] border p-2 text-sm outline-hidden"
                   style={inputStyle}
                   required
                 />
               </div>
 
-              <div className="rounded-lg bg-blue-50 p-3 border border-blue-200 text-blue-800 text-[11px]">
+              <div
+                className="p-3 text-[11px]"
+                style={{ borderRadius: 'var(--radius-sm)', background: 'var(--accent-wash)', border: '1px solid var(--border)', color: 'var(--accent-dark)' }}
+              >
                 <span className="font-bold">QR Barcode Generator:</span> A unique QR barcode (`QR-EQX-${Math.floor(40+Math.random()*60)}`) will be automatically assigned to this physical machine for warehouse dispatch scanning.
               </div>
 
-              <div className="flex items-center justify-end gap-2 border-t pt-4">
+              <div className="flex items-center justify-end gap-2 border-t pt-4" style={{ borderColor: 'var(--border)' }}>
                 <Button variant="secondary" onClick={() => setShowRegisterModal(false)}>
                   Cancel
                 </Button>
@@ -394,7 +403,7 @@ function UnitDetail({ eq, today }) {
       {!isMaintenance && (
         <div className="mt-5 border-t pt-4" style={{ borderColor: 'var(--border)' }}>
           <div className="mb-3 flex items-center justify-between">
-            <h4 className="font-semibold text-xs text-slate-800">Unit Telemetry Logs</h4>
+            <h4 className="font-semibold text-xs" style={{ color: 'var(--ink-primary)' }}>Unit Telemetry Logs</h4>
             
             {/* View Mode Toggle */}
             <div className="flex gap-1 rounded-md border p-0.5" style={{ borderColor: 'var(--border)' }}>
@@ -424,76 +433,65 @@ function UnitDetail({ eq, today }) {
           </div>
 
           {/* Sleek Segmented Range Control */}
-          <div className="mb-3 flex rounded-lg bg-slate-100 p-1 border border-slate-200 text-xs">
-            <button
-              onClick={() => setPresetPeriod('agreement')}
-              className={`flex-1 rounded-md py-1.5 px-2 text-[11px] font-bold whitespace-nowrap transition-all ${
-                presetPeriod === 'agreement' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              Agreement
-            </button>
-            <button
-              onClick={() => setPresetPeriod('7days')}
-              className={`flex-1 rounded-md py-1.5 px-2 text-[11px] font-bold whitespace-nowrap transition-all ${
-                presetPeriod === '7days' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              7 Days
-            </button>
-            <button
-              onClick={() => setPresetPeriod('all')}
-              className={`flex-1 rounded-md py-1.5 px-2 text-[11px] font-bold whitespace-nowrap transition-all ${
-                presetPeriod === 'all' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              All Records
-            </button>
-            <button
-              onClick={() => setPresetPeriod('custom')}
-              className={`flex-1 rounded-md py-1.5 px-2 text-[11px] font-bold whitespace-nowrap transition-all ${
-                presetPeriod === 'custom' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              Custom Range
-            </button>
+          <div className="mb-3 flex p-1 text-xs" style={{ borderRadius: 'var(--radius-sm)', background: 'var(--bg-surface-raised)', border: '1px solid var(--border)' }}>
+            {[
+              { key: 'agreement', label: 'Agreement' },
+              { key: '7days', label: '7 Days' },
+              { key: 'all', label: 'All Records' },
+              { key: 'custom', label: 'Custom Range' },
+            ].map((opt) => (
+              <button
+                key={opt.key}
+                onClick={() => setPresetPeriod(opt.key)}
+                className="flex-1 py-1.5 px-2 text-[11px] font-bold whitespace-nowrap transition-all"
+                style={{
+                  borderRadius: 'calc(var(--radius-sm) - 2px)',
+                  background: presetPeriod === opt.key ? 'var(--bg-surface)' : 'transparent',
+                  color: presetPeriod === opt.key ? 'var(--accent)' : 'var(--ink-muted)',
+                  boxShadow: presetPeriod === opt.key ? 'var(--shadow-card)' : 'none',
+                }}
+              >
+                {opt.label}
+              </button>
+            ))}
           </div>
 
           {/* Manual Custom Date Range Inputs with Agreement Bounds & Error Display */}
           {presetPeriod === 'custom' && (
-            <div className="mb-3 flex flex-col gap-2 rounded-lg bg-slate-50 p-2.5 border border-slate-200">
+            <div className="mb-3 flex flex-col gap-2 p-2.5" style={{ borderRadius: 'var(--radius-sm)', background: 'var(--bg-surface-raised)', border: '1px solid var(--border)' }}>
               {dateError && (
-                <div className="flex items-center gap-1.5 rounded-md bg-rose-50 px-2.5 py-1.5 text-xs text-rose-700 font-medium border border-rose-200">
+                <div
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium"
+                  style={{ borderRadius: 'var(--radius-sm)', background: 'var(--critical-wash)', color: 'var(--critical)', border: '1px solid var(--border)' }}
+                >
                   <Icon name="alert" size={14} />
                   <span>{dateError}</span>
                 </div>
               )}
               <div className="flex items-center gap-2">
                 <div className="flex-1">
-                  <span className="block text-[9px] font-bold text-slate-400 uppercase mb-0.5">From Date</span>
+                  <span className="block text-[9px] font-bold uppercase mb-0.5" style={{ color: 'var(--ink-muted)' }}>From Date</span>
                   <input
                     type="date"
                     min={agreementStart}
                     max={agreementEnd}
                     value={customStartDate}
                     onChange={(e) => setCustomStartDate(e.target.value)}
-                    className={`w-full rounded border px-2 py-1 text-xs outline-hidden bg-white ${
-                      dateError ? 'border-rose-400 focus:border-rose-500' : 'border-slate-300'
-                    }`}
+                    className="w-full rounded-[var(--radius-sm)] border px-2 py-1 text-xs outline-hidden"
+                    style={{ background: 'var(--bg-surface)', borderColor: dateError ? 'var(--critical)' : 'var(--border-strong)', color: 'var(--ink-primary)' }}
                   />
                 </div>
-                <span className="text-xs text-slate-400 font-bold mt-3">to</span>
+                <span className="text-xs font-bold mt-3" style={{ color: 'var(--ink-muted)' }}>to</span>
                 <div className="flex-1">
-                  <span className="block text-[9px] font-bold text-slate-400 uppercase mb-0.5">To Date</span>
+                  <span className="block text-[9px] font-bold uppercase mb-0.5" style={{ color: 'var(--ink-muted)' }}>To Date</span>
                   <input
                     type="date"
                     min={agreementStart}
                     max={agreementEnd}
                     value={customEndDate}
                     onChange={(e) => setCustomEndDate(e.target.value)}
-                    className={`w-full rounded border px-2 py-1 text-xs outline-hidden bg-white ${
-                      dateError ? 'border-rose-400 focus:border-rose-500' : 'border-slate-300'
-                    }`}
+                    className="w-full rounded-[var(--radius-sm)] border px-2 py-1 text-xs outline-hidden"
+                    style={{ background: 'var(--bg-surface)', borderColor: dateError ? 'var(--critical)' : 'var(--border-strong)', color: 'var(--ink-primary)' }}
                   />
                 </div>
               </div>
@@ -501,14 +499,14 @@ function UnitDetail({ eq, today }) {
           )}
 
           {/* Telemetry Quick Summary Badges */}
-          <div className="mb-3 grid grid-cols-2 gap-2 rounded-lg bg-slate-50 p-2 text-xs border" style={{ borderColor: 'var(--border)' }}>
+          <div className="mb-3 grid grid-cols-2 gap-2 p-2 text-xs border" style={{ borderRadius: 'var(--radius-sm)', background: 'var(--bg-surface-raised)', borderColor: 'var(--border)' }}>
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Runtime</span>
-              <div className="font-mono font-bold text-blue-600">{totalRuntime.toFixed(1)} hrs</div>
+              <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--ink-muted)' }}>Total Runtime</span>
+              <div className="font-mono font-bold" style={{ color: 'var(--accent)' }}>{totalRuntime.toFixed(1)} hrs</div>
             </div>
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Est. Fuel Consumed</span>
-              <div className="font-mono font-bold text-emerald-600">{totalFuel.toFixed(1)} L</div>
+              <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--ink-muted)' }}>Est. Fuel Consumed</span>
+              <div className="font-mono font-bold" style={{ color: 'var(--good)' }}>{totalFuel.toFixed(1)} L</div>
             </div>
           </div>
 
@@ -518,9 +516,9 @@ function UnitDetail({ eq, today }) {
               <UsageHistoryChart data={chartData} height={180} />
             </div>
           ) : (
-            <div className="max-h-56 overflow-y-auto rounded-lg border" style={{ borderColor: 'var(--border)' }}>
+            <div className="max-h-56 overflow-y-auto border" style={{ borderRadius: 'var(--radius-sm)', borderColor: 'var(--border)' }}>
               <table className="w-full text-left text-xs">
-                <thead className="sticky top-0 shadow-xs bg-slate-100 text-slate-600">
+                <thead className="sticky top-0" style={{ background: 'var(--bg-surface-raised)', color: 'var(--ink-muted)' }}>
                   <tr>
                     <th className="px-3 py-2 font-semibold">Date</th>
                     <th className="px-2 py-2 font-semibold">Runtime</th>
@@ -531,16 +529,16 @@ function UnitDetail({ eq, today }) {
                 <tbody>
                   {eqLogs.length > 0 ? (
                     eqLogs.map((log) => (
-                      <tr key={log.date} className="border-t border-slate-100 hover:bg-slate-50">
-                        <td className="px-3 py-1.5 font-mono text-slate-800">{log.date}</td>
-                        <td className="px-2 py-1.5 font-mono text-blue-600 font-bold">{log.engineHours}h</td>
-                        <td className="px-2 py-1.5 font-mono text-amber-600">{log.idleHours}h</td>
-                        <td className="px-2 py-1.5 font-mono text-emerald-600">{log.fuelUsageL}L</td>
+                      <tr key={log.date} className="border-t" style={{ borderColor: 'var(--border)' }}>
+                        <td className="px-3 py-1.5 font-mono" style={{ color: 'var(--ink-primary)' }}>{log.date}</td>
+                        <td className="px-2 py-1.5 font-mono font-bold" style={{ color: 'var(--accent)' }}>{log.engineHours}h</td>
+                        <td className="px-2 py-1.5 font-mono" style={{ color: 'var(--warning)' }}>{log.idleHours}h</td>
+                        <td className="px-2 py-1.5 font-mono" style={{ color: 'var(--good)' }}>{log.fuelUsageL}L</td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={4} className="px-3 py-6 text-center text-xs text-slate-400">
+                      <td colSpan={4} className="px-3 py-6 text-center text-xs" style={{ color: 'var(--ink-muted)' }}>
                         No telemetry logs for this period.
                       </td>
                     </tr>

@@ -19,10 +19,10 @@ export default function ExtendRentalModal({ equipment, onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(2px)' }}>
       <div
-        className="w-full max-w-md rounded-2xl border p-6 shadow-2xl"
-        style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)' }}
+        className="w-full max-w-md border p-6"
+        style={{ borderRadius: 'var(--radius-lg)', background: 'var(--bg-surface)', borderColor: 'var(--border)', boxShadow: 'var(--shadow-lifted)' }}
       >
         <div className="flex items-center justify-between border-b pb-4" style={{ borderColor: 'var(--border)' }}>
           <div>
@@ -58,10 +58,11 @@ export default function ExtendRentalModal({ equipment, onClose }) {
                   key={d}
                   type="button"
                   onClick={() => setDays(d)}
-                  className={`rounded-xl border py-2.5 text-center text-xs font-bold transition-all ${
+                  className={`border py-2.5 text-center text-xs font-bold transition-all ${
                     days === d ? 'ring-2' : ''
                   }`}
                   style={{
+                    borderRadius: 'var(--radius-md)',
                     background: days === d ? 'var(--accent-wash)' : 'var(--bg-page)',
                     color: days === d ? 'var(--accent)' : 'var(--ink-primary)',
                     borderColor: days === d ? 'var(--accent)' : 'var(--border)',
@@ -73,7 +74,7 @@ export default function ExtendRentalModal({ equipment, onClose }) {
             </div>
           </div>
 
-          <div className="rounded-xl border p-4" style={{ background: 'var(--bg-page)', borderColor: 'var(--border)' }}>
+          <div className="border p-4" style={{ borderRadius: 'var(--radius-md)', background: 'var(--bg-page)', borderColor: 'var(--border)' }}>
             <div className="flex items-center justify-between text-xs" style={{ color: 'var(--ink-secondary)' }}>
               <span>Daily Rate</span>
               <span className="font-data font-bold">${dailyCost}/day</span>

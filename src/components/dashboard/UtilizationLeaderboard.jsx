@@ -1,6 +1,6 @@
 function Row({ entry, tone, rank }) {
   const { eq, util } = entry
-  const barColor = tone === 'top' ? '#1d4ed8' : '#b45309'
+  const barColor = tone === 'top' ? 'var(--accent)' : 'var(--warning)'
 
   return (
     <tr className="border-t" style={{ borderColor: 'var(--border)' }}>
@@ -13,7 +13,7 @@ function Row({ entry, tone, rank }) {
       </td>
       <td className="py-2.5 pr-4 w-full">
         <div className="flex items-center gap-2">
-          <div className="h-1.5 flex-1 rounded-full bg-slate-100">
+          <div className="h-1.5 flex-1 rounded-full" style={{ background: 'var(--bg-surface-raised)' }}>
             <div
               className="h-full rounded-full"
               style={{ width: `${Math.max(util, 2)}%`, background: barColor }}
@@ -33,10 +33,9 @@ export default function UtilizationLeaderboard({ ranking }) {
     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
       {/* Top Performers */}
       <div
-        className="bg-white"
-        style={{ borderRadius: '8px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-card)' }}
+        style={{ borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', background: 'var(--bg-surface)', boxShadow: 'var(--shadow-card)' }}
       >
-        <div className="border-b px-5 py-3" style={{ borderColor: 'var(--border)', background: 'var(--bg-surface-raised)', borderRadius: '8px 8px 0 0' }}>
+        <div className="border-b px-5 py-3" style={{ borderColor: 'var(--border)', background: 'var(--bg-surface-raised)', borderRadius: 'var(--radius-md) var(--radius-md) 0 0' }}>
           <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--ink-muted)' }}>
             Top Performers — Engine Utilization
           </span>
@@ -52,10 +51,9 @@ export default function UtilizationLeaderboard({ ranking }) {
 
       {/* Least Utilized */}
       <div
-        className="bg-white"
-        style={{ borderRadius: '8px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-card)' }}
+        style={{ borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', background: 'var(--bg-surface)', boxShadow: 'var(--shadow-card)' }}
       >
-        <div className="border-b px-5 py-3" style={{ borderColor: 'var(--border)', background: 'var(--bg-surface-raised)', borderRadius: '8px 8px 0 0' }}>
+        <div className="border-b px-5 py-3" style={{ borderColor: 'var(--border)', background: 'var(--bg-surface-raised)', borderRadius: 'var(--radius-md) var(--radius-md) 0 0' }}>
           <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--ink-muted)' }}>
             Under-utilized — Attention Required
           </span>

@@ -1,17 +1,17 @@
 const SEVERITY_BORDER = {
-  good:     '#15803d',
-  warning:  '#b45309',
-  serious:  '#c2410c',
-  critical: '#b91c1c',
-  neutral:  '#e5e7eb',
+  good:     'var(--good)',
+  warning:  'var(--warning)',
+  serious:  'var(--serious)',
+  critical: 'var(--critical)',
+  neutral:  'var(--border)',
 }
 
 const SEVERITY_VALUE = {
-  good:     '#15803d',
-  warning:  '#b45309',
-  serious:  '#c2410c',
-  critical: '#b91c1c',
-  neutral:  '#111827',
+  good:     'var(--good)',
+  warning:  'var(--warning)',
+  serious:  'var(--serious)',
+  critical: 'var(--critical)',
+  neutral:  'var(--ink-primary)',
 }
 
 export default function StatTile({ label, value, unit, hint, severity = 'neutral' }) {
@@ -21,9 +21,10 @@ export default function StatTile({ label, value, unit, hint, severity = 'neutral
 
   return (
     <div
-      className="flex flex-col gap-2 bg-white p-5"
+      className="flex flex-col gap-2 p-5"
       style={{
         borderRadius: 'var(--radius-md)',
+        background: 'var(--bg-surface)',
         border: '1px solid var(--border)',
         borderTop: `3px solid ${borderTop}`,
         boxShadow: 'var(--shadow-card)',

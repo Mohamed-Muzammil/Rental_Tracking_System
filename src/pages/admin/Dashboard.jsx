@@ -132,7 +132,7 @@ export default function Dashboard() {
           { label: 'Deployed Sites', value: `${kpis.activeSites} / ${sites.length}` },
         ].map((s, i) => (
           <div key={s.label} className="flex items-center gap-3">
-            {i > 0 && <div className="h-8 w-px bg-slate-200" />}
+            {i > 0 && <div className="h-8 w-px" style={{ background: 'var(--border)' }} />}
             <div className="flex flex-col gap-0.5">
               <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'var(--ink-muted)' }}>{s.label}</span>
               <span className="tabular font-data text-sm font-semibold" style={{ color: 'var(--ink-primary)' }}>{s.value}</span>

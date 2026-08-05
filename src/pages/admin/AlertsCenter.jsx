@@ -71,10 +71,10 @@ export default function AlertsCenter() {
       {/* Page Title */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-xl font-semibold text-slate-900" style={{ color: 'var(--ink-primary)' }}>
+          <h1 className="font-display text-xl font-semibold" style={{ color: 'var(--ink-primary)' }}>
             Telematics Anomaly & Misuse Command Console
           </h1>
-          <p className="text-sm text-slate-500" style={{ color: 'var(--ink-secondary)' }}>
+          <p className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
             Real-time geofence breaches, unauthorized operators, ML anomaly scores & overdue rental returns.
           </p>
         </div>
@@ -134,7 +134,7 @@ export default function AlertsCenter() {
         </div>
 
         {activeTab === 'incidents' && (
-          <span className="text-xs font-medium text-slate-500">
+          <span className="text-xs font-medium" style={{ color: 'var(--ink-muted)' }}>
             History: {resolvedIncidents.length} resolved cases archived
           </span>
         )}
@@ -145,29 +145,39 @@ export default function AlertsCenter() {
         <Card title="Active Telematics & Anomaly Incidents" bodyClassName="p-0">
           {activeIncidents.length === 0 ? (
             <div className="flex flex-col items-center gap-2 px-5 py-16 text-center">
-              <Icon name="checkCircle" size={32} className="text-emerald-500 opacity-80" />
-              <p className="text-sm font-medium text-slate-700">No active telematics misuse incidents detected.</p>
-              <p className="text-xs text-slate-400">All machinery operating within assigned geofences and authorized limits.</p>
+              <Icon name="checkCircle" size={32} style={{ color: 'var(--good)', opacity: 0.8 }} />
+              <p className="text-sm font-medium" style={{ color: 'var(--ink-secondary)' }}>No active telematics misuse incidents detected.</p>
+              <p className="text-xs" style={{ color: 'var(--ink-faint)' }}>All machinery operating within assigned geofences and authorized limits.</p>
             </div>
           ) : (
-            <div className="divide-y divide-slate-100">
+            <div>
               {activeIncidents.map((inc) => (
-                <div key={inc.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between hover:bg-slate-50/70 transition-colors">
+                <div
+                  key={inc.id}
+                  className="flex flex-col gap-3 border-t p-4 first:border-t-0 sm:flex-row sm:items-center sm:justify-between transition-colors"
+                  style={{ borderColor: 'var(--border)' }}
+                >
                   <div className="flex items-start gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-rose-50 text-rose-600 font-bold">
+                    <div
+                      className="flex h-10 w-10 shrink-0 items-center justify-center font-bold"
+                      style={{ borderRadius: 'var(--radius-sm)', background: 'var(--critical-wash)', color: 'var(--critical)' }}
+                    >
                       <Icon name="alert" size={20} />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs font-bold text-slate-900">{inc.id}</span>
+                        <span className="font-mono text-xs font-bold" style={{ color: 'var(--ink-primary)' }}>{inc.id}</span>
                         <StatusChip severity={inc.severity}>{SEVERITY_LABEL[inc.severity]}</StatusChip>
-                        <span className="rounded bg-slate-100 px-2 py-0.5 font-mono text-[11px] font-bold text-slate-600">
+                        <span
+                          className="px-2 py-0.5 font-mono text-[11px] font-bold"
+                          style={{ borderRadius: 'var(--radius-sm)', background: 'var(--bg-surface-raised)', color: 'var(--ink-secondary)' }}
+                        >
                           ML Score: {inc.anomalyScore}%
                         </span>
                       </div>
-                      <h4 className="font-bold text-sm text-slate-900 mt-1">{inc.title}</h4>
-                      <p className="text-xs text-slate-600 mt-0.5">{inc.details}</p>
-                      <div className="mt-1 text-[11px] text-slate-400 font-medium">Logged at: {inc.createdAt}</div>
+                      <h4 className="font-bold text-sm mt-1" style={{ color: 'var(--ink-primary)' }}>{inc.title}</h4>
+                      <p className="text-xs mt-0.5" style={{ color: 'var(--ink-secondary)' }}>{inc.details}</p>
+                      <div className="mt-1 text-[11px] font-medium" style={{ color: 'var(--ink-faint)' }}>Logged at: {inc.createdAt}</div>
                     </div>
                   </div>
 
@@ -176,7 +186,7 @@ export default function AlertsCenter() {
                     <Button variant="secondary" onClick={() => handleFalseAlarm(inc.id)} className="text-xs px-2.5 py-1">
                       False Alarm
                     </Button>
-                    <Button variant="primary" onClick={() => handleCorrectiveActionModal(inc)} className="text-xs px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white">
+                    <Button variant="danger" onClick={() => handleCorrectiveActionModal(inc)} className="text-xs px-3 py-1">
                       Take Corrective Action
                     </Button>
                   </div>

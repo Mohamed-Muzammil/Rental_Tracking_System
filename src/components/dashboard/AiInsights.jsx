@@ -10,13 +10,13 @@ import Icon from '../ui/Icon'
 function InsightCard({ icon, label, headline, detail, to, actionLabel }) {
   return (
     <div
-      className="flex flex-col gap-2 rounded-xl border p-4"
-      style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)' }}
+      className="flex flex-col gap-2 border p-4"
+      style={{ borderRadius: 'var(--radius-md)', background: 'var(--bg-surface)', borderColor: 'var(--border)' }}
     >
       <div className="flex items-center gap-2">
         <span
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
-          style={{ background: 'var(--accent-wash)', color: 'var(--accent)' }}
+          className="flex h-7 w-7 shrink-0 items-center justify-center"
+          style={{ borderRadius: 'var(--radius-sm)', background: 'var(--accent-wash)', color: 'var(--accent)' }}
         >
           <Icon name={icon} size={15} />
         </span>
@@ -73,8 +73,8 @@ export default function AiInsights({ active, today, categories }) {
 
   return (
     <div
-      className="rounded-xl border p-4"
-      style={{ background: 'var(--accent-wash)', borderColor: 'var(--border)' }}
+      className="border p-4"
+      style={{ borderRadius: 'var(--radius-md)', background: 'var(--accent-wash)', borderColor: 'var(--border)' }}
     >
       <div className="mb-3 flex items-center justify-between gap-3">
         <h2 className="font-display text-[13px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--ink-secondary)' }}>

@@ -89,15 +89,22 @@ export default function Companies() {
   const totalDailyRevenue = groups.reduce((sum, g) => sum + g.dailySpend, 0)
   const totalAtRiskUnits = groups.reduce((sum, g) => sum + g.atRisk, 0)
 
+  const segmentBtnStyle = (active) => ({
+    background: active ? 'var(--bg-surface)' : 'transparent',
+    color: active ? 'var(--accent)' : 'var(--ink-secondary)',
+    boxShadow: active ? 'var(--shadow-card)' : 'none',
+    borderRadius: 'calc(var(--radius-sm) - 2px)',
+  })
+
   return (
     <div className="flex flex-col gap-6">
       {/* Page Title & Context */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-xl font-semibold text-slate-900" style={{ color: 'var(--ink-primary)' }}>
+          <h1 className="font-display text-xl font-semibold" style={{ color: 'var(--ink-primary)' }}>
             Client Accounts & Site Operations
           </h1>
-          <p className="text-sm text-slate-500" style={{ color: 'var(--ink-secondary)' }}>
+          <p className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
             Enterprise rental accounts, active machinery deployment, and financial rate breakdown.
           </p>
         </div>
@@ -126,10 +133,10 @@ export default function Companies() {
         />
       </div>
 
-      {/* Industrial Control Toolbar — Pixel-Perfect Baseline Alignment */}
+      {/* Industrial Control Toolbar */}
       <div
-        className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-white p-3 shadow-xs"
-        style={{ borderColor: 'var(--border)' }}
+        className="flex flex-wrap items-center justify-between gap-4 border p-3"
+        style={{ borderRadius: 'var(--radius-md)', borderColor: 'var(--border)', background: 'var(--bg-surface)', boxShadow: 'var(--shadow-card)' }}
       >
         <div className="flex flex-wrap items-center gap-3">
           {/* Search Input Box (Height h-9 = 36px) */}
@@ -139,7 +146,7 @@ export default function Companies() {
               placeholder="Search company, contact, or site..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-9 w-full rounded-lg border px-3 text-xs outline-hidden font-medium"
+              className="h-9 w-full rounded-[var(--radius-sm)] border px-3 text-xs outline-hidden font-medium"
               style={{
                 background: 'var(--bg-surface-raised)',
                 borderColor: 'var(--border-strong)',
@@ -149,15 +156,17 @@ export default function Companies() {
           </div>
 
           {/* Account Filter Tabs (1st: All Accounts, 2nd: At Risk, 3rd: Filter By) */}
-          <div className="flex h-9 items-center gap-1 rounded-lg bg-slate-100 p-1 border border-slate-200 text-xs">
+          <div
+            className="flex h-9 items-center gap-1 p-1 text-xs"
+            style={{ borderRadius: 'var(--radius-sm)', background: 'var(--bg-surface-raised)', border: '1px solid var(--border)' }}
+          >
             <button
               onClick={() => {
                 setFilterMode('all')
                 setAppliedMinDeployment(null)
               }}
-              className={`flex h-7 items-center rounded-md px-3 text-xs font-bold transition-all ${
-                filterMode === 'all' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
-              }`}
+              className="flex h-7 items-center px-3 text-xs font-bold transition-all"
+              style={segmentBtnStyle(filterMode === 'all')}
             >
               All Accounts ({groups.length})
             </button>
@@ -167,18 +176,16 @@ export default function Companies() {
                 setFilterMode('atRisk')
                 setAppliedMinDeployment(null)
               }}
-              className={`flex h-7 items-center rounded-md px-3 text-xs font-bold transition-all ${
-                filterMode === 'atRisk' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
-              }`}
+              className="flex h-7 items-center px-3 text-xs font-bold transition-all"
+              style={segmentBtnStyle(filterMode === 'atRisk')}
             >
               At Risk ({groups.filter((g) => g.atRisk > 0).length})
             </button>
 
             <button
               onClick={() => setFilterMode('filterBy')}
-              className={`flex h-7 items-center rounded-md px-3 text-xs font-bold transition-all ${
-                filterMode === 'filterBy' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
-              }`}
+              className="flex h-7 items-center px-3 text-xs font-bold transition-all"
+              style={segmentBtnStyle(filterMode === 'filterBy')}
             >
               Filter By
             </button>
@@ -186,20 +193,21 @@ export default function Companies() {
         </div>
 
         {/* View Mode Toggle (Height h-9 = 36px) */}
-        <div className="flex h-9 items-center gap-1 rounded-lg bg-slate-100 p-1 border border-slate-200 text-xs">
+        <div
+          className="flex h-9 items-center gap-1 p-1 text-xs"
+          style={{ borderRadius: 'var(--radius-sm)', background: 'var(--bg-surface-raised)', border: '1px solid var(--border)' }}
+        >
           <button
             onClick={() => setViewMode('grid')}
-            className={`flex h-7 items-center gap-1 rounded-md px-3 text-xs font-bold transition-all ${
-              viewMode === 'grid' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
-            }`}
+            className="flex h-7 items-center gap-1 px-3 text-xs font-bold transition-all"
+            style={segmentBtnStyle(viewMode === 'grid')}
           >
             <Icon name="grid" size={13} /> Grid Cards
           </button>
           <button
             onClick={() => setViewMode('table')}
-            className={`flex h-7 items-center gap-1 rounded-md px-3 text-xs font-bold transition-all ${
-              viewMode === 'table' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
-            }`}
+            className="flex h-7 items-center gap-1 px-3 text-xs font-bold transition-all"
+            style={segmentBtnStyle(viewMode === 'table')}
           >
             <Icon name="table" size={13} /> Table
           </button>
@@ -208,13 +216,16 @@ export default function Companies() {
 
       {/* Next Line Drawer for 'Filter By' Machine Deployment */}
       {filterMode === 'filterBy' && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-slate-50 p-3 shadow-xs border-slate-200">
+        <div
+          className="flex flex-wrap items-center justify-between gap-3 border p-3"
+          style={{ borderRadius: 'var(--radius-md)', background: 'var(--bg-surface-raised)', borderColor: 'var(--border)' }}
+        >
           <div className="flex flex-wrap items-center gap-3">
-            <span className="text-xs font-bold text-slate-800">
+            <span className="text-xs font-bold" style={{ color: 'var(--ink-primary)' }}>
               Show companies based on machine deployment:
             </span>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-500 font-medium">Minimum units:</span>
+              <span className="text-xs font-medium" style={{ color: 'var(--ink-muted)' }}>Minimum units:</span>
               <input
                 type="number"
                 min="0"
@@ -222,11 +233,13 @@ export default function Companies() {
                 placeholder="e.g. 3"
                 value={minDeploymentInput}
                 onChange={(e) => setMinDeploymentInput(e.target.value)}
-                className="h-8 w-20 rounded-md border border-slate-300 bg-white px-2.5 text-xs font-mono font-bold outline-hidden focus:border-blue-500"
+                className="h-8 w-20 rounded-[var(--radius-sm)] border px-2.5 text-xs font-mono font-bold outline-hidden"
+                style={{ background: 'var(--bg-surface)', borderColor: 'var(--border-strong)', color: 'var(--ink-primary)' }}
               />
               <button
                 onClick={() => setAppliedMinDeployment(minDeploymentInput)}
-                className="h-8 rounded-md bg-blue-600 px-4 text-xs font-bold text-white hover:bg-blue-700 transition-colors shadow-xs"
+                className="h-8 rounded-[var(--radius-sm)] px-4 text-xs font-bold transition-opacity hover:opacity-85"
+                style={{ background: 'var(--accent)', color: 'var(--accent-ink)' }}
               >
                 Apply
               </button>
@@ -236,7 +249,8 @@ export default function Companies() {
                     setAppliedMinDeployment(null)
                     setMinDeploymentInput('3')
                   }}
-                  className="h-8 rounded-md bg-slate-200 px-3 text-xs font-semibold text-slate-700 hover:bg-slate-300 transition-colors"
+                  className="h-8 rounded-[var(--radius-sm)] px-3 text-xs font-semibold transition-opacity hover:opacity-85"
+                  style={{ background: 'var(--border)', color: 'var(--ink-secondary)' }}
                 >
                   Reset
                 </button>
@@ -245,7 +259,10 @@ export default function Companies() {
           </div>
 
           {appliedMinDeployment !== null && (
-            <span className="text-xs font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-md border border-blue-200">
+            <span
+              className="text-xs font-bold px-3 py-1"
+              style={{ borderRadius: 'var(--radius-sm)', color: 'var(--accent-dark)', background: 'var(--accent-wash)', border: '1px solid var(--border)' }}
+            >
               Filtering: Companies with ≥ {appliedMinDeployment} machines deployed ({filteredGroups.length} matching)
             </span>
           )}
@@ -259,24 +276,32 @@ export default function Companies() {
             <Link
               key={g.client.id}
               to={`/admin/equipment?client=${g.client.id}`}
-              className="group flex flex-col justify-between rounded-xl border bg-white text-left transition-all hover:border-blue-400 hover:shadow-md"
+              className="group flex flex-col justify-between border text-left transition-all hover:shadow-md"
               style={{
+                borderRadius: 'var(--radius-md)',
                 borderColor: 'var(--border)',
+                background: 'var(--bg-surface)',
                 boxShadow: 'var(--shadow-card)',
               }}
             >
               <div>
                 {/* Account Card Header */}
-                <div className="flex items-start justify-between gap-2 border-b p-4 bg-slate-50/70 rounded-t-xl" style={{ borderColor: 'var(--border)' }}>
+                <div
+                  className="flex items-start justify-between gap-2 border-b p-4"
+                  style={{ borderColor: 'var(--border)', background: 'var(--bg-surface-raised)', borderRadius: 'var(--radius-md) var(--radius-md) 0 0' }}
+                >
                   <div className="flex items-start gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-700 font-bold text-xs">
+                    <span
+                      className="flex h-9 w-9 shrink-0 items-center justify-center font-bold text-xs"
+                      style={{ borderRadius: 'var(--radius-sm)', background: 'var(--accent-wash)', color: 'var(--accent-dark)' }}
+                    >
                       {g.client.id}
                     </span>
                     <div>
-                      <h3 className="font-bold text-sm leading-tight text-slate-900 group-hover:text-blue-600 transition-colors">
+                      <h3 className="font-bold text-sm leading-tight transition-colors" style={{ color: 'var(--ink-primary)' }}>
                         {g.client.name}
                       </h3>
-                      <div className="text-xs text-slate-500 font-medium">{g.client.contact}</div>
+                      <div className="text-xs font-medium" style={{ color: 'var(--ink-muted)' }}>{g.client.contact}</div>
                     </div>
                   </div>
                   {g.atRisk > 0 ? (
@@ -290,8 +315,8 @@ export default function Companies() {
                 <div className="flex flex-col gap-3 p-4">
                   {/* Rented Equipment Fraction (Industrial format e.g. 4/40 total units rented) */}
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-500 font-medium">Rented Fleet Share:</span>
-                    <span className="font-mono font-bold text-slate-800">
+                    <span className="font-medium" style={{ color: 'var(--ink-muted)' }}>Rented Fleet Share:</span>
+                    <span className="font-mono font-bold" style={{ color: 'var(--ink-primary)' }}>
                       {g.units.length} / {TOTAL_UNITS} units rented ({Math.round((g.units.length / TOTAL_UNITS) * 100)}%)
                     </span>
                   </div>
@@ -302,20 +327,21 @@ export default function Companies() {
                       Object.entries(g.categoryCounts).map(([cat, count]) => (
                         <span
                           key={cat}
-                          className="rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 text-[11px] font-semibold text-slate-700"
+                          className="border px-2 py-0.5 text-[11px] font-semibold"
+                          style={{ borderRadius: 'var(--radius-sm)', background: 'var(--bg-surface-raised)', borderColor: 'var(--border)', color: 'var(--ink-secondary)' }}
                         >
                           {count}x {cat}
                         </span>
                       ))
                     ) : (
-                      <span className="text-xs text-slate-400 italic">No equipment currently on rent</span>
+                      <span className="text-xs italic" style={{ color: 'var(--ink-faint)' }}>No equipment currently on rent</span>
                     )}
                   </div>
 
                   {/* Deployment Site Locations */}
                   {g.siteNames.length > 0 && (
-                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                      <Icon name="mapPin" size={13} className="text-slate-400 shrink-0" />
+                    <div className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--ink-muted)' }}>
+                      <Icon name="mapPin" size={13} className="shrink-0" style={{ color: 'var(--ink-faint)' }} />
                       <span className="truncate">{g.siteNames.join(', ')}</span>
                     </div>
                   )}
@@ -323,9 +349,9 @@ export default function Companies() {
                   {/* Telemetry Efficiency Bar */}
                   {g.units.length > 0 && (
                     <div className="mt-1">
-                      <div className="mb-1 flex justify-between text-[11px] font-medium text-slate-500">
+                      <div className="mb-1 flex justify-between text-[11px] font-medium" style={{ color: 'var(--ink-muted)' }}>
                         <span>Utilization Efficiency</span>
-                        <span className="font-mono text-slate-700">
+                        <span className="font-mono" style={{ color: 'var(--ink-secondary)' }}>
                           {(g.totalEngine + g.totalIdle > 0
                             ? Math.round((g.totalEngine / (g.totalEngine + g.totalIdle)) * 100)
                             : 0)}%
@@ -339,15 +365,15 @@ export default function Companies() {
 
               {/* Financial & Action Footer */}
               <div
-                className="flex items-center justify-between border-t p-4 text-xs bg-slate-50/50 rounded-b-xl"
-                style={{ borderColor: 'var(--border)' }}
+                className="flex items-center justify-between border-t p-4 text-xs"
+                style={{ borderColor: 'var(--border)', background: 'var(--bg-surface-raised)', borderRadius: '0 0 var(--radius-md) var(--radius-md)' }}
               >
                 <div>
-                  <span className="block text-[10px] uppercase font-bold text-slate-400">Daily Billing</span>
-                  <span className="font-mono font-bold text-sm text-slate-900">${g.dailySpend.toLocaleString()}/day</span>
+                  <span className="block text-[10px] uppercase font-bold" style={{ color: 'var(--ink-faint)' }}>Daily Billing</span>
+                  <span className="font-mono font-bold text-sm" style={{ color: 'var(--ink-primary)' }}>${g.dailySpend.toLocaleString()}/day</span>
                 </div>
 
-                <span className="inline-flex items-center gap-1 font-bold text-blue-600 group-hover:translate-x-0.5 transition-transform">
+                <span className="inline-flex items-center gap-1 font-bold transition-transform group-hover:translate-x-0.5" style={{ color: 'var(--accent)' }}>
                   View Account Fleet <Icon name="chevronRight" size={14} />
                 </span>
               </div>
@@ -359,7 +385,7 @@ export default function Companies() {
         <Card bodyClassName="overflow-x-auto p-0">
           <table className="w-full min-w-[720px] text-sm">
             <thead>
-              <tr className="text-left bg-slate-50 text-slate-500 border-b" style={{ borderColor: 'var(--border)' }}>
+              <tr className="text-left border-b" style={{ borderColor: 'var(--border)', background: 'var(--bg-surface-raised)', color: 'var(--ink-muted)' }}>
                 <th className="px-5 py-3 text-[11px] font-bold uppercase tracking-wider">Account & Code</th>
                 <th className="px-3 py-3 text-[11px] font-bold uppercase tracking-wider">Contact</th>
                 <th className="px-3 py-3 text-[11px] font-bold uppercase tracking-wider">Rented Share</th>
@@ -372,26 +398,30 @@ export default function Companies() {
             </thead>
             <tbody>
               {filteredGroups.map((g) => (
-                <tr key={g.client.id} className="border-t hover:bg-slate-50/80 transition-colors" style={{ borderColor: 'var(--border)' }}>
-                  <td className="px-5 py-3.5 font-medium text-slate-900">
+                <tr key={g.client.id} className="border-t transition-colors hover:opacity-90" style={{ borderColor: 'var(--border)' }}>
+                  <td className="px-5 py-3.5 font-medium" style={{ color: 'var(--ink-primary)' }}>
                     <div className="font-bold">{g.client.name}</div>
-                    <div className="text-xs text-blue-600 font-mono">{g.client.id}</div>
+                    <div className="text-xs font-mono" style={{ color: 'var(--accent)' }}>{g.client.id}</div>
                   </td>
-                  <td className="px-3 py-3.5 text-xs text-slate-600 font-medium">{g.client.contact}</td>
-                  <td className="px-3 py-3.5 font-mono text-xs font-bold text-slate-800">
+                  <td className="px-3 py-3.5 text-xs font-medium" style={{ color: 'var(--ink-secondary)' }}>{g.client.contact}</td>
+                  <td className="px-3 py-3.5 font-mono text-xs font-bold" style={{ color: 'var(--ink-primary)' }}>
                     {g.units.length}/{TOTAL_UNITS} units
                   </td>
                   <td className="px-3 py-3.5 text-xs">
                     <div className="flex flex-wrap gap-1">
                       {Object.entries(g.categoryCounts).map(([cat, count]) => (
-                        <span key={cat} className="rounded bg-slate-100 border border-slate-200 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700">
+                        <span
+                          key={cat}
+                          className="border px-1.5 py-0.5 text-[10px] font-semibold"
+                          style={{ borderRadius: 'var(--radius-sm)', background: 'var(--bg-surface-raised)', borderColor: 'var(--border)', color: 'var(--ink-secondary)' }}
+                        >
                           {count}x {cat}
                         </span>
                       ))}
                     </div>
                   </td>
-                  <td className="px-3 py-3.5 text-xs text-slate-600">{g.siteNames.join(', ') || '—'}</td>
-                  <td className="px-3 py-3.5 font-mono text-xs font-bold text-emerald-600">
+                  <td className="px-3 py-3.5 text-xs" style={{ color: 'var(--ink-secondary)' }}>{g.siteNames.join(', ') || '—'}</td>
+                  <td className="px-3 py-3.5 font-mono text-xs font-bold" style={{ color: 'var(--good)' }}>
                     ${g.dailySpend.toLocaleString()}/day
                   </td>
                   <td className="px-3 py-3.5">
@@ -404,7 +434,8 @@ export default function Companies() {
                   <td className="px-5 py-3.5 text-right">
                     <Link
                       to={`/admin/equipment?client=${g.client.id}`}
-                      className="inline-flex items-center gap-1 rounded bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-600 hover:bg-blue-100 transition-colors"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold transition-opacity hover:opacity-80"
+                      style={{ borderRadius: 'var(--radius-sm)', background: 'var(--accent-wash)', color: 'var(--accent-dark)' }}
                     >
                       View Fleet <Icon name="chevronRight" size={12} />
                     </Link>

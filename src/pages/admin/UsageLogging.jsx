@@ -95,29 +95,46 @@ function LogUsageTab() {
   return (
     <div className="flex flex-col gap-6">
       {/* Top Mode Selector Bar with Pixel-Perfect Alignment */}
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-white p-4 shadow-xs" style={{ borderColor: 'var(--border)' }}>
+      <div
+        className="flex flex-wrap items-center justify-between gap-4 border p-4"
+        style={{ borderRadius: 'var(--radius-md)', background: 'var(--bg-surface)', borderColor: 'var(--border)', boxShadow: 'var(--shadow-card)' }}
+      >
         <div className="flex flex-wrap items-end gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 font-bold self-center">
+          <div
+            className="flex h-10 w-10 shrink-0 items-center justify-center font-bold self-center"
+            style={{ borderRadius: 'var(--radius-sm)', background: 'var(--accent-wash)', color: 'var(--accent)' }}
+          >
             <Icon name="truck" size={20} />
           </div>
 
           {/* Mode Column */}
           <div>
-            <div className="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">FILTER MODE</div>
-            <div className="flex h-[38px] items-center gap-1 rounded-lg bg-slate-100 p-1 border border-slate-200">
+            <div className="mb-1 text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--ink-faint)' }}>FILTER MODE</div>
+            <div
+              className="flex h-[38px] items-center gap-1 p-1"
+              style={{ borderRadius: 'var(--radius-sm)', background: 'var(--bg-surface-raised)', border: '1px solid var(--border)' }}
+            >
               <button
                 onClick={() => setFilterMode('vehicle')}
-                className={`h-full rounded-md px-3 text-xs font-bold transition-all ${
-                  filterMode === 'vehicle' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-500 hover:text-slate-800'
-                }`}
+                className="h-full px-3 text-xs font-bold transition-all"
+                style={{
+                  borderRadius: 'calc(var(--radius-sm) - 2px)',
+                  background: filterMode === 'vehicle' ? 'var(--bg-surface)' : 'transparent',
+                  color: filterMode === 'vehicle' ? 'var(--accent)' : 'var(--ink-muted)',
+                  boxShadow: filterMode === 'vehicle' ? 'var(--shadow-card)' : 'none',
+                }}
               >
                 By Vehicle
               </button>
               <button
                 onClick={() => setFilterMode('category')}
-                className={`h-full rounded-md px-3 text-xs font-bold transition-all ${
-                  filterMode === 'category' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-500 hover:text-slate-800'
-                }`}
+                className="h-full px-3 text-xs font-bold transition-all"
+                style={{
+                  borderRadius: 'calc(var(--radius-sm) - 2px)',
+                  background: filterMode === 'category' ? 'var(--bg-surface)' : 'transparent',
+                  color: filterMode === 'category' ? 'var(--accent)' : 'var(--ink-muted)',
+                  boxShadow: filterMode === 'category' ? 'var(--shadow-card)' : 'none',
+                }}
               >
                 By Category
               </button>
@@ -126,7 +143,7 @@ function LogUsageTab() {
 
           {/* Dynamic Selection Column */}
           <div>
-            <div className="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            <div className="mb-1 text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--ink-faint)' }}>
               {filterMode === 'vehicle' ? 'CHOOSE VEHICLE' : 'CHOOSE CATEGORY'}
             </div>
             {filterMode === 'vehicle' ? (
@@ -158,18 +175,18 @@ function LogUsageTab() {
         </div>
 
         {/* Quick Vehicle / Category Telemetry Summary Stats */}
-        <div className="flex items-center gap-6 text-xs border-l pl-6 border-slate-200">
+        <div className="flex items-center gap-6 text-xs border-l pl-6" style={{ borderColor: 'var(--border)' }}>
           <div>
-            <div className="text-slate-400 font-medium">10-Day Runtime</div>
-            <div className="font-mono text-sm font-bold text-blue-600">{totalEngine.toFixed(1)} hrs</div>
+            <div className="font-medium" style={{ color: 'var(--ink-muted)' }}>10-Day Runtime</div>
+            <div className="font-mono text-sm font-bold" style={{ color: 'var(--accent)' }}>{totalEngine.toFixed(1)} hrs</div>
           </div>
           <div>
-            <div className="text-slate-400 font-medium">10-Day Idle Time</div>
-            <div className="font-mono text-sm font-bold text-amber-600">{totalIdle.toFixed(1)} hrs</div>
+            <div className="font-medium" style={{ color: 'var(--ink-muted)' }}>10-Day Idle Time</div>
+            <div className="font-mono text-sm font-bold" style={{ color: 'var(--warning)' }}>{totalIdle.toFixed(1)} hrs</div>
           </div>
           <div>
-            <div className="text-slate-400 font-medium">Operational Efficiency</div>
-            <div className="font-mono text-sm font-bold text-emerald-600">{avgEfficiency}%</div>
+            <div className="font-medium" style={{ color: 'var(--ink-muted)' }}>Operational Efficiency</div>
+            <div className="font-mono text-sm font-bold" style={{ color: 'var(--good)' }}>{avgEfficiency}%</div>
           </div>
         </div>
       </div>
@@ -205,29 +222,46 @@ function ReportsTab() {
   return (
     <div className="flex flex-col gap-6">
       {/* Top Mode Selector Bar with Pixel-Perfect Alignment */}
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-white p-4 shadow-xs" style={{ borderColor: 'var(--border)' }}>
+      <div
+        className="flex flex-wrap items-center justify-between gap-4 border p-4"
+        style={{ borderRadius: 'var(--radius-md)', background: 'var(--bg-surface)', borderColor: 'var(--border)', boxShadow: 'var(--shadow-card)' }}
+      >
         <div className="flex flex-wrap items-end gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 font-bold self-center">
+          <div
+            className="flex h-10 w-10 shrink-0 items-center justify-center font-bold self-center"
+            style={{ borderRadius: 'var(--radius-sm)', background: 'var(--accent-wash)', color: 'var(--accent)' }}
+          >
             <Icon name="truck" size={20} />
           </div>
 
           {/* Mode Column */}
           <div>
-            <div className="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">FILTER MODE</div>
-            <div className="flex h-[38px] items-center gap-1 rounded-lg bg-slate-100 p-1 border border-slate-200">
+            <div className="mb-1 text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--ink-faint)' }}>FILTER MODE</div>
+            <div
+              className="flex h-[38px] items-center gap-1 p-1"
+              style={{ borderRadius: 'var(--radius-sm)', background: 'var(--bg-surface-raised)', border: '1px solid var(--border)' }}
+            >
               <button
                 onClick={() => { setFilterMode('vehicle'); setSelectedType('ALL'); }}
-                className={`h-full rounded-md px-3 text-xs font-bold transition-all ${
-                  filterMode === 'vehicle' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-500 hover:text-slate-800'
-                }`}
+                className="h-full px-3 text-xs font-bold transition-all"
+                style={{
+                  borderRadius: 'calc(var(--radius-sm) - 2px)',
+                  background: filterMode === 'vehicle' ? 'var(--bg-surface)' : 'transparent',
+                  color: filterMode === 'vehicle' ? 'var(--accent)' : 'var(--ink-muted)',
+                  boxShadow: filterMode === 'vehicle' ? 'var(--shadow-card)' : 'none',
+                }}
               >
                 By Vehicle
               </button>
               <button
                 onClick={() => { setFilterMode('category'); setSelectedEqId('ALL'); }}
-                className={`h-full rounded-md px-3 text-xs font-bold transition-all ${
-                  filterMode === 'category' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-500 hover:text-slate-800'
-                }`}
+                className="h-full px-3 text-xs font-bold transition-all"
+                style={{
+                  borderRadius: 'calc(var(--radius-sm) - 2px)',
+                  background: filterMode === 'category' ? 'var(--bg-surface)' : 'transparent',
+                  color: filterMode === 'category' ? 'var(--accent)' : 'var(--ink-muted)',
+                  boxShadow: filterMode === 'category' ? 'var(--shadow-card)' : 'none',
+                }}
               >
                 By Category
               </button>
@@ -236,7 +270,7 @@ function ReportsTab() {
 
           {/* Dynamic Selection Column */}
           <div>
-            <div className="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            <div className="mb-1 text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--ink-faint)' }}>
               {filterMode === 'vehicle' ? 'CHOOSE VEHICLE' : 'CHOOSE CATEGORY'}
             </div>
             {filterMode === 'vehicle' ? (
@@ -270,18 +304,18 @@ function ReportsTab() {
         </div>
 
         {/* Quick Summary Telemetry Stats */}
-        <div className="flex items-center gap-6 text-xs border-l pl-6 border-slate-200">
+        <div className="flex items-center gap-6 text-xs border-l pl-6" style={{ borderColor: 'var(--border)' }}>
           <div>
-            <div className="text-slate-400 font-medium">Total Rented Hours</div>
-            <div className="font-mono text-sm font-bold text-blue-600">{rented.toFixed(1)} hrs</div>
+            <div className="font-medium" style={{ color: 'var(--ink-muted)' }}>Total Rented Hours</div>
+            <div className="font-mono text-sm font-bold" style={{ color: 'var(--accent)' }}>{rented.toFixed(1)} hrs</div>
           </div>
           <div>
-            <div className="text-slate-400 font-medium">Total Downtime</div>
-            <div className="font-mono text-sm font-bold text-amber-600">{downtime.toFixed(1)} hrs</div>
+            <div className="font-medium" style={{ color: 'var(--ink-muted)' }}>Total Downtime</div>
+            <div className="font-mono text-sm font-bold" style={{ color: 'var(--warning)' }}>{downtime.toFixed(1)} hrs</div>
           </div>
           <div>
-            <div className="text-slate-400 font-medium">Operational Efficiency</div>
-            <div className="font-mono text-sm font-bold text-emerald-600">{efficiency}%</div>
+            <div className="font-medium" style={{ color: 'var(--ink-muted)' }}>Operational Efficiency</div>
+            <div className="font-mono text-sm font-bold" style={{ color: 'var(--good)' }}>{efficiency}%</div>
           </div>
         </div>
       </div>
@@ -316,7 +350,7 @@ function ReportsTab() {
                   <tr key={eq.id} className="border-t" style={{ borderColor: 'var(--border)' }}>
                     <td className="px-5 py-3 font-medium" style={{ color: 'var(--ink-primary)' }}>
                       <div>{eq.id}</div>
-                      <div className="text-xs text-slate-400 font-normal">{eq.tier} {eq.type}</div>
+                      <div className="text-xs font-normal" style={{ color: 'var(--ink-faint)' }}>{eq.tier} {eq.type}</div>
                     </td>
                     <td className="px-3 py-3" style={{ color: 'var(--ink-secondary)' }}>{siteName}</td>
                     <td className="tabular px-3 py-3 font-mono font-bold" style={{ color: 'var(--series-engine)' }}>{eng.toFixed(1)} h</td>
@@ -327,7 +361,7 @@ function ReportsTab() {
               })
             ) : (
               <tr>
-                <td colSpan={5} className="px-5 py-8 text-center text-xs text-slate-400">
+                <td colSpan={5} className="px-5 py-8 text-center text-xs" style={{ color: 'var(--ink-faint)' }}>
                   No machinery matched the selected filter.
                 </td>
               </tr>

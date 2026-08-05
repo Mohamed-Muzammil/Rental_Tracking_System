@@ -93,7 +93,7 @@ export default function ClientReturns() {
                 const site = siteById[eq.siteId]?.name || 'Unassigned'
 
                 return (
-                  <tr key={eq.id} className="border-b transition-colors hover:bg-slate-50/50" style={{ borderColor: 'var(--border)' }}>
+                  <tr key={eq.id} className="border-b transition-colors hover:opacity-90" style={{ borderColor: 'var(--border)' }}>
                     <td className="px-4 py-3">
                       <div className="font-bold" style={{ color: 'var(--ink-primary)' }}>{eq.id}</div>
                       <div className="text-[11px]" style={{ color: 'var(--ink-muted)' }}>{eq.tier} {eq.type}</div>
@@ -103,7 +103,7 @@ export default function ClientReturns() {
                         <Icon name="mapPin" size={13} /> {site}
                       </span>
                     </td>
-                    <td className="px-3 py-3 font-data text-slate-600">{eq.checkIn || '2026-07-15'}</td>
+                    <td className="px-3 py-3 font-data" style={{ color: 'var(--ink-secondary)' }}>{eq.checkIn || '2026-07-15'}</td>
                     <td className="px-3 py-3 font-data font-bold" style={{ color: rs.state === 'overdue' ? 'var(--critical)' : 'var(--ink-primary)' }}>
                       {eq.expectedReturn}
                     </td>
@@ -127,7 +127,7 @@ export default function ClientReturns() {
               })}
               {activeFleet.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-500">
+                  <td colSpan={6} className="py-8 text-center" style={{ color: 'var(--ink-muted)' }}>
                     No active rentals to display.
                   </td>
                 </tr>
@@ -144,8 +144,11 @@ export default function ClientReturns() {
 
       {/* Return Dispatch QR Modal */}
       {returnQrModalEq && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-sm rounded-2xl border p-6 text-center shadow-2xl" style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)' }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(2px)' }}>
+          <div
+            className="w-full max-w-sm border p-6 text-center"
+            style={{ borderRadius: 'var(--radius-lg)', background: 'var(--bg-surface)', borderColor: 'var(--border)', boxShadow: 'var(--shadow-lifted)' }}
+          >
             <div className="mb-2 font-display text-lg font-bold" style={{ color: 'var(--ink-primary)' }}>
               Return Dispatch QR Code
             </div>
@@ -154,11 +157,14 @@ export default function ClientReturns() {
             </p>
 
             <div className="my-6 flex justify-center">
-              <div className="flex h-44 w-44 items-center justify-center rounded-2xl border-4 border-slate-900 bg-white p-2 shadow-inner">
+              <div
+                className="flex h-44 w-44 items-center justify-center p-2"
+                style={{ borderRadius: 'var(--radius-lg)', border: '4px solid var(--ink-primary)', background: '#ffffff', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.08)' }}
+              >
                 {/* Simulated QR Pattern */}
-                <div className="grid grid-cols-5 gap-1.5 h-full w-full bg-slate-900 p-2 rounded-lg">
+                <div className="grid grid-cols-5 gap-1.5 h-full w-full p-2" style={{ background: 'var(--ink-primary)', borderRadius: 'var(--radius-sm)' }}>
                   {Array.from({ length: 25 }).map((_, i) => (
-                    <div key={i} className={`rounded-xs ${i % 2 === 0 || i % 3 === 0 ? 'bg-white' : 'bg-slate-900'}`} />
+                    <div key={i} style={{ borderRadius: '1px', background: i % 2 === 0 || i % 3 === 0 ? '#ffffff' : 'var(--ink-primary)' }} />
                   ))}
                 </div>
               </div>

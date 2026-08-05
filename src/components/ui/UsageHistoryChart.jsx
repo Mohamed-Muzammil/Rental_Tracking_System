@@ -8,7 +8,7 @@ function ChartTooltip({ active, payload, label }) {
       className="rounded-lg border px-3 py-2 text-xs shadow-lg"
       style={{ background: 'var(--bg-surface-raised)', borderColor: 'var(--border)', color: 'var(--ink-primary)' }}
     >
-      <div className="mb-1 font-bold text-slate-800">{label}</div>
+      <div className="mb-1 font-bold" style={{ color: 'var(--ink-primary)' }}>{label}</div>
       {payload.map((p) => (
         <div key={p.dataKey} className="flex items-center gap-2 my-0.5">
           <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: p.color }} />
