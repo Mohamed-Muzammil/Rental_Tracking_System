@@ -14,6 +14,7 @@ const PATHS = {
   swap: 'M7 7h11l-3-3 M18 17H7l3 3 M4 7h.01 M20 17h.01',
   search: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z M21 21l-4.35-4.35',
   plus: 'M12 5v14 M5 12h14',
+  building: 'M4 21V5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v16 M14 21v-9a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v9 M8 8h.01 M8 12h.01 M8 16h.01',
 }
 
 export default function Icon({ name, size = 16, strokeWidth = 2, className = '' }) {

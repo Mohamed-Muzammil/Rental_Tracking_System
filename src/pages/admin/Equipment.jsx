@@ -12,7 +12,9 @@ import UtilizationBar from '../../components/ui/UtilizationBar'
 import Button from '../../components/ui/Button'
 import Icon from '../../components/ui/Icon'
 
-const STATUS_FILTERS = ['All', 'Active', 'Available']
+const STATUS_FILTERS = ['All', 'Active', 'Available', 'Maintenance']
+const STATUS_TO_FIELD = { Active: 'active', Available: 'completed', Maintenance: 'maintenance' }
+const STATUS_ORDER = { active: 0, completed: 1, maintenance: 2 }
 
 const inputStyle = {
   background: 'var(--bg-surface-raised)',
@@ -32,14 +34,16 @@ export default function Equipment() {
 
   const filtered = useMemo(() => {
     return equipment
-      .filter((e) => (statusFilter === 'All' ? true : statusFilter === 'Active' ? e.status === 'active' : e.status === 'completed'))
+      .filter((e) => (statusFilter === 'All' ? true : e.status === STATUS_TO_FIELD[statusFilter]))
       .filter((e) => (typeFilter === 'All' ? true : e.type === typeFilter))
       .filter((e) => {
         const q = query.trim().toLowerCase()
         if (!q) return true
         return e.id.toLowerCase().includes(q) || e.type.toLowerCase().includes(q) || e.tier.toLowerCase().includes(q)
       })
-      .sort((a, b) => (a.status === b.status ? a.id.localeCompare(b.id) : a.status === 'active' ? -1 : 1))
+      .sort((a, b) =>
+        a.status === b.status ? a.id.localeCompare(b.id) : STATUS_ORDER[a.status] - STATUS_ORDER[b.status],
+      )
   }, [equipment, statusFilter, typeFilter, query])
 
   const selected = equipment.find((e) => e.id === selectedId) ?? null
@@ -130,8 +134,11 @@ export default function Equipment() {
                       <div className="text-xs" style={{ color: 'var(--ink-muted)' }}>{eq.tier} {eq.type}</div>
                     </td>
                     <td className="px-3 py-3">
-                      <StatusChip severity={isActive ? 'good' : 'neutral'} icon={isActive ? 'truck' : undefined}>
-                        {isActive ? 'On Rent' : 'Available'}
+                      <StatusChip
+                        severity={isActive ? 'good' : eq.status === 'maintenance' ? 'warning' : 'neutral'}
+                        icon={isActive ? 'truck' : eq.status === 'maintenance' ? 'alertTriangle' : undefined}
+                      >
+                        {isActive ? 'On Rent' : eq.status === 'maintenance' ? 'Maintenance' : 'Available'}
                       </StatusChip>
                     </td>
                     <td className="px-3 py-3" style={{ color: 'var(--ink-secondary)' }}>
@@ -183,20 +190,31 @@ function UnitDetail({ eq, today }) {
   const rs = eq.status === 'active' ? returnStatus(eq, today) : null
   const util = eq.status === 'active' ? utilizationOf(eq) : null
 
+  const isMaintenance = eq.status === 'maintenance'
+
   return (
     <div className="flex flex-col">
       <div className="mb-3 flex items-center gap-2">
-        <StatusChip severity={eq.status === 'active' ? 'good' : 'neutral'}>
-          {eq.status === 'active' ? 'On Rent' : 'Available'}
+        <StatusChip severity={eq.status === 'active' ? 'good' : isMaintenance ? 'warning' : 'neutral'}>
+          {eq.status === 'active' ? 'On Rent' : isMaintenance ? 'Maintenance' : 'Available'}
         </StatusChip>
         <span className="text-sm" style={{ color: 'var(--ink-secondary)' }}>{eq.tier} {eq.type}</span>
       </div>
 
       <Row label="Daily rate" value={`$${catalog.dailyCost}`} />
-      <Row label="Site" value={eq.siteId ? siteById[eq.siteId]?.name : 'Unassigned'} />
-      <Row label="Client" value={eq.clientId ? clientById[eq.clientId]?.name : '—'} />
-      <Row label="Operator" value={eq.operatorId ?? 'Unassigned'} />
-      {eq.status === 'active' ? (
+      {isMaintenance ? (
+        <>
+          <Row label="In workshop for" value={eq.maintenanceNote ?? 'Scheduled service'} />
+          <Row label="Expected back" value={eq.expectedBackOn ?? '—'} />
+        </>
+      ) : (
+        <>
+          <Row label="Site" value={eq.siteId ? siteById[eq.siteId]?.name : 'Unassigned'} />
+          <Row label="Client" value={eq.clientId ? clientById[eq.clientId]?.name : '—'} />
+          <Row label="Operator" value={eq.operatorId ?? 'Unassigned'} />
+        </>
+      )}
+      {eq.status === 'active' && (
         <>
           <Row label="Checked in" value={eq.checkIn} />
           <Row label="Expected return" value={eq.expectedReturn} />
@@ -204,16 +222,19 @@ function UnitDetail({ eq, today }) {
           <Row label="Engine hrs/day" value={eq.avgEngineHoursPerDay} />
           <Row label="Idle hrs/day" value={eq.avgIdleHoursPerDay} />
         </>
-      ) : (
+      )}
+      {eq.status === 'completed' && (
         <>
           <Row label="Last checked out" value={eq.checkIn} />
           <Row label="Last checked in" value={eq.checkOut ?? '—'} />
         </>
       )}
 
-      <Button variant="primary" className="mt-4 justify-center" onClick={() => navigate('/admin/checkin')}>
-        <Icon name="swap" size={14} /> {eq.status === 'active' ? 'Check in this unit' : 'Check out this unit'}
-      </Button>
+      {!isMaintenance && (
+        <Button variant="primary" className="mt-4 justify-center" onClick={() => navigate('/admin/checkin')}>
+          <Icon name="swap" size={14} /> {eq.status === 'active' ? 'Check in this unit' : 'Check out this unit'}
+        </Button>
+      )}
     </div>
   )
 }

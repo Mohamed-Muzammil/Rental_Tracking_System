@@ -6,7 +6,7 @@ export default function UtilizationBar({ engineHours, idleHours, width = 84 }) {
   return (
     <div
       className="inline-flex items-center gap-1.5"
-      title={`Engine ${engineHours}h/day · Idle ${idleHours}h/day`}
+      title={`Engine ${Math.round(engineHours * 10) / 10}h/day · Idle ${Math.round(idleHours * 10) / 10}h/day`}
     >
       <div className="flex h-1.5 overflow-hidden rounded-full" style={{ width, background: 'var(--border)' }}>
         {enginePct > 0 && (

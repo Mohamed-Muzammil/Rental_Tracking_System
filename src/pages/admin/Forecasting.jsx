@@ -31,7 +31,7 @@ export default function Forecasting() {
           Demand Forecasting
         </h1>
         <p className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
-          Moving-average projection over monthly rental counts, per equipment type.
+          Smoothed-trend projection over monthly rental counts, per equipment type.
         </p>
       </div>
 
@@ -65,7 +65,7 @@ export default function Forecasting() {
       <Card title={`${type} — historical vs projected demand`}>
         <ForecastChart data={selected.series} />
         <p className="mt-3 text-xs" style={{ color: 'var(--ink-muted)' }}>
-          Dashed line is a 3-month moving-average + trend projection — a simple baseline, not a trained model.
+          Dashed line is a 3-month smoothed-trend projection — a simple statistical baseline, not a trained model.
         </p>
       </Card>
     </div>

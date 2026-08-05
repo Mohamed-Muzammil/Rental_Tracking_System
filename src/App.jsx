@@ -3,6 +3,7 @@ import RoleSelect from './pages/RoleSelect'
 import AdminLayout from './components/layout/AdminLayout'
 import ClientLayout from './components/layout/ClientLayout'
 import Dashboard from './pages/admin/Dashboard'
+import Companies from './pages/admin/Companies'
 import Equipment from './pages/admin/Equipment'
 import CheckInOut from './pages/admin/CheckInOut'
 import UsageLogging from './pages/admin/UsageLogging'
@@ -20,6 +21,7 @@ export default function App() {
 
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Dashboard />} />
+        <Route path="companies" element={<Companies />} />
         <Route path="equipment" element={<Equipment />} />
         <Route path="checkin" element={<CheckInOut />} />
         <Route path="usage" element={<UsageLogging />} />
