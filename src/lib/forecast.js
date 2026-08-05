@@ -1,5 +1,9 @@
-// Simple moving-average + trend projection — deliberately not ML, just
-// enough to demonstrate the "demand forecasting" outcome from the brief.
+// Smoothed-trend projection — deliberately not ML, just enough to demonstrate
+// the "demand forecasting" outcome from the brief.
+//
+// Projects from the LAST observed value plus a slope averaged over the window,
+// rather than from the window's mean: a plain moving average lags a rising
+// series badly enough that a clear upward trend reads as "flat".
 function shiftMonth(monthStr, n) {
   const [y, m] = monthStr.split('-').map(Number)
   const d = new Date(y, m - 1 + n, 1)
@@ -17,9 +21,9 @@ export function forecastSeries(type, history, monthsAhead = 2, windowSize = 3) {
   let lastMonth = rows[rows.length - 1].month
 
   for (let i = 0; i < monthsAhead; i++) {
-    const avg = window.reduce((a, b) => a + b, 0) / window.length
-    const trend = (window[window.length - 1] - window[0]) / Math.max(1, window.length - 1)
-    const next = Math.max(0, Math.round(avg + trend))
+    const last = window[window.length - 1]
+    const trend = (last - window[0]) / Math.max(1, window.length - 1)
+    const next = Math.max(0, Math.round(last + trend))
     lastMonth = shiftMonth(lastMonth, 1)
     points.push({ month: lastMonth, actual: null, forecast: next })
     window = [...window.slice(1), next]

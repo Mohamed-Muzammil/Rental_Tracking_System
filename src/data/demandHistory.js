@@ -1,41 +1,19 @@
-// Synthetic monthly rental-count history per equipment type, feeding the
-// demand forecasting chart (simple moving-average projection over this).
-export const demandHistory = [
-  // Excavator — steady climb
-  { month: '2026-01', type: 'Excavator', rentals: 5 },
-  { month: '2026-02', type: 'Excavator', rentals: 6 },
-  { month: '2026-03', type: 'Excavator', rentals: 6 },
-  { month: '2026-04', type: 'Excavator', rentals: 8 },
-  { month: '2026-05', type: 'Excavator', rentals: 9 },
-  { month: '2026-06', type: 'Excavator', rentals: 10 },
-  { month: '2026-07', type: 'Excavator', rentals: 12 },
+export const equipmentTypes = ['Excavator', 'Bulldozer', 'Crane', 'Grader', 'Forklift', 'Loader', 'Roller']
 
-  // Bulldozer — roughly flat
-  { month: '2026-01', type: 'Bulldozer', rentals: 7 },
-  { month: '2026-02', type: 'Bulldozer', rentals: 6 },
-  { month: '2026-03', type: 'Bulldozer', rentals: 8 },
-  { month: '2026-04', type: 'Bulldozer', rentals: 7 },
-  { month: '2026-05', type: 'Bulldozer', rentals: 8 },
-  { month: '2026-06', type: 'Bulldozer', rentals: 7 },
-  { month: '2026-07', type: 'Bulldozer', rentals: 8 },
+const MONTHS = ['2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07']
 
-  // Crane — declining (matches the low-utilization signal we're flagging live)
-  { month: '2026-01', type: 'Crane', rentals: 6 },
-  { month: '2026-02', type: 'Crane', rentals: 5 },
-  { month: '2026-03', type: 'Crane', rentals: 5 },
-  { month: '2026-04', type: 'Crane', rentals: 4 },
-  { month: '2026-05', type: 'Crane', rentals: 3 },
-  { month: '2026-06', type: 'Crane', rentals: 3 },
-  { month: '2026-07', type: 'Crane', rentals: 2 },
+// Monthly rental counts per type — the input to the moving-average forecast.
+// Shapes are deliberately varied: climbing, flat, declining, seasonal.
+const SERIES = {
+  Excavator: [5, 6, 6, 8, 9, 10, 12], // steady climb — strongest demand
+  Bulldozer: [7, 6, 8, 7, 8, 7, 8], // flat
+  Crane: [6, 5, 5, 4, 3, 3, 2], // declining — matches the low-utilization signal
+  Grader: [2, 2, 3, 4, 5, 5, 4], // seasonal mid-year bump
+  Forklift: [4, 5, 5, 6, 6, 7, 9], // climbing
+  Loader: [3, 4, 4, 3, 4, 5, 5], // gentle climb
+  Roller: [2, 3, 4, 5, 4, 3, 3], // peaked and easing
+}
 
-  // Grader — seasonal bump mid-year
-  { month: '2026-01', type: 'Grader', rentals: 2 },
-  { month: '2026-02', type: 'Grader', rentals: 2 },
-  { month: '2026-03', type: 'Grader', rentals: 3 },
-  { month: '2026-04', type: 'Grader', rentals: 4 },
-  { month: '2026-05', type: 'Grader', rentals: 5 },
-  { month: '2026-06', type: 'Grader', rentals: 5 },
-  { month: '2026-07', type: 'Grader', rentals: 4 },
-]
-
-export const equipmentTypes = ['Excavator', 'Bulldozer', 'Crane', 'Grader']
+export const demandHistory = Object.entries(SERIES).flatMap(([type, counts]) =>
+  counts.map((rentals, i) => ({ month: MONTHS[i], type, rentals })),
+)
