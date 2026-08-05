@@ -3,7 +3,7 @@ export default function Card({ title, action, children, className = '', bodyClas
     <div
       className={`bg-white ${className}`}
       style={{
-        borderRadius: '8px',
+        borderRadius: 'var(--radius-md)',
         border: '1px solid var(--border)',
         boxShadow: 'var(--shadow-card)',
       }}
@@ -13,7 +13,7 @@ export default function Card({ title, action, children, className = '', bodyClas
           className="flex items-center justify-between gap-4 px-5 py-3"
           style={{
             borderBottom: '1px solid var(--border)',
-            borderRadius: '8px 8px 0 0',
+            borderRadius: 'var(--radius-md) var(--radius-md) 0 0',
             background: 'var(--bg-surface-raised)',
           }}
         >

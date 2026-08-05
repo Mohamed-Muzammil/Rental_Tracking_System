@@ -193,7 +193,7 @@ export default function Companies() {
               viewMode === 'grid' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <span>🗃️</span> Grid Cards
+            <Icon name="grid" size={13} /> Grid Cards
           </button>
           <button
             onClick={() => setViewMode('table')}
@@ -201,7 +201,7 @@ export default function Companies() {
               viewMode === 'table' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <span>📋</span> Enterprise Table
+            <Icon name="table" size={13} /> Table
           </button>
         </div>
       </div>

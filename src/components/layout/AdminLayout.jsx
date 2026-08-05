@@ -71,13 +71,11 @@ export default function AdminLayout() {
               key={item.to}
               to={item.to}
               end={item.end}
-              className={({ isActive }) =>
-                `relative flex shrink-0 items-center gap-1.5 border-b-2 px-4 text-[13px] font-medium transition-colors ${
-                  isActive
-                    ? 'border-blue-700 text-blue-700'
-                    : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'
-                }`
-              }
+              className="relative flex shrink-0 items-center gap-1.5 border-b-2 px-4 text-[13px] font-medium transition-colors"
+              style={({ isActive }) => ({
+                borderColor: isActive ? 'var(--accent)' : 'transparent',
+                color: isActive ? 'var(--accent)' : 'var(--ink-secondary)',
+              })}
             >
               <Icon name={item.icon} size={14} />
               {item.label}
@@ -92,13 +90,11 @@ export default function AdminLayout() {
           </span>
           <NavLink
             to="/admin/alerts"
-            className={({ isActive }) =>
-              `relative flex h-8 w-8 items-center justify-center rounded transition-colors ${
-                isActive
-                  ? 'bg-blue-50 text-blue-700'
-                  : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800'
-              }`
-            }
+            className="relative flex h-8 w-8 items-center justify-center rounded transition-colors hover:opacity-80"
+            style={({ isActive }) => ({
+              background: isActive ? 'var(--accent-wash)' : 'transparent',
+              color: isActive ? 'var(--accent)' : 'var(--ink-muted)',
+            })}
             title="Alerts & Incidents"
           >
             <Icon name="bell" size={16} />

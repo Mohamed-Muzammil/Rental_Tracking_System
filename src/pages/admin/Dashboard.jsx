@@ -269,18 +269,12 @@ export default function Dashboard() {
             <span className="text-[11px]" style={{ color: 'var(--ink-muted)' }}>
               XGBoost projection, 3-month horizon
             </span>
-            <Link
-              to="/admin/forecasting"
-              className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-3 py-1 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:border-blue-300 hover:text-blue-600 transition-colors shadow-xs"
-            >
+            <Button as={Link} to="/admin/forecasting" variant="secondary">
               <Icon name="trendingUp" size={13} /> View Full Forecast
-            </Link>
-            <Link
-              to="/admin/forecasting"
-              className="inline-flex items-center gap-1 rounded-md bg-blue-600 px-3 py-1 text-xs font-bold text-white hover:bg-blue-700 transition-colors shadow-xs"
-            >
+            </Button>
+            <Button as={Link} to="/admin/forecasting" variant="primary">
               <Icon name="swap" size={13} /> Site Reallocation
-            </Link>
+            </Button>
           </div>
         }
       >

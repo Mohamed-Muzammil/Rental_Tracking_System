@@ -13,8 +13,8 @@ export default function ToastStack() {
         <div
           key={t.id}
           role="status"
-          className="flex items-start gap-2 rounded-lg border px-3.5 py-3 text-sm shadow-lg"
-          style={{ background: 'var(--bg-surface-raised)', borderColor: 'var(--border)', color: 'var(--ink-primary)' }}
+          className="flex items-start gap-2 border px-3.5 py-3 text-sm"
+          style={{ borderRadius: 'var(--radius-md)', background: 'var(--bg-surface)', borderColor: 'var(--border)', color: 'var(--ink-primary)', boxShadow: 'var(--shadow-lifted)' }}
         >
           <span style={{ color: 'var(--good)' }} className="mt-0.5">
             <Icon name="checkCircle" size={16} />

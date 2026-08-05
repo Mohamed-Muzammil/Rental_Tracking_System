@@ -23,7 +23,8 @@ export default function StatTile({ label, value, unit, hint, severity = 'neutral
     <div
       className="flex flex-col gap-2 bg-white p-5"
       style={{
-        borderRadius: '8px',
+        borderRadius: 'var(--radius-md)',
+        border: '1px solid var(--border)',
         borderTop: `3px solid ${borderTop}`,
         boxShadow: 'var(--shadow-card)',
       }}

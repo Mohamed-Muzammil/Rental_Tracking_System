@@ -113,23 +113,23 @@ export default function AlertsCenter() {
         <div className="flex gap-2">
           <button
             onClick={() => setActiveTab('incidents')}
-            className={`rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all ${
-              activeTab === 'incidents'
-                ? 'bg-blue-600 text-white shadow-xs'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
+            className="flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all"
+            style={{
+              background: activeTab === 'incidents' ? 'var(--accent)' : 'var(--bg-surface-raised)',
+              color: activeTab === 'incidents' ? 'var(--accent-ink)' : 'var(--ink-secondary)',
+            }}
           >
-            🚨 Telematics Misuse Incidents ({activeIncidents.length})
+            <Icon name="alertTriangle" size={13} /> Telematics Misuse Incidents ({activeIncidents.length})
           </button>
           <button
             onClick={() => setActiveTab('fleetAlerts')}
-            className={`rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all ${
-              activeTab === 'fleetAlerts'
-                ? 'bg-blue-600 text-white shadow-xs'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
+            className="flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all"
+            style={{
+              background: activeTab === 'fleetAlerts' ? 'var(--accent)' : 'var(--bg-surface-raised)',
+              color: activeTab === 'fleetAlerts' ? 'var(--accent-ink)' : 'var(--ink-secondary)',
+            }}
           >
-            📋 Rental & Maintenance Alerts ({alerts.length})
+            <Icon name="gauge" size={13} /> Rental &amp; Maintenance Alerts ({alerts.length})
           </button>
         </div>
 

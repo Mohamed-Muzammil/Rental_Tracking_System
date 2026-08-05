@@ -17,6 +17,8 @@ const PATHS = {
   plus: 'M12 5v14 M5 12h14',
   building: 'M4 21V5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v16 M14 21v-9a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v9 M8 8h.01 M8 12h.01 M8 16h.01',
   trendingUp: 'M3 17l5.5-5.5 4 4L21 7 M15 7h6v6',
+  grid: 'M4 4h7v7H4z M13 4h7v7h-7z M4 13h7v7H4z M13 13h7v7h-7z',
+  table: 'M4 5h16v14H4z M4 10h16 M10 5v14',
 }
 
 export default function Icon({ name, size = 16, strokeWidth = 2, className = '' }) {

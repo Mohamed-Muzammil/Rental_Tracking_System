@@ -102,7 +102,13 @@ export default function ClientUsage() {
                       </span>
                     </td>
                     <td className="px-3 py-3 font-medium" style={{ color: eq.operatorId ? 'var(--ink-primary)' : 'var(--critical)' }}>
-                      {eq.operatorId || '⚠️ Unassigned'}
+                      {eq.operatorId ? (
+                        eq.operatorId
+                      ) : (
+                        <span className="inline-flex items-center gap-1">
+                          <Icon name="alertTriangle" size={12} /> Unassigned
+                        </span>
+                      )}
                     </td>
                     <td className="px-3 py-3">
                       <UtilizationBar engineHours={eq.avgEngineHoursPerDay} idleHours={eq.avgIdleHoursPerDay} />

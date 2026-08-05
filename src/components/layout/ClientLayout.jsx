@@ -1,123 +1,128 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { format } from 'date-fns'
 import { useAppStore } from '../../store/appStore'
 import { clients, clientById } from '../../data/clients'
 import { sites } from '../../data/sites'
 import Icon from '../ui/Icon'
-import Button from '../ui/Button'
 import ToastStack from '../ui/ToastStack'
 import CustomModal from '../ui/CustomModal'
 
 const NAV = [
   { to: '/client', end: true, icon: 'gauge', label: 'Fleet Overview' },
-  { to: '/client/usage', icon: 'clock', label: 'Telemetry & Usage Logs' },
+  { to: '/client/usage', icon: 'clock', label: 'Usage Logs' },
   { to: '/client/returns', icon: 'swap', label: 'Rentals & Returns' },
-  { to: '/client/marketplace', icon: 'truck', label: 'Equipment Marketplace' },
+  { to: '/client/marketplace', icon: 'truck', label: 'Marketplace' },
 ]
+
+const selectStyle = {
+  background: 'var(--bg-surface-raised)',
+  borderColor: 'var(--border)',
+  color: 'var(--ink-primary)',
+}
 
 export default function ClientLayout() {
   const navigate = useNavigate()
-  const today = useAppStore((s) => s.today)
-  const advanceDay = useAppStore((s) => s.advanceDay)
   const activeClientId = useAppStore((s) => s.activeClientId)
   const setActiveClientId = useAppStore((s) => s.setActiveClientId)
   const selectedSiteId = useAppStore((s) => s.selectedSiteId)
   const setSelectedSiteId = useAppStore((s) => s.setSelectedSiteId)
 
   const activeClient = clientById[activeClientId]
-
-  // Filter sites for active client
   const clientSites = sites.filter((s) => activeClient?.sites?.includes(s.id))
 
   return (
     <div className="flex min-h-full flex-col" style={{ background: 'var(--bg-page)' }}>
-      {/* Industrial Header Topbar */}
+      {/* Top Application Bar — same structure/colors as the admin header */}
       <header
-        className="flex flex-wrap items-center justify-between border-b px-6 py-3 text-xs"
-        style={{ background: '#0f172a', borderColor: '#1e293b', color: '#f8fafc' }}
+        className="flex items-center gap-0 border-b"
+        style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)', height: '52px' }}
       >
-        <div className="flex items-center gap-6">
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 font-display text-base font-extrabold uppercase tracking-wider transition-opacity hover:opacity-80"
-            style={{ color: '#f59e0b' }}
-          >
-            <Icon name="truck" size={20} />
-            <span>FleetLoop</span>
-            <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-amber-400">
-              Client Operations
+        <div
+          className="flex h-full items-center gap-2.5 border-r px-5 shrink-0"
+          style={{ borderColor: 'var(--border)', minWidth: '200px' }}
+        >
+          <div className="flex h-7 w-7 items-center justify-center rounded" style={{ background: 'var(--accent)' }}>
+            <Icon name="truck" size={14} style={{ color: '#fff' }} />
+          </div>
+          <button onClick={() => navigate('/')} className="text-left">
+            <span className="block text-[13px] font-bold tracking-tight leading-none" style={{ color: 'var(--ink-primary)' }}>
+              FleetLoop
+            </span>
+            <span className="block text-[10px] font-normal leading-none mt-0.5" style={{ color: 'var(--ink-muted)' }}>
+              Client Portal
             </span>
           </button>
-
-          {/* Client Switcher Dropdown */}
-          <div className="flex items-center gap-2 border-l border-slate-700 pl-6">
-            <span className="font-semibold text-slate-400 uppercase tracking-wider text-[10px]">Client Account:</span>
-            <select
-              value={activeClientId}
-              onChange={(e) => setActiveClientId(e.target.value)}
-              className="rounded-md bg-slate-800 px-3 py-1 text-xs font-medium text-slate-200 border border-slate-700 focus:outline-none focus:ring-1 focus:ring-amber-500"
-            >
-              {clients.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name} ({c.id})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Site Filter Dropdown */}
-          <div className="flex items-center gap-2 border-l border-slate-700 pl-6">
-            <span className="font-semibold text-slate-400 uppercase tracking-wider text-[10px]">Active Site:</span>
-            <select
-              value={selectedSiteId}
-              onChange={(e) => setSelectedSiteId(e.target.value)}
-              className="rounded-md bg-slate-800 px-3 py-1 text-xs font-medium text-slate-200 border border-slate-700 focus:outline-none focus:ring-1 focus:ring-amber-500"
-            >
-              <option value="ALL">All Active Sites ({clientSites.length})</option>
-              {clientSites.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name} ({s.region})
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
 
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2 text-emerald-400 font-medium text-[11px]">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>IoT Telemetry Feed Active</span>
-          </div>
-        </div>
-      </header>
-
-      {/* Industrial Sub-Nav Tabs */}
-      <div className="border-b px-6 shadow-xs" style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)' }}>
-        <nav className="flex gap-2">
+        <nav className="flex h-full min-w-0 flex-1 items-stretch overflow-x-auto">
           {NAV.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               end={item.end}
-              className={({ isActive }) =>
-                `flex items-center gap-2 border-b-2 px-4 py-3 text-xs font-bold transition-all ${
-                  isActive ? 'border-amber-500 text-amber-600 bg-amber-50/50' : 'border-transparent hover:text-slate-900'
-                }`
-              }
+              className="relative flex shrink-0 items-center gap-1.5 border-b-2 px-4 text-[13px] font-medium transition-colors"
               style={({ isActive }) => ({
-                color: isActive ? 'var(--accent)' : 'var(--ink-secondary)',
                 borderColor: isActive ? 'var(--accent)' : 'transparent',
+                color: isActive ? 'var(--accent)' : 'var(--ink-secondary)',
               })}
             >
-              <Icon name={item.icon} size={15} />
-              <span>{item.label}</span>
+              <Icon name={item.icon} size={14} />
+              {item.label}
             </NavLink>
           ))}
         </nav>
+
+        <div className="flex h-full items-center gap-1.5 border-l px-3 shrink-0" style={{ borderColor: 'var(--border)' }}>
+          <span
+            className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium"
+            style={{ background: 'var(--good-wash)', color: 'var(--good)' }}
+          >
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--good)' }} />
+            Telemetry live
+          </span>
+        </div>
+      </header>
+
+      {/* Account context sub-bar */}
+      <div
+        className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b px-5 py-2"
+        style={{ background: 'var(--bg-surface-raised)', borderColor: 'var(--border)' }}
+      >
+        <label className="flex items-center gap-2 text-xs">
+          <span className="font-semibold uppercase tracking-wider" style={{ color: 'var(--ink-muted)' }}>
+            Account
+          </span>
+          <select
+            value={activeClientId}
+            onChange={(e) => setActiveClientId(e.target.value)}
+            className="rounded-md border px-2.5 py-1 text-xs font-medium outline-hidden"
+            style={selectStyle}
+          >
+            {clients.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        </label>
+
+        <label className="flex items-center gap-2 text-xs">
+          <span className="font-semibold uppercase tracking-wider" style={{ color: 'var(--ink-muted)' }}>
+            Site
+          </span>
+          <select
+            value={selectedSiteId}
+            onChange={(e) => setSelectedSiteId(e.target.value)}
+            className="rounded-md border px-2.5 py-1 text-xs font-medium outline-hidden"
+            style={selectStyle}
+          >
+            <option value="ALL">All sites ({clientSites.length})</option>
+            {clientSites.map((s) => (
+              <option key={s.id} value={s.id}>{s.name}</option>
+            ))}
+          </select>
+        </label>
       </div>
 
-      {/* Main Content Area */}
-      <main className="min-w-0 flex-1 px-6 py-6 lg:px-10 lg:py-8">
+      {/* Page Content */}
+      <main className="min-w-0 flex-1 overflow-y-auto" style={{ padding: '24px 32px' }}>
         <Outlet />
       </main>
 

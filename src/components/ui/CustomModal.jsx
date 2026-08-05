@@ -24,41 +24,39 @@ export default function CustomModal() {
 
   const isAlert = type === 'alert'
   const isWarning = type === 'warning' || type === 'confirm'
+  const iconWash = isAlert ? 'var(--critical-wash)' : isWarning ? 'var(--warning-wash)' : 'var(--accent-wash)'
+  const iconInk = isAlert ? 'var(--critical)' : isWarning ? 'var(--warning)' : 'var(--accent)'
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+      style={{ background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(2px)' }}
       onClick={closeModal}
     >
       <div
-        className="w-full max-w-md rounded-2xl border bg-white p-6 shadow-2xl transition-all"
-        style={{ borderColor: 'var(--border)' }}
+        className="w-full max-w-md border p-6 transition-all"
+        style={{ borderRadius: 'var(--radius-lg)', borderColor: 'var(--border)', background: 'var(--bg-surface)', boxShadow: 'var(--shadow-lifted)' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start gap-4">
           <div
-            className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl font-bold ${
-              isAlert
-                ? 'bg-rose-100 text-rose-600'
-                : isWarning
-                ? 'bg-amber-100 text-amber-600'
-                : 'bg-blue-100 text-blue-600'
-            }`}
+            className="flex h-12 w-12 shrink-0 items-center justify-center font-bold"
+            style={{ borderRadius: 'var(--radius-md)', background: iconWash, color: iconInk }}
           >
             <Icon name={isAlert ? 'x' : 'alertTriangle'} size={24} />
           </div>
 
           <div className="flex-1">
-            <h3 className="font-display text-base font-bold text-slate-900 leading-tight">
+            <h3 className="font-display text-base font-bold leading-tight" style={{ color: 'var(--ink-primary)' }}>
               {title}
             </h3>
-            <p className="mt-2 text-xs font-medium text-slate-600 leading-relaxed">
+            <p className="mt-2 text-xs font-medium leading-relaxed" style={{ color: 'var(--ink-secondary)' }}>
               {message}
             </p>
           </div>
         </div>
 
-        <div className="mt-6 flex items-center justify-end gap-2 border-t pt-4 border-slate-100">
+        <div className="mt-6 flex items-center justify-end gap-2 border-t pt-4" style={{ borderColor: 'var(--border)' }}>
           {!isAlert && (
             <Button
               variant="secondary"
@@ -72,11 +70,8 @@ export default function CustomModal() {
           <Button
             variant="primary"
             onClick={handleConfirm}
-            className={`text-xs px-5 py-2 font-bold ${
-              isAlert
-                ? 'bg-slate-900 hover:bg-slate-800 text-white'
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
-            }`}
+            className="text-xs px-5 py-2 font-bold"
+            style={isAlert ? { background: 'var(--ink-primary)', borderColor: 'var(--ink-primary)' } : undefined}
           >
             {isAlert ? 'OK' : confirmText}
           </Button>

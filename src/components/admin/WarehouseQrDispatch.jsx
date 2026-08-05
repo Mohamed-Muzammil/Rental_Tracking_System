@@ -123,7 +123,7 @@ export default function WarehouseQrDispatch() {
       {/* Top Banner Explanation */}
       <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-500 text-slate-950 font-bold">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg" style={{ background: 'var(--accent-wash)', color: 'var(--accent)' }}>
             <Icon name="truck" size={20} />
           </div>
           <div>
@@ -213,7 +213,7 @@ export default function WarehouseQrDispatch() {
               />
             </div>
 
-            <Button type="submit" variant="primary" className="mt-2 justify-center py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold border-none">
+            <Button type="submit" variant="primary" className="mt-2 justify-center py-2.5 font-bold">
               <Icon name="swap" size={15} /> Auto-Allocate & Create Order
             </Button>
           </form>
@@ -234,7 +234,7 @@ export default function WarehouseQrDispatch() {
               {/* Order Header & Progress Bar */}
               <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl bg-slate-900 p-4 text-white">
                 <div>
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
+                  <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--accent-wash)' }}>
                     Order Ref: {activeOrder.orderId}
                   </div>
                   <div className="text-sm font-extrabold text-white mt-0.5">
@@ -245,8 +245,8 @@ export default function WarehouseQrDispatch() {
                 {/* Progress Bar */}
                 <div className="w-full sm:w-48 bg-slate-800 h-3 rounded-full overflow-hidden p-0.5 border border-slate-700">
                   <div
-                    className="bg-amber-500 h-full rounded-full transition-all duration-300"
-                    style={{ width: `${(totalScanned / totalAllocated) * 100}%` }}
+                    className="h-full rounded-full transition-all duration-300"
+                    style={{ width: `${(totalScanned / totalAllocated) * 100}%`, background: 'var(--accent)' }}
                   />
                 </div>
               </div>
@@ -256,7 +256,7 @@ export default function WarehouseQrDispatch() {
                 <div className="rounded-xl border border-rose-300 bg-rose-50 p-4 shadow-xs">
                   <div className="flex items-start gap-3">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-rose-600 text-white font-bold">
-                      ✕
+                      <Icon name="x" size={16} />
                     </div>
                     <div>
                       <h4 className="font-bold text-xs text-rose-950">
@@ -318,13 +318,16 @@ export default function WarehouseQrDispatch() {
                       className={`cursor-pointer rounded-xl border p-3.5 transition-all ${
                         isScanned
                           ? 'border-emerald-500 bg-emerald-50/50 shadow-xs'
-                          : 'border-slate-200 bg-white hover:border-amber-400'
+                          : 'border-slate-200 bg-white'
                       }`}
+                      style={!isScanned ? {} : undefined}
+                      onMouseEnter={(e) => { if (!isScanned) e.currentTarget.style.borderColor = 'var(--accent)' }}
+                      onMouseLeave={(e) => { if (!isScanned) e.currentTarget.style.borderColor = '' }}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-mono text-sm font-extrabold text-slate-900">{item.id}</span>
-                        <StatusChip severity={isScanned ? 'good' : 'warning'}>
-                          {isScanned ? '✓ Verified' : '⏳ Scan QR'}
+                        <StatusChip severity={isScanned ? 'good' : 'warning'} icon={isScanned ? 'checkCircle' : 'clock'}>
+                          {isScanned ? 'Verified' : 'Scan QR'}
                         </StatusChip>
                       </div>
                       <div className="text-xs text-slate-500">{item.tier} {item.type}</div>

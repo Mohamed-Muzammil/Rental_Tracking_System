@@ -58,8 +58,8 @@ export default function LogTelemetryModal({ equipment, onClose }) {
               Unit ID: <strong style={{ color: 'var(--ink-primary)' }}>{equipment.id}</strong> ({equipment.type})
             </p>
           </div>
-          <button onClick={onClose} className="rounded-lg p-1 hover:opacity-70" style={{ color: 'var(--ink-muted)' }}>
-            ✕
+          <button onClick={onClose} className="rounded-lg p-1 hover:opacity-70" style={{ color: 'var(--ink-muted)' }} aria-label="Close">
+            <Icon name="x" size={16} />
           </button>
         </div>
 

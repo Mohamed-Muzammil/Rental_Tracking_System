@@ -400,19 +400,25 @@ function UnitDetail({ eq, today }) {
             <div className="flex gap-1 rounded-md border p-0.5" style={{ borderColor: 'var(--border)' }}>
               <button
                 onClick={() => setViewMode('chart')}
-                className={`rounded px-2 py-0.5 text-[11px] font-medium transition-colors ${
-                  viewMode === 'chart' ? 'bg-blue-600 text-white font-bold' : 'text-slate-500 hover:text-slate-800'
-                }`}
+                className="flex items-center gap-1 rounded px-2 py-0.5 text-[11px] font-medium transition-colors"
+                style={{
+                  background: viewMode === 'chart' ? 'var(--accent)' : 'transparent',
+                  color: viewMode === 'chart' ? 'var(--accent-ink)' : 'var(--ink-muted)',
+                  fontWeight: viewMode === 'chart' ? 700 : 500,
+                }}
               >
-                📊 Chart
+                <Icon name="trendingUp" size={12} /> Chart
               </button>
               <button
                 onClick={() => setViewMode('table')}
-                className={`rounded px-2 py-0.5 text-[11px] font-medium transition-colors ${
-                  viewMode === 'table' ? 'bg-blue-600 text-white font-bold' : 'text-slate-500 hover:text-slate-800'
-                }`}
+                className="flex items-center gap-1 rounded px-2 py-0.5 text-[11px] font-medium transition-colors"
+                style={{
+                  background: viewMode === 'table' ? 'var(--accent)' : 'transparent',
+                  color: viewMode === 'table' ? 'var(--accent-ink)' : 'var(--ink-muted)',
+                  fontWeight: viewMode === 'table' ? 700 : 500,
+                }}
               >
-                📋 Table
+                <Icon name="table" size={12} /> Table
               </button>
             </div>
           </div>
