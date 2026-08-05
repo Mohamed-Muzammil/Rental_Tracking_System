@@ -4,6 +4,7 @@ import { useAppStore } from '../../store/appStore'
 import { buildAlerts } from '../../lib/rules'
 import Icon from '../ui/Icon'
 import ToastStack from '../ui/ToastStack'
+import CustomModal from '../ui/CustomModal'
 
 const NAV = [
   { to: '/admin', end: true, icon: 'gauge', label: 'Dashboard' },
@@ -84,6 +85,7 @@ export default function AdminLayout() {
         <Outlet />
       </main>
       <ToastStack />
+      <CustomModal />
     </div>
   )
 }

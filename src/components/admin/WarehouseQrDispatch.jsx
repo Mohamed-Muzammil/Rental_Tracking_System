@@ -18,6 +18,7 @@ export default function WarehouseQrDispatch() {
   const equipment = useAppStore((s) => s.equipment)
   const today = useAppStore((s) => s.today)
   const batchCheckOutEquipment = useAppStore((s) => s.batchCheckOutEquipment)
+  const openModal = useAppStore((s) => s.openModal)
 
   // Step 1: Order Setup
   const [clientId, setClientId] = useState('C001')
@@ -56,7 +57,11 @@ export default function WarehouseQrDispatch() {
     pickUnits('Crane', Number(craneQty))
 
     if (allocated.length === 0) {
-      alert('No available equipment matching your requested categories.')
+      openModal({
+        title: 'Equipment Allocation Unavailable',
+        message: 'No available equipment in the yard matching your requested categories. Please try adjusting requested quantities.',
+        type: 'alert',
+      })
       return
     }
 

@@ -205,6 +205,7 @@ function UnitDetail({ eq, today }) {
   const navigate = useNavigate()
   const checkIn = useAppStore((s) => s.checkIn)
   const usageLogs = useAppStore((s) => s.usageLogs)
+  const openModal = useAppStore((s) => s.openModal)
   
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
@@ -333,9 +334,12 @@ function UnitDetail({ eq, today }) {
           className="mt-4 justify-center" 
           onClick={() => {
             if (eq.status === 'active') {
-              if (window.confirm(`Are you sure you want to check in ${eq.id}?`)) {
-                checkIn(eq.id)
-              }
+              openModal({
+                title: `Confirm Unit Check-In`,
+                message: `Are you sure you want to check in ${eq.id} (${eq.tier} ${eq.type}) back to the equipment yard?`,
+                confirmText: 'Check In Unit',
+                onConfirm: () => checkIn(eq.id),
+              })
             } else {
               navigate('/admin/checkin')
             }

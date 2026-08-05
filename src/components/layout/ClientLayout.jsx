@@ -6,6 +6,7 @@ import { sites } from '../../data/sites'
 import Icon from '../ui/Icon'
 import Button from '../ui/Button'
 import ToastStack from '../ui/ToastStack'
+import CustomModal from '../ui/CustomModal'
 
 const NAV = [
   { to: '/client', end: true, icon: 'gauge', label: 'Fleet Overview' },
@@ -121,6 +122,7 @@ export default function ClientLayout() {
       </main>
 
       <ToastStack />
+      <CustomModal />
     </div>
   )
 }

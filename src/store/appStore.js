@@ -16,10 +16,14 @@ export const useAppStore = create((set, get) => ({
   usageLogs: [...seedUsageLogs],
   dismissedAlertIds: [],
   toasts: [],
+  modalConfig: null,
 
   setRole: (role) => set({ role }),
   setActiveClientId: (activeClientId) => set({ activeClientId, selectedSiteId: 'ALL' }),
   setSelectedSiteId: (selectedSiteId) => set({ selectedSiteId }),
+
+  openModal: (config) => set({ modalConfig: config }),
+  closeModal: () => set({ modalConfig: null }),
 
   advanceDay: () =>
     set((s) => ({ today: addDays(s.today, 1) })),
