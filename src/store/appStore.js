@@ -98,6 +98,7 @@ export const useAppStore = create((set, get) => ({
     }))
     get().pushToast(`${equipmentId} checked in`, 'good')
   },
+  checkIn: (equipmentId) => get().checkInEquipment(equipmentId),
 
   logUsage: ({ equipmentId, engineHours, idleHours, fuelUsageL, operatorId }) => {
     const s = get()

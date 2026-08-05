@@ -12,6 +12,7 @@ import StatusChip from '../../components/ui/StatusChip'
 import UtilizationBar from '../../components/ui/UtilizationBar'
 import Button from '../../components/ui/Button'
 import Icon from '../../components/ui/Icon'
+import UsageHistoryChart from '../../components/ui/UsageHistoryChart'
 
 const STATUS_FILTERS = ['All', 'Active', 'Available', 'Maintenance']
 const STATUS_TO_FIELD = { Active: 'active', Available: 'completed', Maintenance: 'maintenance' }
@@ -203,30 +204,40 @@ function Row({ label, value }) {
 
 function UnitDetail({ eq, today }) {
   const navigate = useNavigate()
-  const checkIn = useAppStore((s) => s.checkIn)
+  const checkInEquipment = useAppStore((s) => s.checkInEquipment || s.checkIn)
   const usageLogs = useAppStore((s) => s.usageLogs)
   const openModal = useAppStore((s) => s.openModal)
   
-  const [startDate, setStartDate] = useState('')
-  const [endDate, setEndDate] = useState('')
+  const [presetPeriod, setPresetPeriod] = useState('agreement') // 'agreement' | '7days' | 'all' | 'custom'
+  const [viewMode, setViewMode] = useState('chart')
+  const [customStartDate, setCustomStartDate] = useState('')
+  const [customEndDate, setCustomEndDate] = useState('')
 
   const catalog = catalogById[eq.catalogId]
-  const rs = eq.status === 'active' ? returnStatus(eq, today) : null
   const util = eq.status === 'active' ? utilizationOf(eq) : null
-
   const isMaintenance = eq.status === 'maintenance'
 
   const eqLogs = useMemo(() => {
     let logs = usageLogs.filter((l) => l.equipmentId === eq.id)
-    if (startDate) logs = logs.filter((l) => l.date >= startDate)
-    if (endDate) logs = logs.filter((l) => l.date <= endDate)
-    return logs.sort((a, b) => b.date.localeCompare(a.date)) // newest first
-  }, [usageLogs, eq.id, startDate, endDate])
+    if (presetPeriod === 'agreement' && eq.checkIn) {
+      logs = logs.filter((l) => l.date >= eq.checkIn && (eq.expectedReturn ? l.date <= eq.expectedReturn : true))
+    } else if (presetPeriod === '7days') {
+      logs = logs.slice(-7)
+    } else if (presetPeriod === 'custom') {
+      if (customStartDate) logs = logs.filter((l) => l.date >= customStartDate)
+      if (customEndDate) logs = logs.filter((l) => l.date <= customEndDate)
+    }
+    // Always sort in ASCENDING order (earliest date to latest date)
+    return logs.sort((a, b) => a.date.localeCompare(b.date))
+  }, [usageLogs, eq.id, eq.checkIn, eq.expectedReturn, presetPeriod, customStartDate, customEndDate])
 
-  const handleAgreementToCurrent = () => {
-    if (eq.checkIn) setStartDate(eq.checkIn)
-    setEndDate(format(today, 'yyyy-MM-dd'))
-  }
+  const chartData = useMemo(
+    () => eqLogs.map((l) => ({ ...l, date: l.date.slice(5) })),
+    [eqLogs],
+  )
+
+  const totalRuntime = useMemo(() => eqLogs.reduce((sum, l) => sum + (l.engineHours || 0), 0), [eqLogs])
+  const totalFuel = useMemo(() => eqLogs.reduce((sum, l) => sum + (l.fuelUsageL || 0), 0), [eqLogs])
 
   return (
     <div className="flex flex-col">
@@ -269,62 +280,149 @@ function UnitDetail({ eq, today }) {
       {!isMaintenance && (
         <div className="mt-5 border-t pt-4" style={{ borderColor: 'var(--border)' }}>
           <div className="mb-3 flex items-center justify-between">
-            <h4 className="font-semibold" style={{ color: 'var(--ink-primary)' }}>Daily Usage Logs</h4>
-            <Button variant="ghost" onClick={handleAgreementToCurrent} className="px-2 py-1 text-xs">
-              Agreement to Current
-            </Button>
-          </div>
-          
-          <div className="mb-4 flex items-center gap-2">
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="rounded-lg border px-2 py-1.5 text-xs outline-none"
-              style={inputStyle}
-            />
-            <span className="text-xs" style={{ color: 'var(--ink-muted)' }}>to</span>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="rounded-lg border px-2 py-1.5 text-xs outline-none"
-              style={inputStyle}
-            />
+            <h4 className="font-semibold text-xs text-slate-800">Unit Telemetry Logs</h4>
+            
+            {/* View Mode Toggle */}
+            <div className="flex gap-1 rounded-md border p-0.5" style={{ borderColor: 'var(--border)' }}>
+              <button
+                onClick={() => setViewMode('chart')}
+                className={`rounded px-2 py-0.5 text-[11px] font-medium transition-colors ${
+                  viewMode === 'chart' ? 'bg-blue-600 text-white font-bold' : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                📊 Chart
+              </button>
+              <button
+                onClick={() => setViewMode('table')}
+                className={`rounded px-2 py-0.5 text-[11px] font-medium transition-colors ${
+                  viewMode === 'table' ? 'bg-blue-600 text-white font-bold' : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                📋 Table
+              </button>
+            </div>
           </div>
 
-          <div className="max-h-64 overflow-y-auto rounded-lg border" style={{ borderColor: 'var(--border)' }}>
-            <table className="w-full text-left text-xs">
-              <thead className="sticky top-0 shadow-sm" style={{ background: 'var(--bg-surface-raised)', color: 'var(--ink-secondary)' }}>
-                <tr>
-                  <th className="px-3 py-2 font-medium">Date</th>
-                  <th className="px-3 py-2 font-medium">Runtime (h)</th>
-                  <th className="px-3 py-2 font-medium">Idle (h)</th>
-                  <th className="px-3 py-2 font-medium">Fuel (L)</th>
-                  <th className="px-3 py-2 font-medium">Location</th>
-                </tr>
-              </thead>
-              <tbody>
-                {eqLogs.length > 0 ? (
-                  eqLogs.map((log) => (
-                    <tr key={log.date} className="border-t" style={{ borderColor: 'var(--border)' }}>
-                      <td className="px-3 py-2 font-data" style={{ color: 'var(--ink-primary)' }}>{log.date}</td>
-                      <td className="px-3 py-2 font-data" style={{ color: 'var(--ink-secondary)' }}>{log.engineHours}</td>
-                      <td className="px-3 py-2 font-data" style={{ color: 'var(--ink-secondary)' }}>{log.idleHours}</td>
-                      <td className="px-3 py-2 font-data" style={{ color: 'var(--ink-secondary)' }}>{log.fuelUsageL}</td>
-                      <td className="px-3 py-2" style={{ color: 'var(--ink-secondary)' }}>{eq.siteId ? siteById[eq.siteId]?.name : '—'}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={5} className="px-3 py-6 text-center text-xs" style={{ color: 'var(--ink-muted)' }}>
-                      No usage records found for this period.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+          {/* Quick Preset Filter Pills */}
+          <div className="mb-3 flex items-center gap-1.5 overflow-x-auto pb-1">
+            <button
+              onClick={() => setPresetPeriod('agreement')}
+              className={`rounded-full px-2.5 py-1 text-[10px] font-bold transition-colors ${
+                presetPeriod === 'agreement'
+                  ? 'bg-blue-100 text-blue-700 border border-blue-300'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              Current Agreement
+            </button>
+            <button
+              onClick={() => setPresetPeriod('7days')}
+              className={`rounded-full px-2.5 py-1 text-[10px] font-bold transition-colors ${
+                presetPeriod === '7days'
+                  ? 'bg-blue-100 text-blue-700 border border-blue-300'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              Last 7 Days
+            </button>
+            <button
+              onClick={() => setPresetPeriod('all')}
+              className={`rounded-full px-2.5 py-1 text-[10px] font-bold transition-colors ${
+                presetPeriod === 'all'
+                  ? 'bg-blue-100 text-blue-700 border border-blue-300'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              All Records
+            </button>
+            <button
+              onClick={() => setPresetPeriod('custom')}
+              className={`rounded-full px-2.5 py-1 text-[10px] font-bold transition-colors ${
+                presetPeriod === 'custom'
+                  ? 'bg-blue-100 text-blue-700 border border-blue-300'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              Custom Dates
+            </button>
           </div>
+
+          {/* Manual Custom Date Range Inputs */}
+          {presetPeriod === 'custom' && (
+            <div className="mb-3 flex items-center gap-2 rounded-lg bg-slate-50 p-2 border border-slate-200">
+              <div className="flex-1">
+                <span className="block text-[9px] font-bold text-slate-400 uppercase">From</span>
+                <input
+                  type="date"
+                  value={customStartDate}
+                  onChange={(e) => setCustomStartDate(e.target.value)}
+                  className="w-full rounded border px-2 py-1 text-xs outline-hidden bg-white"
+                  style={inputStyle}
+                />
+              </div>
+              <span className="text-xs text-slate-400 font-bold mt-3">to</span>
+              <div className="flex-1">
+                <span className="block text-[9px] font-bold text-slate-400 uppercase">To</span>
+                <input
+                  type="date"
+                  value={customEndDate}
+                  onChange={(e) => setCustomEndDate(e.target.value)}
+                  className="w-full rounded border px-2 py-1 text-xs outline-hidden bg-white"
+                  style={inputStyle}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Telemetry Quick Summary Badges */}
+          <div className="mb-3 grid grid-cols-2 gap-2 rounded-lg bg-slate-50 p-2 text-xs border" style={{ borderColor: 'var(--border)' }}>
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Runtime</span>
+              <div className="font-mono font-bold text-blue-600">{totalRuntime.toFixed(1)} hrs</div>
+            </div>
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Est. Fuel Consumed</span>
+              <div className="font-mono font-bold text-emerald-600">{totalFuel.toFixed(1)} L</div>
+            </div>
+          </div>
+
+          {/* Telemetry Display (Chart or Table) */}
+          {viewMode === 'chart' ? (
+            <div className="pt-2">
+              <UsageHistoryChart data={chartData} height={180} />
+            </div>
+          ) : (
+            <div className="max-h-56 overflow-y-auto rounded-lg border" style={{ borderColor: 'var(--border)' }}>
+              <table className="w-full text-left text-xs">
+                <thead className="sticky top-0 shadow-xs bg-slate-100 text-slate-600">
+                  <tr>
+                    <th className="px-3 py-2 font-semibold">Date</th>
+                    <th className="px-2 py-2 font-semibold">Runtime</th>
+                    <th className="px-2 py-2 font-semibold">Idle</th>
+                    <th className="px-2 py-2 font-semibold">Fuel</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {eqLogs.length > 0 ? (
+                    eqLogs.map((log) => (
+                      <tr key={log.date} className="border-t border-slate-100 hover:bg-slate-50">
+                        <td className="px-3 py-1.5 font-mono text-slate-800">{log.date}</td>
+                        <td className="px-2 py-1.5 font-mono text-blue-600 font-bold">{log.engineHours}h</td>
+                        <td className="px-2 py-1.5 font-mono text-amber-600">{log.idleHours}h</td>
+                        <td className="px-2 py-1.5 font-mono text-emerald-600">{log.fuelUsageL}L</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="px-3 py-6 text-center text-xs text-slate-400">
+                        No telemetry logs for this period.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
 
@@ -338,7 +436,9 @@ function UnitDetail({ eq, today }) {
                 title: `Confirm Unit Check-In`,
                 message: `Are you sure you want to check in ${eq.id} (${eq.tier} ${eq.type}) back to the equipment yard?`,
                 confirmText: 'Check In Unit',
-                onConfirm: () => checkIn(eq.id),
+                onConfirm: () => {
+                  checkInEquipment(eq.id)
+                },
               })
             } else {
               navigate('/admin/checkin')
