@@ -38,15 +38,16 @@ export default function Dashboard() {
   const categories = useMemo(() => categorySummary(equipment), [equipment])
   const ranking = useMemo(() => utilizationRanking(active), [active])
 
+  const mlForecast = useAppStore((s) => s.mlForecast)
   // Same trained-model output the Forecasting page charts, so the two views
   // can never show different numbers for the same category.
   const forecastSummaries = useMemo(
-    () => mlSummaries().map((s) => ({ ...s, trend: s.delta })),
-    [],
+    () => mlSummaries(mlForecast).map((s) => ({ ...s, trend: s.delta })),
+    [mlForecast],
   )
   const [forecastType, setForecastType] = useState(forecastSummaries[0]?.type)
   const selectedForecast =
-    forecastSummaries.find((s) => s.type === forecastType) ?? forecastSummaries[0]
+    forecastSummaries.find((s) => s.type === forecastType) ?? forecastSummaries[0] ?? { type: 'Loading', series: [] }
 
   const alerts = useMemo(
     () => buildAlerts(equipment, today, usageLogs).filter((a) => !dismissedAlertIds.includes(a.id)),
@@ -99,6 +100,26 @@ export default function Dashboard() {
             Live asset status, open alerts, and performance metrics across all active sites.
           </p>
         </div>
+        <Button
+          variant="secondary"
+          onClick={async () => {
+            if (!window.confirm('Are you sure you want to reset the database to stock tables? This cannot be undone.')) return
+            try {
+              const res = await fetch('http://localhost:8000/api/admin/reset', { method: 'POST' })
+              if (!res.ok) throw new Error('Reset failed')
+              // Use store to show toast
+              useAppStore.getState().pushToast('Database reset to stock tables!', 'good')
+              // Optionally reload to fetch fresh state if frontend gets hooked up to API
+              setTimeout(() => window.location.reload(), 1500)
+            } catch (err) {
+              console.error(err)
+              useAppStore.getState().pushToast('Failed to reset database', 'critical')
+            }
+          }}
+        >
+          <Icon name="refresh" size={14} />
+          Reset Database
+        </Button>
       </div>
 
       {/* ① KPI Metrics Row */}

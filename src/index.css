@@ -13,50 +13,49 @@
   color-scheme: light;
 
   /* Backgrounds */
-  --bg-page:           #f0f2f5;
+  --bg-page:           #f3f4f6; /* Gray 100 */
   --bg-surface:        #ffffff;
-  --bg-surface-raised: #f8f9fa;
+  --bg-surface-raised: #f9fafb; /* Gray 50 */
 
   /* Typography */
-  --ink-primary:   #111827;
-  --ink-secondary: #374151;
-  --ink-muted:     #6b7280;
-  --ink-faint:     #9ca3af;
+  --ink-primary:   #111827; /* Gray 900 */
+  --ink-secondary: #374151; /* Gray 700 */
+  --ink-muted:     #6b7280; /* Gray 500 */
+  --ink-faint:     #9ca3af; /* Gray 400 */
 
   /* Borders */
-  --border:        #e5e7eb;
-  --border-strong: #d1d5db;
+  --border:        #e5e7eb; /* Gray 200 */
+  --border-strong: #d1d5db; /* Gray 300 */
 
   /* Brand accent */
-  --accent:      #1d4ed8;
-  --accent-dark: #1e3a8a;
+  --accent:      #2563eb; /* Blue 600 */
+  --accent-dark: #1d4ed8; /* Blue 700 */
   --accent-ink:  #ffffff;
-  --accent-wash: #eff6ff;
+  --accent-wash: #eff6ff; /* Blue 50 */
 
   /* Chart */
-  --series-engine: #1d4ed8;
-  --series-idle:   #9ca3af;
+  --series-engine: #2563eb;
+  --series-idle:   #d1d5db;
 
   /* Status */
-  --good:     #15803d;
-  --warning:  #b45309;
-  --serious:  #c2410c;
-  --critical: #b91c1c;
+  --good:     #16a34a; /* Green 600 */
+  --warning:  #d97706; /* Amber 600 */
+  --serious:  #ea580c; /* Orange 600 */
+  --critical: #dc2626; /* Red 600 */
 
-  --good-wash:     #dcfce7;
-  --warning-wash:  #fef3c7;
-  --serious-wash:  #ffedd5;
-  --critical-wash: #fee2e2;
+  --good-wash:     #dcfce7; /* Green 100 */
+  --warning-wash:  #fef3c7; /* Amber 100 */
+  --serious-wash:  #ffedd5; /* Orange 100 */
+  --critical-wash: #fee2e2; /* Red 100 */
 
   /* Shadows */
-  --shadow-card:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-panel: 0 2px 8px rgba(0,0,0,0.07);
-  --shadow-lifted: 0 8px 24px rgba(15,23,42,0.10), 0 2px 6px rgba(15,23,42,0.06);
+  --shadow-card:  0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-panel: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
-  /* Radius scale — keep to these three so the app reads as one system */
-  --radius-sm: 6px;   /* controls: buttons, inputs, chips, badges */
-  --radius-md: 10px;  /* cards, panels, tables */
-  --radius-lg: 14px;  /* hero / feature surfaces */
+  /* Radius scale */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
 }
 
 * { box-sizing: border-box; }
@@ -72,10 +71,19 @@ body {
   line-height: 1.5;
 }
 
-::selection { background: #dbeafe; }
+::selection { background: #bfdbfe; }
 button, input, select, textarea { font: inherit; color: inherit; }
 .tabular { font-variant-numeric: tabular-nums; }
 .font-data { font-family: ui-monospace, 'Roboto Mono', Consolas, monospace; }
+
+@media print {
+  @page {
+    margin: 0;
+  }
+  body {
+    margin: 1cm;
+  }
+}
 
 /* Thin scrollbar */
 ::-webkit-scrollbar { width: 5px; height: 5px; }

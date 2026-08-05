@@ -31,10 +31,10 @@ export default function AdminLayout() {
   const todayLabel = format(today, 'EEE, d MMM yyyy')
 
   return (
-    <div className="flex min-h-full flex-col" style={{ background: 'var(--bg-page)' }}>
+    <div className="flex h-screen flex-col" style={{ background: 'var(--bg-page)' }}>
       {/* Top Application Bar */}
       <header
-        className="flex items-center gap-0 border-b"
+        className="flex items-center gap-0 border-b print:hidden shrink-0"
         style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)', height: '52px' }}
       >
         {/* Brand / Logo */}
@@ -111,7 +111,7 @@ export default function AdminLayout() {
       </header>
 
       {/* Page Content */}
-      <main className="min-w-0 flex-1 overflow-y-auto" style={{ padding: '24px 32px' }}>
+      <main className="min-w-0 flex-1 overflow-y-auto px-8 py-6 print:p-0 print:overflow-visible">
         <Outlet />
       </main>
 

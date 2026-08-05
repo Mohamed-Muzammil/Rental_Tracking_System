@@ -1,4 +1,3 @@
-import mlForecast from '../data/mlForecast.json'
 import { siteById } from '../data/sites'
 
 // Output of the XGBoost model trained in ml/train_model.py. Predictions are
@@ -6,24 +5,24 @@ import { siteById } from '../data/sites'
 //   python ml/generate_dataset.py && python ml/train_model.py
 // then copy ml/artifacts/forecast_export.json to src/data/mlForecast.json.
 
-export const model = {
-  name: mlForecast.model,
-  trainedOn: mlForecast.trainedOn,
-  note: mlForecast.note,
-  featureCount: mlForecast.features,
-  trainRows: mlForecast.trainRows,
-  testRows: mlForecast.testRows,
-  testWindow: mlForecast.testWindow,
-  horizonMonths: mlForecast.horizonMonths,
-  metrics: mlForecast.metrics,
-  siteLevelMetrics: mlForecast.siteLevelMetrics,
+export function mlModelMeta(mlForecast) {
+  if (!mlForecast) return null
+  return {
+    name: mlForecast.model,
+    trainedOn: mlForecast.trainedOn,
+    note: mlForecast.note,
+    featureCount: mlForecast.features,
+    trainRows: mlForecast.trainRows,
+    testRows: mlForecast.testRows,
+    testWindow: mlForecast.testWindow,
+    horizonMonths: mlForecast.horizonMonths,
+    metrics: mlForecast.metrics,
+    siteLevelMetrics: mlForecast.siteLevelMetrics,
+  }
 }
 
-export const forecastTypes = Object.keys(mlForecast.byCategory).sort()
-
-/** Actual + predicted monthly rentals for one category, ready to chart. */
-export function mlSeriesFor(category) {
-  return mlForecast.byCategory[category] ?? []
+export function mlSeriesFor(mlForecast, category) {
+  return mlForecast?.byCategory?.[category] ?? []
 }
 
 /**
@@ -36,9 +35,11 @@ export function mlSeriesFor(category) {
  */
 const BASELINE_MONTHS = 3
 
-export function mlSummaries() {
+export function mlSummaries(mlForecast) {
+  if (!mlForecast || !mlForecast.byCategory) return []
+  const forecastTypes = Object.keys(mlForecast.byCategory).sort()
   return forecastTypes.map((type) => {
-    const series = mlSeriesFor(type)
+    const series = mlSeriesFor(mlForecast, type)
     const actuals = series.filter((p) => p.actual != null)
     const projected = series.filter((p) => p.actual == null && p.forecast != null)
 
@@ -62,8 +63,8 @@ export function mlSummaries() {
  * the highest predicted demand against units of that category currently idle
  * elsewhere. Returns at most `limit` suggestions, biggest gap first.
  */
-export function reallocationSuggestions(idleUnits, limit = 3) {
-  const bySite = mlForecast.siteForecasts ?? []
+export function reallocationSuggestions(mlForecast, idleUnits, limit = 3) {
+  const bySite = mlForecast?.siteForecasts ?? []
   const out = []
 
   for (const unit of idleUnits) {

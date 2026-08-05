@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { differenceInCalendarDays } from 'date-fns'
 import { Link } from 'react-router-dom'
+import { useAppStore } from '../../store/appStore'
 import { mlSummaries } from '../../lib/mlForecast'
 import { siteById } from '../../data/sites'
 import { catalogById } from '../../data/catalog'
@@ -40,10 +41,13 @@ function InsightCard({ icon, label, headline, detail, to, actionLabel }) {
 }
 
 export default function AiInsights({ active, today, categories }) {
+  const mlForecast = useAppStore((s) => s.mlForecast)
+
   const insights = useMemo(() => {
+    if (!mlForecast) return {}
     // 1. Demand forecast — same XGBoost output the Forecasting page charts, so
     // the two views can never disagree. Biggest projected rise vs recent trend.
-    const demand = [...mlSummaries()].sort((a, b) => b.delta - a.delta)[0]
+    const demand = [...mlSummaries(mlForecast)].sort((a, b) => b.delta - a.delta)[0]
 
     // 2. Idle detection — worst-utilization unit on rent, with recoverable spend.
     const idleUnits = active
@@ -74,7 +78,7 @@ export default function AiInsights({ active, today, categories }) {
   return (
     <div
       className="border p-4"
-      style={{ borderRadius: 'var(--radius-md)', background: 'var(--accent-wash)', borderColor: 'var(--border)' }}
+      style={{ borderRadius: 'var(--radius-md)', background: 'var(--bg-surface-raised)', borderColor: 'var(--border)' }}
     >
       <div className="mb-3 flex items-center justify-between gap-3">
         <h2 className="font-display text-[13px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--ink-secondary)' }}>

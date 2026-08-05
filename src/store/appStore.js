@@ -1,9 +1,8 @@
 import { create } from 'zustand'
 import { addDays, format } from 'date-fns'
-import { equipment as seedEquipment } from '../data/equipment'
-import { usageLogs as seedUsageLogs } from '../data/usageLogs'
 import { SIM_TODAY } from '../lib/clock'
 import { pointNearSite } from '../lib/geo'
+import { clientById } from '../data/clients'
 
 let toastId = 0
 
@@ -60,9 +59,10 @@ export const useAppStore = create((set, get) => ({
   selectedSiteId: 'ALL', // 'ALL' or specific siteId
 
   today: SIM_TODAY,
-  equipment: seedEquipment.map((e) => ({ ...e })),
-  usageLogs: [...seedUsageLogs],
-  misuseIncidents: [...seedIncidents],
+  equipment: [],
+  usageLogs: [],
+  misuseIncidents: [],
+  mlForecast: null,
   dismissedAlertIds: [],
   toasts: [],
   modalConfig: null,
@@ -70,6 +70,24 @@ export const useAppStore = create((set, get) => ({
   setRole: (role) => set({ role }),
   setActiveClientId: (activeClientId) => set({ activeClientId, selectedSiteId: 'ALL' }),
   setSelectedSiteId: (selectedSiteId) => set({ selectedSiteId }),
+
+  initializeStore: async () => {
+    try {
+      const [eqRes, logsRes, alertsRes, mlRes] = await Promise.all([
+        fetch('http://localhost:8000/api/equipment'),
+        fetch('http://localhost:8000/api/usage-logs'),
+        fetch('http://localhost:8000/api/incidents'),
+        fetch('http://localhost:8000/api/ml/forecast')
+      ])
+      const [equipment, usageLogs, misuseIncidents, mlForecast] = await Promise.all([
+        eqRes.json(), logsRes.json(), alertsRes.json(), mlRes.json()
+      ])
+      set({ equipment, usageLogs, misuseIncidents, mlForecast })
+    } catch (err) {
+      console.error("Failed to fetch backend state:", err)
+      get().pushToast("Failed to connect to backend", "critical")
+    }
+  },
 
   openModal: (config) => set({ modalConfig: config }),
   closeModal: () => set({ modalConfig: null }),
@@ -92,26 +110,36 @@ export const useAppStore = create((set, get) => ({
     get().pushToast(`Reminder sent for ${equipmentId}`, 'good')
   },
 
-  // Admin registers new physical equipment with unique ID & QR Code
-  registerEquipment: ({ id, type, tier, dailyCost, qrCode }) => {
+  registerEquipment: async ({ id, type, tier, dailyCost, qrCode }) => {
     const newEq = {
       id: id || `EQX-${Math.floor(2030 + Math.random() * 100)}`,
       type: type || 'Excavator',
       tier: tier || 'Heavy Duty',
-      catalogId: 'CAT-EXC-01',
-      status: 'completed', // Available in warehouse yard
-      siteId: null,
-      clientId: null,
-      operatorId: null,
-      checkIn: null,
-      expectedReturn: null,
-      avgEngineHoursPerDay: 0,
-      avgIdleHoursPerDay: 0,
-      qrCode: qrCode || `QR-${id || 'NEW'}`,
+      catalog_id: 'CAT-EXC-01',
+      status: 'completed',
+      site_id: null,
+      client_id: null,
+      operator_id: null,
+      check_in: null,
+      expected_return: null,
+      avg_engine_hours_per_day: 0,
+      avg_idle_hours_per_day: 0,
     }
 
-    set((s) => ({ equipment: [newEq, ...s.equipment] }))
-    get().pushToast(`Registered ${newEq.id} (${newEq.tier} ${newEq.type}) — Status: Available in Yard`, 'good')
+    try {
+      const res = await fetch('http://localhost:8000/api/equipment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newEq)
+      })
+      if (!res.ok) throw new Error('Backend rejection')
+      const savedEq = await res.json()
+      set((s) => ({ equipment: [savedEq, ...s.equipment] }))
+      get().pushToast(`Registered ${savedEq.id} (${savedEq.tier} ${savedEq.type}) — Status: Available in Yard`, 'good')
+    } catch (err) {
+      console.error(err)
+      get().pushToast(`Failed to register equipment`, 'critical')
+    }
   },
 
   // Hold / Reservation Step
@@ -203,6 +231,50 @@ export const useAppStore = create((set, get) => ({
     get().inspectAndReturnEquipment({ equipmentId, condition: 'good', notes: 'Checked in' })
   },
   checkIn: (equipmentId) => get().checkInEquipment(equipmentId),
+
+  issueFine: (equipmentId, amount) => {
+    const s = get()
+    const eq = s.equipment.find(e => e.id === equipmentId)
+    
+    if (eq && eq.clientId) {
+      const client = clientById[eq.clientId]
+      if (client) {
+        client.fineAmount = (client.fineAmount || 0) + (amount || 25000)
+        client.billingHistory = client.billingHistory || []
+        client.billingHistory.unshift({
+          id: `FINE-${equipmentId}-${Date.now().toString().slice(-4)}`,
+          date: format(s.today, 'yyyy-MM-dd'),
+          amount: amount || 25000,
+          status: 'overdue' // Default to overdue for fines to make them visible
+        })
+      }
+    }
+    
+    set((state) => ({
+      equipment: state.equipment.map((e) =>
+        e.id === equipmentId ? { ...e, finePending: true } : e
+      ),
+    }))
+    get().pushToast(`Fine formally issued and pending for ${equipmentId}`, 'critical')
+  },
+
+  payInvoice: (clientId, invoiceId) => {
+    const client = clientById[clientId]
+    if (client) {
+      const invoice = client.billingHistory.find(inv => inv.id === invoiceId)
+      if (invoice && invoice.status !== 'paid') {
+        invoice.status = 'paid'
+        if (invoice.id.startsWith('FINE-')) {
+          client.fineAmount = Math.max(0, (client.fineAmount || 0) - invoice.amount)
+          client.paidFines = (client.paidFines || 0) + invoice.amount
+        } else {
+          client.overdueAmount = Math.max(0, (client.overdueAmount || 0) - invoice.amount)
+        }
+        set((state) => ({ ...state })) // Trigger a re-render for components observing the store (even though we mutated the client object)
+        get().pushToast(`Invoice ${invoiceId} marked as paid`, 'good')
+      }
+    }
+  },
 
   // Misuse Incident Engine
   resolveMisuseIncident: ({ incidentId, actionType, notes }) => {

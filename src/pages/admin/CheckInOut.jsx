@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { format, addDays } from 'date-fns'
 import { useAppStore } from '../../store/appStore'
 import { sites } from '../../data/sites'
-import { clients } from '../../data/clients'
+import { clients, clientById } from '../../data/clients'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import Icon from '../../components/ui/Icon'
@@ -120,6 +120,12 @@ function CheckOutForm() {
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
+            {clientById[clientId]?.fineAmount > 0 && (
+              <div className="mt-2 text-[10px] font-bold px-2 py-1.5 rounded" style={{ background: 'var(--critical-wash)', color: 'var(--critical)' }}>
+                <Icon name="alertTriangle" size={12} className="inline-block mr-1 -mt-0.5" />
+                Warning: The organization has already been fined for not maintaining equipment. Please proceed at your own risk.
+              </div>
+            )}
           </Field>
           <Field label="Operator ID (optional — leave blank to flag as unassigned)">
             <input

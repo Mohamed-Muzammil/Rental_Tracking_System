@@ -85,10 +85,11 @@ def metrics(y_true, y_pred) -> dict:
 
 
 # ── training ──────────────────────────────────────────────────────────────────
-def main() -> None:
-    raw = pd.read_csv(DATA)
-    raw["month_ts"] = pd.to_datetime(raw["month"] + "-01")
-
+def train_and_export(raw: pd.DataFrame) -> tuple[xgb.XGBRegressor, dict]:
+    """Train + evaluate + build the forecast export from a raw demand-history
+    dataframe (as produced by generate_dataset.build()), returning the final
+    (refit-on-all-data) model and the export dict — without touching disk.
+    Callable directly from the FastAPI ml_service for live retraining."""
     df = add_features(raw)
     # Rows without a full 12-month lag history cannot be scored fairly.
     df = df.dropna(subset=FEATURES).reset_index(drop=True)
@@ -197,9 +198,6 @@ def main() -> None:
     future = forecast_forward(raw, final, FORECAST_HORIZON)
 
     # ── export ────────────────────────────────────────────────────────────────
-    ARTIFACTS.mkdir(exist_ok=True)
-    final.save_model(ARTIFACTS / "demand_model.json")
-
     history = (
         raw.groupby(["month", "category"], as_index=False)["rentals"].sum()
         .rename(columns={"rentals": "actual"})
@@ -210,6 +208,17 @@ def main() -> None:
         (a_model, a_naive, a_seasonal),
         len(train), len(test),
     )
+    return final, export
+
+
+def main() -> None:
+    raw = pd.read_csv(DATA)
+    raw["month_ts"] = pd.to_datetime(raw["month"] + "-01")
+
+    final, export = train_and_export(raw)
+
+    ARTIFACTS.mkdir(exist_ok=True)
+    final.save_model(ARTIFACTS / "demand_model.json")
     (ARTIFACTS / "forecast_export.json").write_text(json.dumps(export, indent=2))
 
     print(f"\nwrote {ARTIFACTS / 'demand_model.json'}")

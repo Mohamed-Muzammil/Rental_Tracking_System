@@ -8,21 +8,21 @@
   "testWindow": "2025-08 to 2026-07",
   "horizonMonths": 3,
   "metrics": {
-    "mae": 3.103,
-    "rmse": 4.062,
-    "r2": 0.5446,
+    "mae": 3.062,
+    "rmse": 4.004,
+    "r2": 0.5575,
     "maeNaive": 3.714,
     "maeSeasonalNaive": 3.738,
-    "skillVsNaive": 16.5,
-    "skillVsSeasonalNaive": 17.0
+    "skillVsNaive": 17.5,
+    "skillVsSeasonalNaive": 18.1
   },
   "siteLevelMetrics": {
     "mae": 0.77,
-    "rmse": 1.015,
-    "r2": 0.1465,
+    "rmse": 1.016,
+    "r2": 0.1448,
     "maeNaive": 0.966,
     "maeSeasonalNaive": 0.911,
-    "skillVsNaive": 20.3,
+    "skillVsNaive": 20.4,
     "skillVsSeasonalNaive": 15.5
   },
   "byCategory": {
@@ -125,12 +125,12 @@
       {
         "month": "2026-09",
         "actual": null,
-        "forecast": 14
+        "forecast": 13
       },
       {
         "month": "2026-10",
         "actual": null,
-        "forecast": 13
+        "forecast": 12
       }
     ],
     "Crane": [
@@ -237,7 +237,7 @@
       {
         "month": "2026-10",
         "actual": null,
-        "forecast": 9
+        "forecast": 10
       }
     ],
     "Excavator": [
@@ -334,17 +334,17 @@
       {
         "month": "2026-08",
         "actual": null,
-        "forecast": 25
+        "forecast": 24
       },
       {
         "month": "2026-09",
         "actual": null,
-        "forecast": 24
+        "forecast": 25
       },
       {
         "month": "2026-10",
         "actual": null,
-        "forecast": 19
+        "forecast": 21
       }
     ],
     "Forklift": [
@@ -441,7 +441,7 @@
       {
         "month": "2026-08",
         "actual": null,
-        "forecast": 14
+        "forecast": 15
       },
       {
         "month": "2026-09",
@@ -451,7 +451,7 @@
       {
         "month": "2026-10",
         "actual": null,
-        "forecast": 13
+        "forecast": 14
       }
     ],
     "Grader": [
@@ -548,17 +548,17 @@
       {
         "month": "2026-08",
         "actual": null,
-        "forecast": 9
+        "forecast": 10
       },
       {
         "month": "2026-09",
         "actual": null,
-        "forecast": 9
+        "forecast": 10
       },
       {
         "month": "2026-10",
         "actual": null,
-        "forecast": 10
+        "forecast": 12
       }
     ],
     "Loader": [
@@ -772,7 +772,7 @@
       {
         "month": "2026-10",
         "actual": null,
-        "forecast": 10
+        "forecast": 11
       }
     ]
   },
@@ -784,19 +784,25 @@
       "forecast": 3
     },
     {
-      "siteId": "S011",
-      "category": "Excavator",
-      "month": "2026-08",
-      "forecast": 3
-    },
-    {
       "siteId": "S012",
       "category": "Excavator",
       "month": "2026-08",
       "forecast": 3
     },
     {
-      "siteId": "S008",
+      "siteId": "S002",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 2
+    },
+    {
+      "siteId": "S001",
+      "category": "Excavator",
+      "month": "2026-08",
+      "forecast": 2
+    },
+    {
+      "siteId": "S011",
       "category": "Excavator",
       "month": "2026-08",
       "forecast": 2
@@ -808,13 +814,7 @@
       "forecast": 2
     },
     {
-      "siteId": "S002",
-      "category": "Forklift",
-      "month": "2026-08",
-      "forecast": 2
-    },
-    {
-      "siteId": "S002",
+      "siteId": "S010",
       "category": "Excavator",
       "month": "2026-08",
       "forecast": 2
@@ -826,14 +826,26 @@
       "forecast": 2
     },
     {
+      "siteId": "S008",
+      "category": "Excavator",
+      "month": "2026-08",
+      "forecast": 2
+    },
+    {
       "siteId": "S006",
       "category": "Excavator",
       "month": "2026-08",
       "forecast": 2
     },
     {
-      "siteId": "S010",
-      "category": "Excavator",
+      "siteId": "S011",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 2
+    },
+    {
+      "siteId": "S012",
+      "category": "Bulldozer",
       "month": "2026-08",
       "forecast": 2
     },
@@ -844,16 +856,316 @@
       "forecast": 2
     },
     {
-      "siteId": "S001",
+      "siteId": "S002",
       "category": "Excavator",
       "month": "2026-08",
       "forecast": 2
     },
     {
-      "siteId": "S012",
+      "siteId": "S001",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S001",
+      "category": "Crane",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S002",
       "category": "Bulldozer",
       "month": "2026-08",
-      "forecast": 2
+      "forecast": 1
+    },
+    {
+      "siteId": "S001",
+      "category": "Roller",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S001",
+      "category": "Bulldozer",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S001",
+      "category": "Grader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S003",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S003",
+      "category": "Grader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S003",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S003",
+      "category": "Crane",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S002",
+      "category": "Roller",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S003",
+      "category": "Bulldozer",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S002",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S002",
+      "category": "Grader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S001",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S002",
+      "category": "Crane",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S005",
+      "category": "Grader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S003",
+      "category": "Roller",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S004",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S004",
+      "category": "Bulldozer",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S004",
+      "category": "Excavator",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S004",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S007",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S007",
+      "category": "Roller",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S007",
+      "category": "Grader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S006",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S007",
+      "category": "Crane",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S007",
+      "category": "Bulldozer",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S006",
+      "category": "Grader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S006",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S008",
+      "category": "Bulldozer",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S005",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S005",
+      "category": "Roller",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S005",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S006",
+      "category": "Bulldozer",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S005",
+      "category": "Excavator",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S005",
+      "category": "Crane",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S005",
+      "category": "Bulldozer",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S012",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S011",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S011",
+      "category": "Roller",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S012",
+      "category": "Crane",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S011",
+      "category": "Grader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S007",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S008",
+      "category": "Crane",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S008",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S010",
+      "category": "Grader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S009",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S010",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S010",
+      "category": "Bulldozer",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S008",
+      "category": "Roller",
+      "month": "2026-08",
+      "forecast": 1
     },
     {
       "siteId": "S009",
@@ -862,98 +1174,38 @@
       "forecast": 1
     },
     {
-      "siteId": "S008",
-      "category": "Roller",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S008",
-      "category": "Loader",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S008",
-      "category": "Grader",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S001",
-      "category": "Bulldozer",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S008",
-      "category": "Crane",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S008",
-      "category": "Bulldozer",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
       "siteId": "S009",
       "category": "Forklift",
       "month": "2026-08",
       "forecast": 1
     },
     {
-      "siteId": "S007",
-      "category": "Loader",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S007",
+      "siteId": "S008",
       "category": "Grader",
       "month": "2026-08",
       "forecast": 1
     },
     {
-      "siteId": "S007",
-      "category": "Forklift",
+      "siteId": "S012",
+      "category": "Loader",
       "month": "2026-08",
       "forecast": 1
     },
     {
-      "siteId": "S007",
+      "siteId": "S012",
+      "category": "Grader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S012",
       "category": "Roller",
       "month": "2026-08",
       "forecast": 1
     },
     {
-      "siteId": "S010",
-      "category": "Forklift",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S009",
-      "category": "Loader",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S010",
+      "siteId": "S011",
       "category": "Bulldozer",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S001",
-      "category": "Crane",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S010",
-      "category": "Grader",
       "month": "2026-08",
       "forecast": 1
     },
@@ -965,253 +1217,7 @@
     },
     {
       "siteId": "S011",
-      "category": "Bulldozer",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S011",
       "category": "Crane",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S011",
-      "category": "Forklift",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S011",
-      "category": "Grader",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S011",
-      "category": "Loader",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S011",
-      "category": "Roller",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S012",
-      "category": "Crane",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S012",
-      "category": "Forklift",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S012",
-      "category": "Grader",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S012",
-      "category": "Loader",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S007",
-      "category": "Crane",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S007",
-      "category": "Bulldozer",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S004",
-      "category": "Excavator",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S006",
-      "category": "Loader",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S003",
-      "category": "Roller",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S003",
-      "category": "Loader",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S003",
-      "category": "Grader",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S003",
-      "category": "Forklift",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S003",
-      "category": "Crane",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S003",
-      "category": "Bulldozer",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S002",
-      "category": "Roller",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S002",
-      "category": "Loader",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S002",
-      "category": "Grader",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S002",
-      "category": "Crane",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S002",
-      "category": "Bulldozer",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S001",
-      "category": "Roller",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S001",
-      "category": "Loader",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S001",
-      "category": "Grader",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S001",
-      "category": "Forklift",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S004",
-      "category": "Bulldozer",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S012",
-      "category": "Roller",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S005",
-      "category": "Crane",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S005",
-      "category": "Forklift",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S006",
-      "category": "Forklift",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S006",
-      "category": "Bulldozer",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S004",
-      "category": "Loader",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S005",
-      "category": "Roller",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S005",
-      "category": "Loader",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S005",
-      "category": "Grader",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S005",
-      "category": "Bulldozer",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S004",
-      "category": "Forklift",
-      "month": "2026-08",
-      "forecast": 1
-    },
-    {
-      "siteId": "S005",
-      "category": "Excavator",
       "month": "2026-08",
       "forecast": 1
     }
