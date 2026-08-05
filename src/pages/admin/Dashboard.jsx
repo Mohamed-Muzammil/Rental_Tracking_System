@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAppStore } from '../../store/appStore'
 import { siteById, sites } from '../../data/sites'
@@ -11,9 +11,12 @@ import StatusChip from '../../components/ui/StatusChip'
 import UtilizationBar from '../../components/ui/UtilizationBar'
 import Button from '../../components/ui/Button'
 import Icon from '../../components/ui/Icon'
+import ForecastChart from '../../components/ui/ForecastChart'
 import CategoryAvailability from '../../components/dashboard/CategoryAvailability'
 import UtilizationLeaderboard from '../../components/dashboard/UtilizationLeaderboard'
 import AiInsights from '../../components/dashboard/AiInsights'
+import { demandHistory, equipmentTypes } from '../../data/demandHistory'
+import { forecastSeries } from '../../lib/forecast'
 
 const SEVERITY_RANK = { critical: 0, serious: 1, warning: 2, info: 3 }
 const SEVERITY_LABEL = { critical: 'Critical', serious: 'Serious', warning: 'Warning', info: 'Idea' }
@@ -34,6 +37,21 @@ export default function Dashboard() {
   const active = useMemo(() => equipment.filter((e) => e.status === 'active'), [equipment])
   const categories = useMemo(() => categorySummary(equipment), [equipment])
   const ranking = useMemo(() => utilizationRanking(active), [active])
+
+  const [forecastType, setForecastType] = useState(equipmentTypes[0])
+  const forecastSummaries = useMemo(
+    () =>
+      equipmentTypes.map((t) => {
+        const series = forecastSeries(t, demandHistory)
+        const actuals = series.filter((p) => p.actual != null)
+        const lastActual = actuals[actuals.length - 1]
+        const prevActual = actuals[actuals.length - 2]
+        const trend = lastActual && prevActual ? lastActual.actual - prevActual.actual : 0
+        return { type: t, series, lastActual, trend }
+      }),
+    [],
+  )
+  const selectedForecast = forecastSummaries.find((s) => s.type === forecastType)
 
   const alerts = useMemo(
     () => buildAlerts(equipment, today).filter((a) => !dismissedAlertIds.includes(a.id)),
@@ -230,6 +248,43 @@ export default function Dashboard() {
 
       {/* ⑦ Utilization leaderboard */}
       <UtilizationLeaderboard ranking={ranking} />
+
+      {/* ⑧ Demand Forecasting */}
+      <Card
+        title="Demand Forecasting"
+        action={
+          <span className="text-[11px]" style={{ color: 'var(--ink-muted)' }}>
+            3-month smoothed-trend projection
+          </span>
+        }
+      >
+        <div className="mb-4 flex flex-wrap gap-2">
+          {forecastSummaries.map((s) => (
+            <button
+              key={s.type}
+              onClick={() => setForecastType(s.type)}
+              className="rounded-lg border px-3 py-2 text-left transition-opacity hover:opacity-90"
+              style={{
+                background: forecastType === s.type ? 'var(--accent-wash)' : 'var(--bg-surface-raised)',
+                borderColor: forecastType === s.type ? 'var(--accent)' : 'var(--border)',
+              }}
+            >
+              <div className="font-display text-[10px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--ink-muted)' }}>
+                {s.type}
+              </div>
+              <div className="tabular mt-0.5 flex items-center gap-1.5 font-data text-lg font-medium leading-none" style={{ color: 'var(--ink-primary)' }}>
+                {s.series[s.series.length - 2]?.forecast ?? '—'}
+                {s.trend !== 0 && (
+                  <StatusChip severity={s.trend > 0 ? 'good' : 'warning'}>
+                    {s.trend > 0 ? '+' : ''}{s.trend}
+                  </StatusChip>
+                )}
+              </div>
+            </button>
+          ))}
+        </div>
+        <ForecastChart data={selectedForecast.series} height={240} />
+      </Card>
     </div>
   )
 }

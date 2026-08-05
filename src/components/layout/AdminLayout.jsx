@@ -30,75 +30,68 @@ export default function AdminLayout() {
   }, [equipment, today, dismissedAlertIds])
 
   return (
-    <div className="flex min-h-full" style={{ background: 'var(--bg-page)' }}>
-      <aside
-        className="flex w-56 shrink-0 flex-col gap-1 border-r px-3 py-4"
+    <div className="flex min-h-full flex-col" style={{ background: 'var(--bg-page)' }}>
+      <header
+        className="flex items-center gap-4 border-b px-5 py-2.5"
         style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)' }}
       >
         <button
           onClick={() => navigate('/')}
-          className="mb-4 flex items-center gap-2 px-2 text-left"
+          className="mr-2 shrink-0"
         >
           <span className="font-display text-[15px] font-bold uppercase tracking-[0.06em]" style={{ color: 'var(--accent)' }}>
             FleetLoop
           </span>
         </button>
 
-        {NAV.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.end}
-            className={({ isActive }) =>
-              `flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${isActive ? '' : 'hover:opacity-80'}`
-            }
-            style={({ isActive }) => ({
-              background: isActive ? 'var(--accent-wash)' : 'transparent',
-              color: isActive ? 'var(--accent)' : 'var(--ink-secondary)',
-            })}
-          >
-            <Icon name={item.icon} size={16} />
-            {item.label}
-            {item.to === '/admin/alerts' && openAlertCount > 0 && (
-              <span
-                className="tabular ml-auto rounded-full px-1.5 py-0.5 text-[11px] font-semibold"
-                style={{ background: 'var(--critical)', color: '#fff' }}
-              >
-                {openAlertCount}
-              </span>
-            )}
-          </NavLink>
-        ))}
+        <nav className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto">
+          {NAV.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              className={({ isActive }) =>
+                `flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[13px] font-medium transition-colors ${isActive ? '' : 'hover:opacity-80'}`
+              }
+              style={({ isActive }) => ({
+                background: isActive ? 'var(--accent-wash)' : 'transparent',
+                color: isActive ? 'var(--accent)' : 'var(--ink-secondary)',
+              })}
+            >
+              <Icon name={item.icon} size={15} />
+              {item.label}
+              {item.to === '/admin/alerts' && openAlertCount > 0 && (
+                <span
+                  className="tabular ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-none"
+                  style={{ background: 'var(--critical)', color: '#fff' }}
+                >
+                  {openAlertCount}
+                </span>
+              )}
+            </NavLink>
+          ))}
+        </nav>
 
-        <div className="mt-auto px-2 pt-3 text-[11px] uppercase tracking-[0.06em]" style={{ color: 'var(--ink-muted)' }}>
-          Rental Provider view
-        </div>
-      </aside>
-
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header
-          className="flex items-center justify-between gap-4 border-b px-6 py-3"
-          style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)' }}
-        >
-          <div>
-            <div className="font-display text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--ink-muted)' }}>
+        <div className="flex shrink-0 items-center gap-3">
+          <div className="text-right">
+            <div className="font-display text-[10px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--ink-muted)' }}>
               Simulated date
             </div>
-            <div className="tabular font-data text-sm font-medium" style={{ color: 'var(--ink-primary)' }}>
+            <div className="tabular font-data text-[13px] font-medium" style={{ color: 'var(--ink-primary)' }}>
               {format(today, 'EEE, d MMM yyyy')}
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="secondary" onClick={advanceDay}>
-              <Icon name="clock" size={14} /> Advance day
-            </Button>
-          </div>
-        </header>
-        <main className="min-w-0 flex-1 overflow-y-auto px-6 py-6">
-          <Outlet />
-        </main>
-      </div>
+          <Button variant="secondary" onClick={advanceDay}>
+            <Icon name="clock" size={14} /> Advance day
+          </Button>
+        </div>
+      </header>
+
+      <main className="min-w-0 flex-1 overflow-y-auto px-6 py-6">
+        <Outlet />
+      </main>
       <ToastStack />
     </div>
   )
 }
+

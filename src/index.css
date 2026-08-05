@@ -9,99 +9,99 @@
 :root {
   color-scheme: light;
 
-  --bg-page: #f5f1e8;
-  --bg-surface: #fdfbf7;
+  --bg-page: #eef1f8;
+  --bg-surface: #f7f8fc;
   --bg-surface-raised: #ffffff;
-  --ink-primary: #1c1a17;
-  --ink-secondary: #5c574c;
-  --ink-muted: #918a7b;
-  --border: #e3ddce;
-  --border-strong: #cdc4b0;
+  --ink-primary: #1a1d2e;
+  --ink-secondary: #4e5369;
+  --ink-muted: #8b90a5;
+  --border: #dde1ed;
+  --border-strong: #c5cada;
 
-  --accent: #b85c2e;
-  --accent-ink: #fffaf5;
-  --accent-wash: #f3e2d4;
+  --accent: #6246ea;
+  --accent-ink: #ffffff;
+  --accent-wash: #ece8fd;
 
-  --series-engine: #b85c2e;
-  --series-idle: #2a78d6;
+  --series-engine: #6246ea;
+  --series-idle: #2ecdb0;
 
-  --good: #0ca30c;
-  --warning: #b8790e;
-  --serious: #c1552f;
-  --critical: #d03b3b;
+  --good: #10b981;
+  --warning: #f59e0b;
+  --serious: #f97316;
+  --critical: #ef4444;
 
-  --good-wash: #e3f3e0;
-  --warning-wash: #f6e9d2;
-  --serious-wash: #f7e2d6;
-  --critical-wash: #fadedd;
+  --good-wash: #d1fae5;
+  --warning-wash: #fef3c7;
+  --serious-wash: #ffedd5;
+  --critical-wash: #fee2e2;
 
-  --shadow-card: 0 1px 2px rgba(28, 26, 23, 0.06), 0 8px 24px -12px rgba(28, 26, 23, 0.18);
+  --shadow-card: 0 1px 3px rgba(26, 29, 46, 0.06), 0 8px 24px -12px rgba(98, 70, 234, 0.10);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:where(:not([data-theme="light"])) {
     color-scheme: dark;
 
-    --bg-page: #15120e;
-    --bg-surface: #1e1a15;
-    --bg-surface-raised: #262019;
-    --ink-primary: #f3ede1;
-    --ink-secondary: #c7bda9;
-    --ink-muted: #8c8375;
-    --border: #34291d;
-    --border-strong: #4a3c29;
+    --bg-page: #0d0f18;
+    --bg-surface: #151827;
+    --bg-surface-raised: #1d2136;
+    --ink-primary: #e6e8f0;
+    --ink-secondary: #a2a8c3;
+    --ink-muted: #6a7199;
+    --border: #252a42;
+    --border-strong: #353b5a;
 
-    --accent: #d87f42;
-    --accent-ink: #1c1208;
-    --accent-wash: #3a2618;
+    --accent: #8b72ff;
+    --accent-ink: #0d0f18;
+    --accent-wash: #28204a;
 
-    --series-engine: #d87f42;
-    --series-idle: #5c9bea;
+    --series-engine: #8b72ff;
+    --series-idle: #34e0c0;
 
-    --good: #35c455;
-    --warning: #e0a930;
-    --serious: #e2795a;
-    --critical: #e2685f;
+    --good: #34d399;
+    --warning: #fbbf24;
+    --serious: #fb923c;
+    --critical: #f87171;
 
-    --good-wash: #17301c;
-    --warning-wash: #3a2c12;
-    --serious-wash: #392019;
-    --critical-wash: #3a1c1a;
+    --good-wash: #0d2e22;
+    --warning-wash: #2e2810;
+    --serious-wash: #2e1d0e;
+    --critical-wash: #2e1414;
 
-    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.35), 0 8px 24px -12px rgba(0, 0, 0, 0.55);
   }
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --bg-page: #15120e;
-  --bg-surface: #1e1a15;
-  --bg-surface-raised: #262019;
-  --ink-primary: #f3ede1;
-  --ink-secondary: #c7bda9;
-  --ink-muted: #8c8375;
-  --border: #34291d;
-  --border-strong: #4a3c29;
+  --bg-page: #0d0f18;
+  --bg-surface: #151827;
+  --bg-surface-raised: #1d2136;
+  --ink-primary: #e6e8f0;
+  --ink-secondary: #a2a8c3;
+  --ink-muted: #6a7199;
+  --border: #252a42;
+  --border-strong: #353b5a;
 
-  --accent: #d87f42;
-  --accent-ink: #1c1208;
-  --accent-wash: #3a2618;
+  --accent: #8b72ff;
+  --accent-ink: #0d0f18;
+  --accent-wash: #28204a;
 
-  --series-engine: #d87f42;
-  --series-idle: #5c9bea;
+  --series-engine: #8b72ff;
+  --series-idle: #34e0c0;
 
-  --good: #35c455;
-  --warning: #e0a930;
-  --serious: #e2795a;
-  --critical: #e2685f;
+  --good: #34d399;
+  --warning: #fbbf24;
+  --serious: #fb923c;
+  --critical: #f87171;
 
-  --good-wash: #17301c;
-  --warning-wash: #3a2c12;
-  --serious-wash: #392019;
-  --critical-wash: #3a1c1a;
+  --good-wash: #0d2e22;
+  --warning-wash: #2e2810;
+  --serious-wash: #2e1d0e;
+  --critical-wash: #2e1414;
 
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.35), 0 8px 24px -12px rgba(0, 0, 0, 0.55);
 }
 
 :root[data-theme="light"] {
