@@ -67,8 +67,8 @@ export default function Equipment() {
           </h1>
           <p className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
             {clientFilter
-              ? `${equipment.length} total units, ${equipment.filter((e) => e.clientId === clientFilter && e.status === 'active').length} units rented to ${clientById[clientFilter]?.name || 'client'}.`
-              : `Full fleet roster — ${equipment.length} units, ${equipment.filter((e) => e.status === 'active').length} currently on rent.`}
+              ? `${clientById[clientFilter]?.name || 'Client'} — ${equipment.filter((e) => e.clientId === clientFilter && e.status === 'active').length}/${equipment.length} units currently on rent.`
+              : `Full fleet roster — ${equipment.filter((e) => e.status === 'active').length}/${equipment.length} units currently on rent.`}
           </p>
         </div>
         <Button variant="primary" onClick={() => navigate('/admin/checkin')}>
