@@ -12,6 +12,7 @@ const SEVERITY_LABEL = { critical: 'Critical', high: 'High Risk', serious: 'Seri
 
 export default function AlertsCenter() {
   const equipment = useAppStore((s) => s.equipment)
+  const usageLogs = useAppStore((s) => s.usageLogs)
   const today = useAppStore((s) => s.today)
   const dismissedAlertIds = useAppStore((s) => s.dismissedAlertIds)
   const dismissAlert = useAppStore((s) => s.dismissAlert)
@@ -27,8 +28,8 @@ export default function AlertsCenter() {
 
   // Rule-based fleet alerts
   const alerts = useMemo(
-    () => buildAlerts(equipment, today).filter((a) => !dismissedAlertIds.includes(a.id)),
-    [equipment, today, dismissedAlertIds],
+    () => buildAlerts(equipment, today, usageLogs).filter((a) => !dismissedAlertIds.includes(a.id)),
+    [equipment, today, usageLogs, dismissedAlertIds],
   )
 
   const activeIncidents = useMemo(

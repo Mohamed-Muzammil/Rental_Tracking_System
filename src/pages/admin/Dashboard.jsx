@@ -29,6 +29,7 @@ const RETURN_SEVERITY = { overdue: 'critical', 'due-soon': 'warning', 'on-track'
 
 export default function Dashboard() {
   const equipment = useAppStore((s) => s.equipment)
+  const usageLogs = useAppStore((s) => s.usageLogs)
   const today = useAppStore((s) => s.today)
   const dismissedAlertIds = useAppStore((s) => s.dismissedAlertIds)
   const sendReminder = useAppStore((s) => s.sendReminder)
@@ -48,8 +49,8 @@ export default function Dashboard() {
     forecastSummaries.find((s) => s.type === forecastType) ?? forecastSummaries[0]
 
   const alerts = useMemo(
-    () => buildAlerts(equipment, today).filter((a) => !dismissedAlertIds.includes(a.id)),
-    [equipment, today, dismissedAlertIds],
+    () => buildAlerts(equipment, today, usageLogs).filter((a) => !dismissedAlertIds.includes(a.id)),
+    [equipment, today, usageLogs, dismissedAlertIds],
   )
 
   const kpis = useMemo(() => {

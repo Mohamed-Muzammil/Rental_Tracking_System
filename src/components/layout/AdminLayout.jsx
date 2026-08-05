@@ -20,12 +20,13 @@ export default function AdminLayout() {
   const navigate = useNavigate()
   const today = useAppStore((s) => s.today)
   const equipment = useAppStore((s) => s.equipment)
+  const usageLogs = useAppStore((s) => s.usageLogs)
   const dismissedAlertIds = useAppStore((s) => s.dismissedAlertIds)
 
   const openAlertCount = useMemo(() => {
-    const alerts = buildAlerts(equipment, today).filter((a) => !dismissedAlertIds.includes(a.id))
+    const alerts = buildAlerts(equipment, today, usageLogs).filter((a) => !dismissedAlertIds.includes(a.id))
     return alerts.length
-  }, [equipment, today, dismissedAlertIds])
+  }, [equipment, today, usageLogs, dismissedAlertIds])
 
   const todayLabel = format(today, 'EEE, d MMM yyyy')
 

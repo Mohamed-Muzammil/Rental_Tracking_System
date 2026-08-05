@@ -3,6 +3,7 @@ import { addDays, format } from 'date-fns'
 import { equipment as seedEquipment } from '../data/equipment'
 import { usageLogs as seedUsageLogs } from '../data/usageLogs'
 import { SIM_TODAY } from '../lib/clock'
+import { pointNearSite } from '../lib/geo'
 
 let toastId = 0
 
@@ -138,6 +139,7 @@ export const useAppStore = create((set, get) => ({
               expectedReturn,
               avgEngineHoursPerDay: 0,
               avgIdleHoursPerDay: 0,
+              returnRequested: false,
             }
           : e,
       ),
@@ -161,6 +163,7 @@ export const useAppStore = create((set, get) => ({
               expectedReturn,
               avgEngineHoursPerDay: 0,
               avgIdleHoursPerDay: 0,
+              returnRequested: false,
             }
           : e,
       ),
@@ -182,6 +185,7 @@ export const useAppStore = create((set, get) => ({
               status: newStatus,
               checkOut: format(s.today, 'yyyy-MM-dd'),
               operatorId: null,
+              returnRequested: false,
               maintenanceNote: isDamaged ? notes || 'Damaged upon return inspection' : null,
             }
           : e,
@@ -224,13 +228,17 @@ export const useAppStore = create((set, get) => ({
     get().pushToast(`Incident ${incidentId}: ${actionText}`, actionType === 'false_alarm' ? 'good' : 'warning')
   },
 
-  logUsage: ({ equipmentId, engineHours, idleHours, fuelUsageL, operatorId }) => {
+  logUsage: ({ equipmentId, engineHours, idleHours, fuelUsageL, operatorId, location }) => {
     const s = get()
     const date = format(s.today, 'yyyy-MM-dd')
+    // Fall back to the assigned site centre when no position is supplied, so a
+    // log entry always carries a location for the geofence rule to test.
+    const eq = s.equipment.find((e) => e.id === equipmentId)
+    const resolvedLocation = location ?? pointNearSite(eq?.siteId, 0)
     set((state) => ({
       usageLogs: [
         ...state.usageLogs,
-        { equipmentId, operatorId, date, engineHours, idleHours, fuelUsageL },
+        { equipmentId, operatorId, date, engineHours, idleHours, fuelUsageL, location: resolvedLocation },
       ],
       equipment: state.equipment.map((e) =>
         e.id === equipmentId ? { ...e, avgEngineHoursPerDay: engineHours, avgIdleHoursPerDay: idleHours } : e,
@@ -239,14 +247,14 @@ export const useAppStore = create((set, get) => ({
     get().pushToast(`Usage logged for ${equipmentId}`, 'good')
   },
 
+  // Allocates an existing yard unit of this catalog tier rather than
+  // manufacturing a new one — a rental is supposed to consume available
+  // stock, not grow the fleet. Only mints a new unit as a last resort, when
+  // the yard genuinely has none of that tier (equivalent to a warehouse
+  // order), and says so explicitly rather than pretending supply is infinite.
   rentFromCatalog: (catalogItem, siteId) => {
     const s = get()
-    const newId = `EQX-3${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`
-    const newEquipment = {
-      id: newId,
-      type: catalogItem.type,
-      tier: catalogItem.tier,
-      catalogId: catalogItem.id,
+    const dispatch = (id) => ({
       status: 'active',
       siteId: siteId || 'S001',
       clientId: s.activeClientId,
@@ -255,13 +263,33 @@ export const useAppStore = create((set, get) => ({
       expectedReturn: format(addDays(s.today, 30), 'yyyy-MM-dd'),
       avgEngineHoursPerDay: 0,
       avgIdleHoursPerDay: 0,
+      returnRequested: false,
+    })
+
+    const availableUnit = s.equipment.find(
+      (e) => e.status === 'completed' && e.catalogId === catalogItem.id,
+    )
+
+    if (availableUnit) {
+      set((state) => ({
+        equipment: state.equipment.map((e) =>
+          e.id === availableUnit.id ? { ...e, ...dispatch(e.id) } : e,
+        ),
+      }))
+      get().pushToast(`Allocated ${availableUnit.id} — ${catalogItem.tier} ${catalogItem.type} from yard stock`, 'good')
+      return
     }
 
-    set((state) => ({
-      equipment: [...state.equipment, newEquipment],
-    }))
-
-    get().pushToast(`Successfully rented ${catalogItem.tier} ${catalogItem.type} (${newId})`, 'good')
+    const newId = `EQX-3${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`
+    const newEquipment = {
+      id: newId,
+      type: catalogItem.type,
+      tier: catalogItem.tier,
+      catalogId: catalogItem.id,
+      ...dispatch(newId),
+    }
+    set((state) => ({ equipment: [...state.equipment, newEquipment] }))
+    get().pushToast(`No yard stock for ${catalogItem.tier} ${catalogItem.type} — ordered new unit ${newId}`, 'warning')
   },
 
   extendRental: (equipmentId, extraDays) => {
@@ -276,14 +304,17 @@ export const useAppStore = create((set, get) => ({
     get().pushToast(`Rental extended by ${extraDays} days for ${equipmentId}`, 'good')
   },
 
+  // Flags the unit for the provider's queue rather than silently rewriting the
+  // contract's expected-return date — that was overwriting real rental terms
+  // with today's date. The provider now sees an explicit alert and actions it
+  // through the normal check-in flow.
   requestReturn: (equipmentId) => {
-    const s = get()
     set((state) => ({
       equipment: state.equipment.map((e) =>
-        e.id === equipmentId ? { ...e, expectedReturn: format(s.today, 'yyyy-MM-dd') } : e,
+        e.id === equipmentId ? { ...e, returnRequested: true } : e,
       ),
     }))
-    get().pushToast(`Return dispatch scheduled for ${equipmentId}`, 'warning')
+    get().pushToast(`Return requested for ${equipmentId} — provider notified`, 'warning')
   },
 
   acceptRecommendation: (equipmentId, recommendation) => {

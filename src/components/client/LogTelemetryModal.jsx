@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useAppStore } from '../../store/appStore'
+import { pointNearSite } from '../../lib/geo'
+import { siteById } from '../../data/sites'
 import Button from '../ui/Button'
 import Icon from '../ui/Icon'
 
@@ -11,6 +13,11 @@ export default function LogTelemetryModal({ equipment, onClose }) {
   const [operatorId, setOperatorId] = useState(equipment.operatorId || 'OP101')
   const [mode, setMode] = useState('manual') // 'manual' | 'qr'
   const [scanning, setScanning] = useState(false)
+  // Real telemetry supplies GPS automatically. We simulate that here, with an
+  // opt-in toggle to demo the geofence rule flagging a machine off its site.
+  const [offSite, setOffSite] = useState(false)
+
+  const site = equipment.siteId ? siteById[equipment.siteId] : null
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -20,6 +27,7 @@ export default function LogTelemetryModal({ equipment, onClose }) {
       idleHours: Number(idleHours),
       fuelUsageL: Number(fuelUsageL),
       operatorId: operatorId.trim() || null,
+      location: pointNearSite(equipment.siteId, offSite ? 6 : 0),
     })
     onClose()
   }
@@ -168,6 +176,24 @@ export default function LogTelemetryModal({ equipment, onClose }) {
                   style={{ background: 'var(--bg-page)', borderColor: 'var(--border)' }}
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="flex items-center justify-between rounded-lg border px-3 py-2.5" style={{ borderColor: 'var(--border)', background: 'var(--bg-page)' }}>
+                <span className="flex items-center gap-2 text-xs font-medium" style={{ color: 'var(--ink-primary)' }}>
+                  <Icon name="mapPin" size={14} />
+                  GPS location — {site?.name ?? 'no site assigned'}
+                </span>
+                <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--ink-muted)' }}>
+                  Simulate off-site reading
+                  <input type="checkbox" checked={offSite} onChange={(e) => setOffSite(e.target.checked)} />
+                </span>
+              </label>
+              {offSite && (
+                <p className="mt-1 text-[11px]" style={{ color: 'var(--warning)' }}>
+                  This will log a position ~6km outside {site?.name ?? 'the assigned site'} — expect a geofence alert.
+                </p>
+              )}
             </div>
 
             <div className="mt-4 flex items-center justify-end gap-2 border-t pt-4" style={{ borderColor: 'var(--border)' }}>
