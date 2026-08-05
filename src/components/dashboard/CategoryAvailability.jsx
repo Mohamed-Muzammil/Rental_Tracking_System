@@ -50,6 +50,27 @@ export default function CategoryAvailability({ categories }) {
             </Link>
           )
         })}
+
+        {/* View All Card */}
+        <Link
+          to="/admin/equipment"
+          className="group flex flex-col items-center justify-center rounded-2xl border border-dashed transition-all hover:-translate-y-1 hover:border-blue-400 hover:bg-blue-50/30"
+          style={{
+            background: 'var(--bg-surface)',
+            borderColor: 'var(--border-strong)',
+            padding: '24px 12px',
+          }}
+        >
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-blue-600 transition-transform group-hover:scale-110">
+            <Icon name="chevronRight" size={28} />
+          </div>
+          <h3 className="text-center font-display text-sm font-bold text-slate-900">
+            View All Categories
+          </h3>
+          <p className="mt-1 text-center text-xs font-medium text-slate-500">
+            Explore full fleet roster →
+          </p>
+        </Link>
       </div>
   )
 }

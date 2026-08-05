@@ -7,10 +7,12 @@ import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import Icon from '../../components/ui/Icon'
 import StatusChip from '../../components/ui/StatusChip'
+import WarehouseQrDispatch from '../../components/admin/WarehouseQrDispatch'
 
 const TABS = [
-  { id: 'out', label: 'Check Out', icon: 'truck' },
-  { id: 'in', label: 'Check In', icon: 'checkCircle' },
+  { id: 'batch', label: 'Warehouse Batch Dispatch (QR Verification)', icon: 'truck' },
+  { id: 'out', label: 'Single Unit Check Out', icon: 'swap' },
+  { id: 'in', label: 'Unit Check In', icon: 'checkCircle' },
 ]
 
 const fieldStyle = {
@@ -20,25 +22,25 @@ const fieldStyle = {
 }
 
 export default function CheckInOut() {
-  const [tab, setTab] = useState('out')
+  const [tab, setTab] = useState('batch')
 
   return (
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="font-display text-xl font-semibold" style={{ color: 'var(--ink-primary)' }}>
-          Check-in / Check-out
+          Yard Check-in / Check-out & QR Dispatch
         </h1>
         <p className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
-          Simulates a QR/RFID scan at the yard gate — pick a unit and confirm.
+          Manage batch orders, verify physical machinery QR codes on truck loading, and process single unit check-ins.
         </p>
       </div>
 
-      <div className="flex gap-1 self-start rounded-lg border p-0.5" style={{ borderColor: 'var(--border-strong)' }}>
+      <div className="flex flex-wrap gap-1 self-start rounded-lg border p-0.5" style={{ borderColor: 'var(--border-strong)' }}>
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium"
+            className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
             style={{
               background: tab === t.id ? 'var(--accent)' : 'transparent',
               color: tab === t.id ? 'var(--accent-ink)' : 'var(--ink-secondary)',
@@ -50,7 +52,13 @@ export default function CheckInOut() {
         ))}
       </div>
 
-      {tab === 'out' ? <CheckOutForm /> : <CheckInList />}
+      {tab === 'batch' ? (
+        <WarehouseQrDispatch />
+      ) : tab === 'out' ? (
+        <CheckOutForm />
+      ) : (
+        <CheckInList />
+      )}
     </div>
   )
 }
@@ -82,7 +90,7 @@ function CheckOutForm() {
   }
 
   return (
-    <Card title="Simulated scan — check out a unit" className="max-w-xl">
+    <Card title="Simulated scan — check out a single unit" className="max-w-xl">
       {available.length === 0 ? (
         <p className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
           No available units in the yard right now.
