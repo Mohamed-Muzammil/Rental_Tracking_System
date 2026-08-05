@@ -3,6 +3,7 @@ import { format, addDays } from 'date-fns'
 import { useAppStore } from '../../store/appStore'
 import { sites } from '../../data/sites'
 import { clients } from '../../data/clients'
+import { equipmentTypes } from '../../data/demandHistory'
 import Card from '../ui/Card'
 import Button from '../ui/Button'
 import Icon from '../ui/Icon'
@@ -23,9 +24,15 @@ export default function WarehouseQrDispatch() {
   // Step 1: Order Setup
   const [clientId, setClientId] = useState('C001')
   const [siteId, setSiteId] = useState('S001')
-  const [excavatorQty, setExcavatorQty] = useState(2)
-  const [bulldozerQty, setBulldozerQty] = useState(1)
-  const [craneQty, setCraneQty] = useState(0)
+  const [requestedQuantities, setRequestedQuantities] = useState({
+    Excavator: 2,
+    Bulldozer: 1,
+    Crane: 0,
+    Grader: 0,
+    Forklift: 0,
+    Loader: 0,
+    Roller: 0,
+  })
   const [expectedReturn, setExpectedReturn] = useState(format(addDays(today, 14), 'yyyy-MM-dd'))
 
   // Step 2: Allocated Order State
@@ -44,22 +51,18 @@ export default function WarehouseQrDispatch() {
 
     const allocated = []
 
-    // Helper to pick N available units of a type
-    const pickUnits = (type, qty) => {
+    equipmentTypes.forEach((type) => {
+      const qty = Number(requestedQuantities[type] || 0)
       if (qty <= 0) return
-      const matches = availableEquipment.filter((e) => e.type === type && !allocated.some((a) => a.id === e.id))
+      const matches = availableEquipment.filter((eq) => eq.type === type && !allocated.some((a) => a.id === eq.id))
       const picked = matches.slice(0, qty)
       allocated.push(...picked)
-    }
-
-    pickUnits('Excavator', Number(excavatorQty))
-    pickUnits('Bulldozer', Number(bulldozerQty))
-    pickUnits('Crane', Number(craneQty))
+    })
 
     if (allocated.length === 0) {
       openModal({
         title: 'Equipment Allocation Unavailable',
-        message: 'No available equipment in the yard matching your requested categories. Please try adjusting requested quantities.',
+        message: 'No available equipment in the yard matching your requested quantities. Please check available machinery counts.',
         type: 'alert',
       })
       return
@@ -167,44 +170,35 @@ export default function WarehouseQrDispatch() {
             </div>
 
             <div className="border-t pt-3 border-slate-200">
-              <label className="block font-bold uppercase tracking-wider text-slate-500 text-[10px] mb-2">Requested Machinery Quantities</label>
-              <div className="grid grid-cols-3 gap-2">
-                <div>
-                  <span className="text-[11px] font-semibold text-slate-700">Excavators</span>
-                  <input
-                    type="number"
-                    min="0"
-                    max="5"
-                    value={excavatorQty}
-                    onChange={(e) => setExcavatorQty(e.target.value)}
-                    className="mt-1 w-full rounded-lg border px-2.5 py-1.5 font-bold outline-hidden"
-                    style={inputStyle}
-                  />
-                </div>
-                <div>
-                  <span className="text-[11px] font-semibold text-slate-700">Bulldozers</span>
-                  <input
-                    type="number"
-                    min="0"
-                    max="5"
-                    value={bulldozerQty}
-                    onChange={(e) => setBulldozerQty(e.target.value)}
-                    className="mt-1 w-full rounded-lg border px-2.5 py-1.5 font-bold outline-hidden"
-                    style={inputStyle}
-                  />
-                </div>
-                <div>
-                  <span className="text-[11px] font-semibold text-slate-700">Cranes</span>
-                  <input
-                    type="number"
-                    min="0"
-                    max="5"
-                    value={craneQty}
-                    onChange={(e) => setCraneQty(e.target.value)}
-                    className="mt-1 w-full rounded-lg border px-2.5 py-1.5 font-bold outline-hidden"
-                    style={inputStyle}
-                  />
-                </div>
+              <label className="block font-bold uppercase tracking-wider text-slate-500 text-[10px] mb-2">
+                Requested Machinery Quantities (All 7 Fleet Categories)
+              </label>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {equipmentTypes.map((type) => {
+                  const availCount = availableEquipment.filter((e) => e.type === type).length
+                  return (
+                    <div key={type} className="rounded-lg border p-2 bg-slate-50/50" style={{ borderColor: 'var(--border)' }}>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-800">{type}s</span>
+                        <span className="text-[9px] font-semibold text-slate-400">Yard: {availCount}</span>
+                      </div>
+                      <input
+                        type="number"
+                        min="0"
+                        max={availCount || 10}
+                        value={requestedQuantities[type] ?? 0}
+                        onChange={(e) =>
+                          setRequestedQuantities((prev) => ({
+                            ...prev,
+                            [type]: Math.max(0, parseInt(e.target.value) || 0),
+                          }))
+                        }
+                        className="mt-1 w-full rounded-md border px-2 py-1 text-xs font-bold font-mono outline-hidden bg-white"
+                        style={inputStyle}
+                      />
+                    </div>
+                  )
+                })}
               </div>
             </div>
 
