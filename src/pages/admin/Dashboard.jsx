@@ -101,7 +101,7 @@ export default function Dashboard() {
       </div>
 
       {/* ① KPI Metrics Row */}
-      <div className="grid grid-cols-2 gap-px sm:grid-cols-3 lg:grid-cols-5 border border-slate-200 bg-slate-200">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <StatTile
           label="Fleet Utilization"
           value={kpis.utilization}
@@ -117,28 +117,32 @@ export default function Dashboard() {
 
       {/* ② Fleet Summary Strip */}
       <div
-        className="flex flex-wrap items-center divide-x border bg-white"
-        style={{ borderColor: 'var(--border)' }}
+        className="flex flex-wrap items-center gap-4 bg-white px-5 py-3"
+        style={{
+          borderRadius: '8px',
+          border: '1px solid var(--border)',
+          boxShadow: 'var(--shadow-card)',
+        }}
       >
         {[
           { label: 'Fleet Size', value: kpis.total + ' units' },
           { label: 'In Maintenance', value: kpis.maintenanceCount + ' units' },
           { label: 'Client Accounts', value: `${kpis.activeCustomers} / ${clients.length}` },
           { label: 'Deployed Sites', value: `${kpis.activeSites} / ${sites.length}` },
-        ].map((s) => (
-          <div key={s.label} className="flex flex-col gap-0.5 px-5 py-3">
-            <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'var(--ink-muted)' }}>{s.label}</span>
-            <span className="tabular font-data text-sm font-semibold" style={{ color: 'var(--ink-primary)' }}>{s.value}</span>
+        ].map((s, i) => (
+          <div key={s.label} className="flex items-center gap-3">
+            {i > 0 && <div className="h-8 w-px bg-slate-200" />}
+            <div className="flex flex-col gap-0.5">
+              <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'var(--ink-muted)' }}>{s.label}</span>
+              <span className="tabular font-data text-sm font-semibold" style={{ color: 'var(--ink-primary)' }}>{s.value}</span>
+            </div>
           </div>
         ))}
       </div>
 
       {/* ③ Asset Categories */}
       <div>
-        <div className="mb-3 flex items-center gap-3">
-          <h2 className="text-[11px] font-bold uppercase tracking-widest" style={{ color: 'var(--ink-muted)' }}>Category Availability</h2>
-          <div className="flex-1 border-t" style={{ borderColor: 'var(--border)' }} />
-        </div>
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'var(--ink-muted)' }}>Category Availability</p>
         <CategoryAvailability categories={categories} />
       </div>
 

@@ -1,13 +1,21 @@
 export default function Card({ title, action, children, className = '', bodyClassName = '' }) {
   return (
     <div
-      className={`border bg-white ${className}`}
-      style={{ borderColor: 'var(--border)', boxShadow: 'var(--shadow-card)' }}
+      className={`bg-white ${className}`}
+      style={{
+        borderRadius: '8px',
+        border: '1px solid var(--border)',
+        boxShadow: 'var(--shadow-card)',
+      }}
     >
       {(title || action) && (
         <div
-          className="flex items-center justify-between gap-4 border-b px-5 py-3"
-          style={{ borderColor: 'var(--border)', background: 'var(--bg-surface-raised)' }}
+          className="flex items-center justify-between gap-4 px-5 py-3"
+          style={{
+            borderBottom: '1px solid var(--border)',
+            borderRadius: '8px 8px 0 0',
+            background: 'var(--bg-surface-raised)',
+          }}
         >
           {title && (
             <h3

@@ -3,43 +3,41 @@ const SEVERITY_BORDER = {
   warning:  '#b45309',
   serious:  '#c2410c',
   critical: '#b91c1c',
-  neutral:  '#d1d5db',
+  neutral:  '#e5e7eb',
 }
 
-const SEVERITY_VALUE_COLOR = {
+const SEVERITY_VALUE = {
   good:     '#15803d',
   warning:  '#b45309',
   serious:  '#c2410c',
   critical: '#b91c1c',
-  neutral:  'var(--ink-primary)',
+  neutral:  '#111827',
 }
 
 export default function StatTile({ label, value, unit, hint, severity = 'neutral' }) {
-  const borderColor = SEVERITY_BORDER[severity] ?? SEVERITY_BORDER.neutral
-  const valueColor  = SEVERITY_VALUE_COLOR[severity] ?? SEVERITY_VALUE_COLOR.neutral
-  const hasAccent   = severity !== 'neutral'
+  const borderTop = SEVERITY_BORDER[severity] ?? SEVERITY_BORDER.neutral
+  const valueColor = SEVERITY_VALUE[severity] ?? SEVERITY_VALUE.neutral
+  const hasAccent = severity !== 'neutral'
 
   return (
     <div
-      className="relative flex flex-col gap-2 bg-white border p-4"
+      className="flex flex-col gap-2 bg-white p-5"
       style={{
-        borderColor: 'var(--border)',
-        borderLeft: `3px solid ${borderColor}`,
+        borderRadius: '8px',
+        borderTop: `3px solid ${borderTop}`,
         boxShadow: 'var(--shadow-card)',
       }}
     >
-      {/* Label */}
       <div
-        className="text-[11px] font-semibold uppercase tracking-widest"
-        style={{ color: 'var(--ink-muted)', letterSpacing: '0.07em' }}
+        className="text-[10px] font-semibold uppercase tracking-widest"
+        style={{ color: 'var(--ink-muted)' }}
       >
         {label}
       </div>
 
-      {/* Value */}
       <div className="flex items-baseline gap-1.5">
         <span
-          className="tabular font-data text-2xl font-semibold leading-none"
+          className="tabular font-data text-[26px] font-semibold leading-none"
           style={{ color: hasAccent ? valueColor : 'var(--ink-primary)' }}
         >
           {value}
@@ -51,7 +49,6 @@ export default function StatTile({ label, value, unit, hint, severity = 'neutral
         )}
       </div>
 
-      {/* Hint */}
       {hint && (
         <div className="text-[12px]" style={{ color: 'var(--ink-muted)' }}>
           {hint}
