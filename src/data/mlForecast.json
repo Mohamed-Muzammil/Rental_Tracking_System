@@ -1,0 +1,1219 @@
+{
+  "model": "XGBoost (count:poisson)",
+  "trainedOn": "synthetic 5-year rental history \u2014 5,040 observations, 84 site x category series",
+  "note": "Data is synthetic. Metrics are measured on a held-out final year, never seen during training.",
+  "features": 19,
+  "trainRows": 3024,
+  "testRows": 1008,
+  "testWindow": "2025-08 to 2026-07",
+  "horizonMonths": 3,
+  "metrics": {
+    "mae": 3.103,
+    "rmse": 4.062,
+    "r2": 0.5446,
+    "maeNaive": 3.714,
+    "maeSeasonalNaive": 3.738,
+    "skillVsNaive": 16.5,
+    "skillVsSeasonalNaive": 17.0
+  },
+  "siteLevelMetrics": {
+    "mae": 0.77,
+    "rmse": 1.015,
+    "r2": 0.1465,
+    "maeNaive": 0.966,
+    "maeSeasonalNaive": 0.911,
+    "skillVsNaive": 20.3,
+    "skillVsSeasonalNaive": 15.5
+  },
+  "byCategory": {
+    "Bulldozer": [
+      {
+        "month": "2025-02",
+        "actual": 11,
+        "forecast": null
+      },
+      {
+        "month": "2025-03",
+        "actual": 11,
+        "forecast": null
+      },
+      {
+        "month": "2025-04",
+        "actual": 9,
+        "forecast": null
+      },
+      {
+        "month": "2025-05",
+        "actual": 15,
+        "forecast": null
+      },
+      {
+        "month": "2025-06",
+        "actual": 11,
+        "forecast": null
+      },
+      {
+        "month": "2025-07",
+        "actual": 7,
+        "forecast": null
+      },
+      {
+        "month": "2025-08",
+        "actual": 12,
+        "forecast": null
+      },
+      {
+        "month": "2025-09",
+        "actual": 15,
+        "forecast": null
+      },
+      {
+        "month": "2025-10",
+        "actual": 10,
+        "forecast": null
+      },
+      {
+        "month": "2025-11",
+        "actual": 14,
+        "forecast": null
+      },
+      {
+        "month": "2025-12",
+        "actual": 13,
+        "forecast": null
+      },
+      {
+        "month": "2026-01",
+        "actual": 7,
+        "forecast": null
+      },
+      {
+        "month": "2026-02",
+        "actual": 14,
+        "forecast": null
+      },
+      {
+        "month": "2026-03",
+        "actual": 16,
+        "forecast": null
+      },
+      {
+        "month": "2026-04",
+        "actual": 12,
+        "forecast": null
+      },
+      {
+        "month": "2026-05",
+        "actual": 9,
+        "forecast": null
+      },
+      {
+        "month": "2026-06",
+        "actual": 17,
+        "forecast": null
+      },
+      {
+        "month": "2026-07",
+        "actual": 12,
+        "forecast": 12
+      },
+      {
+        "month": "2026-08",
+        "actual": null,
+        "forecast": 13
+      },
+      {
+        "month": "2026-09",
+        "actual": null,
+        "forecast": 14
+      },
+      {
+        "month": "2026-10",
+        "actual": null,
+        "forecast": 13
+      }
+    ],
+    "Crane": [
+      {
+        "month": "2025-02",
+        "actual": 8,
+        "forecast": null
+      },
+      {
+        "month": "2025-03",
+        "actual": 4,
+        "forecast": null
+      },
+      {
+        "month": "2025-04",
+        "actual": 5,
+        "forecast": null
+      },
+      {
+        "month": "2025-05",
+        "actual": 6,
+        "forecast": null
+      },
+      {
+        "month": "2025-06",
+        "actual": 4,
+        "forecast": null
+      },
+      {
+        "month": "2025-07",
+        "actual": 6,
+        "forecast": null
+      },
+      {
+        "month": "2025-08",
+        "actual": 10,
+        "forecast": null
+      },
+      {
+        "month": "2025-09",
+        "actual": 7,
+        "forecast": null
+      },
+      {
+        "month": "2025-10",
+        "actual": 8,
+        "forecast": null
+      },
+      {
+        "month": "2025-11",
+        "actual": 7,
+        "forecast": null
+      },
+      {
+        "month": "2025-12",
+        "actual": 5,
+        "forecast": null
+      },
+      {
+        "month": "2026-01",
+        "actual": 8,
+        "forecast": null
+      },
+      {
+        "month": "2026-02",
+        "actual": 4,
+        "forecast": null
+      },
+      {
+        "month": "2026-03",
+        "actual": 6,
+        "forecast": null
+      },
+      {
+        "month": "2026-04",
+        "actual": 4,
+        "forecast": null
+      },
+      {
+        "month": "2026-05",
+        "actual": 2,
+        "forecast": null
+      },
+      {
+        "month": "2026-06",
+        "actual": 1,
+        "forecast": null
+      },
+      {
+        "month": "2026-07",
+        "actual": 5,
+        "forecast": 5
+      },
+      {
+        "month": "2026-08",
+        "actual": null,
+        "forecast": 8
+      },
+      {
+        "month": "2026-09",
+        "actual": null,
+        "forecast": 8
+      },
+      {
+        "month": "2026-10",
+        "actual": null,
+        "forecast": 9
+      }
+    ],
+    "Excavator": [
+      {
+        "month": "2025-02",
+        "actual": 10,
+        "forecast": null
+      },
+      {
+        "month": "2025-03",
+        "actual": 14,
+        "forecast": null
+      },
+      {
+        "month": "2025-04",
+        "actual": 12,
+        "forecast": null
+      },
+      {
+        "month": "2025-05",
+        "actual": 25,
+        "forecast": null
+      },
+      {
+        "month": "2025-06",
+        "actual": 20,
+        "forecast": null
+      },
+      {
+        "month": "2025-07",
+        "actual": 21,
+        "forecast": null
+      },
+      {
+        "month": "2025-08",
+        "actual": 33,
+        "forecast": null
+      },
+      {
+        "month": "2025-09",
+        "actual": 31,
+        "forecast": null
+      },
+      {
+        "month": "2025-10",
+        "actual": 21,
+        "forecast": null
+      },
+      {
+        "month": "2025-11",
+        "actual": 20,
+        "forecast": null
+      },
+      {
+        "month": "2025-12",
+        "actual": 19,
+        "forecast": null
+      },
+      {
+        "month": "2026-01",
+        "actual": 9,
+        "forecast": null
+      },
+      {
+        "month": "2026-02",
+        "actual": 23,
+        "forecast": null
+      },
+      {
+        "month": "2026-03",
+        "actual": 13,
+        "forecast": null
+      },
+      {
+        "month": "2026-04",
+        "actual": 22,
+        "forecast": null
+      },
+      {
+        "month": "2026-05",
+        "actual": 16,
+        "forecast": null
+      },
+      {
+        "month": "2026-06",
+        "actual": 17,
+        "forecast": null
+      },
+      {
+        "month": "2026-07",
+        "actual": 22,
+        "forecast": 22
+      },
+      {
+        "month": "2026-08",
+        "actual": null,
+        "forecast": 25
+      },
+      {
+        "month": "2026-09",
+        "actual": null,
+        "forecast": 24
+      },
+      {
+        "month": "2026-10",
+        "actual": null,
+        "forecast": 19
+      }
+    ],
+    "Forklift": [
+      {
+        "month": "2025-02",
+        "actual": 12,
+        "forecast": null
+      },
+      {
+        "month": "2025-03",
+        "actual": 11,
+        "forecast": null
+      },
+      {
+        "month": "2025-04",
+        "actual": 7,
+        "forecast": null
+      },
+      {
+        "month": "2025-05",
+        "actual": 15,
+        "forecast": null
+      },
+      {
+        "month": "2025-06",
+        "actual": 11,
+        "forecast": null
+      },
+      {
+        "month": "2025-07",
+        "actual": 13,
+        "forecast": null
+      },
+      {
+        "month": "2025-08",
+        "actual": 14,
+        "forecast": null
+      },
+      {
+        "month": "2025-09",
+        "actual": 13,
+        "forecast": null
+      },
+      {
+        "month": "2025-10",
+        "actual": 14,
+        "forecast": null
+      },
+      {
+        "month": "2025-11",
+        "actual": 10,
+        "forecast": null
+      },
+      {
+        "month": "2025-12",
+        "actual": 15,
+        "forecast": null
+      },
+      {
+        "month": "2026-01",
+        "actual": 20,
+        "forecast": null
+      },
+      {
+        "month": "2026-02",
+        "actual": 13,
+        "forecast": null
+      },
+      {
+        "month": "2026-03",
+        "actual": 15,
+        "forecast": null
+      },
+      {
+        "month": "2026-04",
+        "actual": 17,
+        "forecast": null
+      },
+      {
+        "month": "2026-05",
+        "actual": 20,
+        "forecast": null
+      },
+      {
+        "month": "2026-06",
+        "actual": 16,
+        "forecast": null
+      },
+      {
+        "month": "2026-07",
+        "actual": 14,
+        "forecast": 14
+      },
+      {
+        "month": "2026-08",
+        "actual": null,
+        "forecast": 14
+      },
+      {
+        "month": "2026-09",
+        "actual": null,
+        "forecast": 14
+      },
+      {
+        "month": "2026-10",
+        "actual": null,
+        "forecast": 13
+      }
+    ],
+    "Grader": [
+      {
+        "month": "2025-02",
+        "actual": 5,
+        "forecast": null
+      },
+      {
+        "month": "2025-03",
+        "actual": 4,
+        "forecast": null
+      },
+      {
+        "month": "2025-04",
+        "actual": 5,
+        "forecast": null
+      },
+      {
+        "month": "2025-05",
+        "actual": 8,
+        "forecast": null
+      },
+      {
+        "month": "2025-06",
+        "actual": 6,
+        "forecast": null
+      },
+      {
+        "month": "2025-07",
+        "actual": 10,
+        "forecast": null
+      },
+      {
+        "month": "2025-08",
+        "actual": 5,
+        "forecast": null
+      },
+      {
+        "month": "2025-09",
+        "actual": 14,
+        "forecast": null
+      },
+      {
+        "month": "2025-10",
+        "actual": 12,
+        "forecast": null
+      },
+      {
+        "month": "2025-11",
+        "actual": 9,
+        "forecast": null
+      },
+      {
+        "month": "2025-12",
+        "actual": 7,
+        "forecast": null
+      },
+      {
+        "month": "2026-01",
+        "actual": 6,
+        "forecast": null
+      },
+      {
+        "month": "2026-02",
+        "actual": 8,
+        "forecast": null
+      },
+      {
+        "month": "2026-03",
+        "actual": 7,
+        "forecast": null
+      },
+      {
+        "month": "2026-04",
+        "actual": 6,
+        "forecast": null
+      },
+      {
+        "month": "2026-05",
+        "actual": 6,
+        "forecast": null
+      },
+      {
+        "month": "2026-06",
+        "actual": 9,
+        "forecast": null
+      },
+      {
+        "month": "2026-07",
+        "actual": 13,
+        "forecast": 13
+      },
+      {
+        "month": "2026-08",
+        "actual": null,
+        "forecast": 9
+      },
+      {
+        "month": "2026-09",
+        "actual": null,
+        "forecast": 9
+      },
+      {
+        "month": "2026-10",
+        "actual": null,
+        "forecast": 10
+      }
+    ],
+    "Loader": [
+      {
+        "month": "2025-02",
+        "actual": 7,
+        "forecast": null
+      },
+      {
+        "month": "2025-03",
+        "actual": 2,
+        "forecast": null
+      },
+      {
+        "month": "2025-04",
+        "actual": 5,
+        "forecast": null
+      },
+      {
+        "month": "2025-05",
+        "actual": 6,
+        "forecast": null
+      },
+      {
+        "month": "2025-06",
+        "actual": 5,
+        "forecast": null
+      },
+      {
+        "month": "2025-07",
+        "actual": 16,
+        "forecast": null
+      },
+      {
+        "month": "2025-08",
+        "actual": 18,
+        "forecast": null
+      },
+      {
+        "month": "2025-09",
+        "actual": 11,
+        "forecast": null
+      },
+      {
+        "month": "2025-10",
+        "actual": 16,
+        "forecast": null
+      },
+      {
+        "month": "2025-11",
+        "actual": 8,
+        "forecast": null
+      },
+      {
+        "month": "2025-12",
+        "actual": 15,
+        "forecast": null
+      },
+      {
+        "month": "2026-01",
+        "actual": 8,
+        "forecast": null
+      },
+      {
+        "month": "2026-02",
+        "actual": 8,
+        "forecast": null
+      },
+      {
+        "month": "2026-03",
+        "actual": 11,
+        "forecast": null
+      },
+      {
+        "month": "2026-04",
+        "actual": 8,
+        "forecast": null
+      },
+      {
+        "month": "2026-05",
+        "actual": 7,
+        "forecast": null
+      },
+      {
+        "month": "2026-06",
+        "actual": 8,
+        "forecast": null
+      },
+      {
+        "month": "2026-07",
+        "actual": 15,
+        "forecast": 15
+      },
+      {
+        "month": "2026-08",
+        "actual": null,
+        "forecast": 12
+      },
+      {
+        "month": "2026-09",
+        "actual": null,
+        "forecast": 12
+      },
+      {
+        "month": "2026-10",
+        "actual": null,
+        "forecast": 12
+      }
+    ],
+    "Roller": [
+      {
+        "month": "2025-02",
+        "actual": 4,
+        "forecast": null
+      },
+      {
+        "month": "2025-03",
+        "actual": 6,
+        "forecast": null
+      },
+      {
+        "month": "2025-04",
+        "actual": 2,
+        "forecast": null
+      },
+      {
+        "month": "2025-05",
+        "actual": 6,
+        "forecast": null
+      },
+      {
+        "month": "2025-06",
+        "actual": 6,
+        "forecast": null
+      },
+      {
+        "month": "2025-07",
+        "actual": 5,
+        "forecast": null
+      },
+      {
+        "month": "2025-08",
+        "actual": 12,
+        "forecast": null
+      },
+      {
+        "month": "2025-09",
+        "actual": 10,
+        "forecast": null
+      },
+      {
+        "month": "2025-10",
+        "actual": 10,
+        "forecast": null
+      },
+      {
+        "month": "2025-11",
+        "actual": 11,
+        "forecast": null
+      },
+      {
+        "month": "2025-12",
+        "actual": 9,
+        "forecast": null
+      },
+      {
+        "month": "2026-01",
+        "actual": 3,
+        "forecast": null
+      },
+      {
+        "month": "2026-02",
+        "actual": 6,
+        "forecast": null
+      },
+      {
+        "month": "2026-03",
+        "actual": 7,
+        "forecast": null
+      },
+      {
+        "month": "2026-04",
+        "actual": 4,
+        "forecast": null
+      },
+      {
+        "month": "2026-05",
+        "actual": 5,
+        "forecast": null
+      },
+      {
+        "month": "2026-06",
+        "actual": 5,
+        "forecast": null
+      },
+      {
+        "month": "2026-07",
+        "actual": 3,
+        "forecast": 3
+      },
+      {
+        "month": "2026-08",
+        "actual": null,
+        "forecast": 8
+      },
+      {
+        "month": "2026-09",
+        "actual": null,
+        "forecast": 8
+      },
+      {
+        "month": "2026-10",
+        "actual": null,
+        "forecast": 10
+      }
+    ]
+  },
+  "siteForecasts": [
+    {
+      "siteId": "S003",
+      "category": "Excavator",
+      "month": "2026-08",
+      "forecast": 3
+    },
+    {
+      "siteId": "S011",
+      "category": "Excavator",
+      "month": "2026-08",
+      "forecast": 3
+    },
+    {
+      "siteId": "S012",
+      "category": "Excavator",
+      "month": "2026-08",
+      "forecast": 3
+    },
+    {
+      "siteId": "S008",
+      "category": "Excavator",
+      "month": "2026-08",
+      "forecast": 2
+    },
+    {
+      "siteId": "S008",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 2
+    },
+    {
+      "siteId": "S002",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 2
+    },
+    {
+      "siteId": "S002",
+      "category": "Excavator",
+      "month": "2026-08",
+      "forecast": 2
+    },
+    {
+      "siteId": "S009",
+      "category": "Excavator",
+      "month": "2026-08",
+      "forecast": 2
+    },
+    {
+      "siteId": "S006",
+      "category": "Excavator",
+      "month": "2026-08",
+      "forecast": 2
+    },
+    {
+      "siteId": "S010",
+      "category": "Excavator",
+      "month": "2026-08",
+      "forecast": 2
+    },
+    {
+      "siteId": "S007",
+      "category": "Excavator",
+      "month": "2026-08",
+      "forecast": 2
+    },
+    {
+      "siteId": "S001",
+      "category": "Excavator",
+      "month": "2026-08",
+      "forecast": 2
+    },
+    {
+      "siteId": "S012",
+      "category": "Bulldozer",
+      "month": "2026-08",
+      "forecast": 2
+    },
+    {
+      "siteId": "S009",
+      "category": "Bulldozer",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S008",
+      "category": "Roller",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S008",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S008",
+      "category": "Grader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S001",
+      "category": "Bulldozer",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S008",
+      "category": "Crane",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S008",
+      "category": "Bulldozer",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S009",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S007",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S007",
+      "category": "Grader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S007",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S007",
+      "category": "Roller",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S010",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S009",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S010",
+      "category": "Bulldozer",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S001",
+      "category": "Crane",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S010",
+      "category": "Grader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S010",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S011",
+      "category": "Bulldozer",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S011",
+      "category": "Crane",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S011",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S011",
+      "category": "Grader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S011",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S011",
+      "category": "Roller",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S012",
+      "category": "Crane",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S012",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S012",
+      "category": "Grader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S012",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S007",
+      "category": "Crane",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S007",
+      "category": "Bulldozer",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S004",
+      "category": "Excavator",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S006",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S003",
+      "category": "Roller",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S003",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S003",
+      "category": "Grader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S003",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S003",
+      "category": "Crane",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S003",
+      "category": "Bulldozer",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S002",
+      "category": "Roller",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S002",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S002",
+      "category": "Grader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S002",
+      "category": "Crane",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S002",
+      "category": "Bulldozer",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S001",
+      "category": "Roller",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S001",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S001",
+      "category": "Grader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S001",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S004",
+      "category": "Bulldozer",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S012",
+      "category": "Roller",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S005",
+      "category": "Crane",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S005",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S006",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S006",
+      "category": "Bulldozer",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S004",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S005",
+      "category": "Roller",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S005",
+      "category": "Loader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S005",
+      "category": "Grader",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S005",
+      "category": "Bulldozer",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S004",
+      "category": "Forklift",
+      "month": "2026-08",
+      "forecast": 1
+    },
+    {
+      "siteId": "S005",
+      "category": "Excavator",
+      "month": "2026-08",
+      "forecast": 1
+    }
+  ]
+}

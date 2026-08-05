@@ -15,8 +15,7 @@ import ForecastChart from '../../components/ui/ForecastChart'
 import CategoryAvailability from '../../components/dashboard/CategoryAvailability'
 import UtilizationLeaderboard from '../../components/dashboard/UtilizationLeaderboard'
 
-import { demandHistory, equipmentTypes } from '../../data/demandHistory'
-import { forecastSeries } from '../../lib/forecast'
+import { mlSummaries } from '../../lib/mlForecast'
 
 const SEVERITY_RANK = { critical: 0, serious: 1, warning: 2, info: 3 }
 const SEVERITY_LABEL = { critical: 'Critical', serious: 'Serious', warning: 'Warning', info: 'Idea' }
@@ -38,20 +37,15 @@ export default function Dashboard() {
   const categories = useMemo(() => categorySummary(equipment), [equipment])
   const ranking = useMemo(() => utilizationRanking(active), [active])
 
-  const [forecastType, setForecastType] = useState(equipmentTypes[0])
+  // Same trained-model output the Forecasting page charts, so the two views
+  // can never show different numbers for the same category.
   const forecastSummaries = useMemo(
-    () =>
-      equipmentTypes.map((t) => {
-        const series = forecastSeries(t, demandHistory)
-        const actuals = series.filter((p) => p.actual != null)
-        const lastActual = actuals[actuals.length - 1]
-        const prevActual = actuals[actuals.length - 2]
-        const trend = lastActual && prevActual ? lastActual.actual - prevActual.actual : 0
-        return { type: t, series, lastActual, trend }
-      }),
+    () => mlSummaries().map((s) => ({ ...s, trend: s.delta })),
     [],
   )
-  const selectedForecast = forecastSummaries.find((s) => s.type === forecastType)
+  const [forecastType, setForecastType] = useState(forecastSummaries[0]?.type)
+  const selectedForecast =
+    forecastSummaries.find((s) => s.type === forecastType) ?? forecastSummaries[0]
 
   const alerts = useMemo(
     () => buildAlerts(equipment, today).filter((a) => !dismissedAlertIds.includes(a.id)),
@@ -250,7 +244,7 @@ export default function Dashboard() {
         action={
           <div className="flex items-center gap-2">
             <span className="text-[11px]" style={{ color: 'var(--ink-muted)' }}>
-              3-month smoothed-trend projection
+              XGBoost projection, 3-month horizon
             </span>
             <Link
               to="/admin/forecasting"
@@ -282,7 +276,7 @@ export default function Dashboard() {
                 {s.type}
               </div>
               <div className="tabular mt-0.5 flex items-center gap-1.5 font-data text-lg font-medium leading-none" style={{ color: 'var(--ink-primary)' }}>
-                {s.series[s.series.length - 2]?.forecast ?? '—'}
+                {s.nextForecast ?? '—'}
                 {s.trend !== 0 && (
                   <StatusChip severity={s.trend > 0 ? 'good' : 'warning'}>
                     {s.trend > 0 ? '+' : ''}{s.trend}

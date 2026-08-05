@@ -1,8 +1,7 @@
 import { useMemo } from 'react'
 import { differenceInCalendarDays } from 'date-fns'
 import { Link } from 'react-router-dom'
-import { demandHistory, equipmentTypes } from '../../data/demandHistory'
-import { forecastSeries } from '../../lib/forecast'
+import { mlSummaries } from '../../lib/mlForecast'
 import { siteById } from '../../data/sites'
 import { catalogById } from '../../data/catalog'
 import { utilizationOf, recommendationFor, UNDERUTILIZED_THRESHOLD } from '../../lib/rules'
@@ -40,20 +39,11 @@ function InsightCard({ icon, label, headline, detail, to, actionLabel }) {
   )
 }
 
-export default function AiInsights({ equipment, active, today, categories }) {
+export default function AiInsights({ active, today, categories }) {
   const insights = useMemo(() => {
-    // 1. Demand forecast — the type with the largest projected month-on-month rise.
-    const demand = equipmentTypes
-      .map((type) => {
-        const series = forecastSeries(type, demandHistory)
-        const actuals = series.filter((p) => p.actual != null)
-        const lastActual = actuals[actuals.length - 1]?.actual ?? 0
-        const projected = series[series.length - 2]?.forecast ?? 0
-        return { type, lastActual, projected, delta: projected - lastActual }
-      })
-      .sort((a, b) => b.delta - a.delta)[0]
-
-    const demandPct = demand?.lastActual ? Math.round((demand.delta / demand.lastActual) * 100) : 0
+    // 1. Demand forecast — same XGBoost output the Forecasting page charts, so
+    // the two views can never disagree. Biggest projected rise vs recent trend.
+    const demand = [...mlSummaries()].sort((a, b) => b.delta - a.delta)[0]
 
     // 2. Idle detection — worst-utilization unit on rent, with recoverable spend.
     const idleUnits = active
@@ -74,12 +64,12 @@ export default function AiInsights({ equipment, active, today, categories }) {
     const relocSite = relocatable?.siteId ? siteById[relocatable.siteId]?.name : 'an unassigned site'
 
     return {
-      demand, demandPct, worst, worstUtil, worstDays, recoverable,
+      demand, worst, worstUtil, worstDays, recoverable,
       scarce, relocatable, relocSite, scarcityMatches, idleCount: idleUnits.length,
     }
   }, [active, today, categories])
 
-  const { demand, demandPct, worst, worstUtil, worstDays, recoverable, scarce, relocatable, relocSite, scarcityMatches, idleCount } = insights
+  const { demand, worst, worstUtil, worstDays, recoverable, scarce, relocatable, relocSite, scarcityMatches, idleCount } = insights
 
   return (
     <div
@@ -91,7 +81,7 @@ export default function AiInsights({ equipment, active, today, categories }) {
           AI Insights
         </h2>
         <span className="text-[11px]" style={{ color: 'var(--ink-muted)' }}>
-          Simulated — rule-based on historical usage data
+          Demand from a trained XGBoost model · idle &amp; relocation from usage rules
         </span>
       </div>
 
@@ -101,12 +91,12 @@ export default function AiInsights({ equipment, active, today, categories }) {
           label="Demand Forecast"
           headline={
             demand && demand.delta > 0
-              ? `${demand.type} demand up ${demandPct}% next month`
+              ? `${demand.type} demand up ${demand.delta} next month`
               : 'Demand steady across all categories'
           }
           detail={
             demand && demand.delta > 0
-              ? `Projected ${demand.projected} rentals vs ${demand.lastActual} last month. Pre-position units before the peak.`
+              ? `Model projects ${demand.nextForecast} rentals vs a ${demand.baseline.toFixed(1)} recent monthly average. Pre-position units before the peak.`
               : 'No category is projected to move more than a unit or two next month.'
           }
           to="/admin/forecasting"
