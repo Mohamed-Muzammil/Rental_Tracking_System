@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAppStore } from '../../store/appStore'
 import { siteById } from '../../data/sites'
 import { clientById } from '../../data/clients'
@@ -29,7 +29,13 @@ export default function Equipment() {
 
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
-  const [typeFilter, setTypeFilter] = useState('All')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const typeFilter = searchParams.get('type') || 'All'
+  const setTypeFilter = (val) => {
+    if (val === 'All') searchParams.delete('type')
+    else searchParams.set('type', val)
+    setSearchParams(searchParams)
+  }
   const [selectedId, setSelectedId] = useState(null)
 
   const filtered = useMemo(() => {

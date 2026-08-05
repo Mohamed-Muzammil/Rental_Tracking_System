@@ -146,37 +146,39 @@ export default function Dashboard() {
       {/* ③ AI Insights */}
       <AiInsights equipment={equipment} active={active} today={today} categories={categories} />
 
-      {/* ④ Category availability + ⑤ Alerts */}
-      <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
-        <div className="xl:col-span-2">
-          <CategoryAvailability rows={categories} />
-        </div>
-
-        <Card
-          title="Alerts"
-          action={
-            <Link to="/admin/alerts" className="text-xs font-medium" style={{ color: 'var(--accent)' }}>
-              View all ({alerts.length})
-            </Link>
-          }
-          bodyClassName="p-0"
-        >
-          {topAlerts.length === 0 ? (
-            <p className="px-5 py-6 text-sm" style={{ color: 'var(--ink-secondary)' }}>
-              No open alerts — all assets healthy.
-            </p>
-          ) : (
-            <ul>
-              {topAlerts.map((a) => (
-                <li key={a.id} className="flex items-start gap-2.5 border-t px-5 py-2.5 first:border-t-0" style={{ borderColor: 'var(--border)' }}>
-                  <StatusChip severity={a.severity}>{SEVERITY_LABEL[a.severity]}</StatusChip>
-                  <span className="text-[13px] leading-snug" style={{ color: 'var(--ink-primary)' }}>{a.message}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
+      {/* ④ Equipment Grid */}
+      <div className="mb-2">
+        <h2 className="mb-4 font-display text-[13px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--ink-secondary)' }}>
+          Asset Categories
+        </h2>
+        <CategoryAvailability categories={categories} />
       </div>
+
+      {/* ⑤ Alerts */}
+      <Card
+        title="Alerts"
+        action={
+          <Link to="/admin/alerts" className="text-xs font-medium" style={{ color: 'var(--accent)' }}>
+            View all ({alerts.length})
+          </Link>
+        }
+        bodyClassName="p-0"
+      >
+        {topAlerts.length === 0 ? (
+          <p className="px-5 py-6 text-sm" style={{ color: 'var(--ink-secondary)' }}>
+            No open alerts — all assets healthy.
+          </p>
+        ) : (
+          <ul>
+            {topAlerts.map((a) => (
+              <li key={a.id} className="flex items-start gap-2.5 border-t px-5 py-2.5 first:border-t-0" style={{ borderColor: 'var(--border)' }}>
+                <StatusChip severity={a.severity}>{SEVERITY_LABEL[a.severity]}</StatusChip>
+                <span className="text-[13px] leading-snug" style={{ color: 'var(--ink-primary)' }}>{a.message}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
 
       {/* ⑥ Active rentals */}
       <Card

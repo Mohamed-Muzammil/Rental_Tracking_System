@@ -1,93 +1,86 @@
-import Card from '../ui/Card'
+import { Link } from 'react-router-dom'
+import Icon from '../ui/Icon'
 
-const LOW_AVAILABILITY = 25
-
-// Inline stacked bar: rented / maintenance / available, in fixed order so the
-// segments always mean the same thing across rows. 2px gaps between segments.
-function StackBar({ row, width = 132 }) {
-  const seg = (n) => (row.total === 0 ? 0 : (n / row.total) * 100)
-  const parts = [
-    { key: 'rented', pct: seg(row.rented), color: 'var(--series-engine)' },
-    { key: 'maintenance', pct: seg(row.maintenance), color: 'var(--warning)' },
-    { key: 'available', pct: seg(row.available), color: 'var(--border-strong)' },
-  ].filter((p) => p.pct > 0)
-
-  return (
-    <div
-      className="flex h-2 overflow-hidden rounded-full"
-      style={{ width, background: 'var(--border)' }}
-      title={`${row.rented} rented · ${row.maintenance} maintenance · ${row.available} available`}
-    >
-      {parts.map((p, i) => (
-        <span key={p.key} className="h-full" style={{ width: `${p.pct}%`, background: p.color, marginLeft: i === 0 ? 0 : 2 }} />
-      ))}
-    </div>
-  )
+const ASSET_META = {
+  Excavator: {
+    image: '/equipment/excavator.png',
+    desc: 'Heavy-duty digging and earthmoving. Essential for site prep and trenching.',
+  },
+  Bulldozer: {
+    image: '/equipment/bulldozer.png',
+    desc: 'Powerful pushing and grading. Used for clearing land and rough grading.',
+  },
+  Crane: {
+    image: '/equipment/crane.png',
+    desc: 'Vertical lifting and material placement. Critical for high-rise steel or precast.',
+  },
+  Grader: {
+    image: '/equipment/grader.png',
+    desc: 'Precision leveling and surface finishing. Used heavily in road construction.',
+  },
+  Forklift: {
+    image: '/equipment/forklift.png',
+    desc: 'Material handling and pallet moving. Fast mobility around yards and sites.',
+  },
+  Loader: {
+    image: '/equipment/loader.png',
+    desc: 'Scooping and loading loose materials. High-capacity bucket operations.',
+  },
+  Roller: {
+    image: '/equipment/roller.png',
+    desc: 'Soil and asphalt compaction. Creates stable, flat foundations.',
+  },
 }
 
-function Legend() {
-  const items = [
-    { label: 'Rented', color: 'var(--series-engine)' },
-    { label: 'Maintenance', color: 'var(--warning)' },
-    { label: 'Available', color: 'var(--border-strong)' },
-  ]
+export default function CategoryAvailability({ categories }) {
   return (
-    <div className="flex items-center gap-3">
-      {items.map((i) => (
-        <span key={i.label} className="flex items-center gap-1.5 text-[11px]" style={{ color: 'var(--ink-secondary)' }}>
-          <span className="inline-block h-2 w-2 rounded-full" style={{ background: i.color }} />
-          {i.label}
-        </span>
-      ))}
-    </div>
-  )
-}
-
-export default function CategoryAvailability({ rows }) {
-  return (
-    <Card title="Equipment Availability by Category" action={<Legend />} bodyClassName="overflow-x-auto p-0">
-      <table className="w-full min-w-[560px] text-sm">
-        <thead>
-          <tr className="text-left" style={{ color: 'var(--ink-muted)' }}>
-            <th className="px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Category</th>
-            <th className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Total</th>
-            <th className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Mix</th>
-            <th className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Avail</th>
-            <th className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Rented</th>
-            <th className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Maint</th>
-            <th className="px-5 py-2.5 text-right text-[11px] font-semibold uppercase tracking-[0.06em]">Avail %</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => {
-            const low = row.availPct < LOW_AVAILABILITY
-            return (
-              <tr key={row.type} className="border-t" style={{ borderColor: 'var(--border)' }}>
-                <td className="px-5 py-3 font-medium" style={{ color: 'var(--ink-primary)' }}>{row.type}</td>
-                <td className="tabular px-3 py-3" style={{ color: 'var(--ink-secondary)' }}>{row.total}</td>
-                <td className="px-3 py-3"><StackBar row={row} /></td>
-                <td className="tabular px-3 py-3" style={{ color: 'var(--ink-primary)' }}>{row.available}</td>
-                <td className="tabular px-3 py-3" style={{ color: 'var(--series-engine)' }}>{row.rented}</td>
-                <td className="tabular px-3 py-3" style={{ color: row.maintenance ? 'var(--warning)' : 'var(--ink-muted)' }}>
-                  {row.maintenance}
-                </td>
-                <td className="px-5 py-3 text-right">
-                  <span
-                    className="tabular inline-block rounded-md px-2 py-0.5 font-data text-sm font-medium"
-                    style={{
-                      background: low ? 'var(--warning-wash)' : 'transparent',
-                      color: low ? 'var(--warning)' : 'var(--ink-primary)',
-                    }}
-                    title={low ? 'Low availability — under 25%' : undefined}
-                  >
-                    {row.availPct}%
-                  </span>
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
-    </Card>
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {categories.map((cat) => {
+          const meta = ASSET_META[cat.type]
+          return (
+            <Link
+              key={cat.type}
+              to={`/admin/equipment?type=${cat.type}`}
+              className="group flex flex-col overflow-hidden rounded-xl border text-left transition-all hover:-translate-y-0.5 hover:shadow-lg"
+              style={{
+                background: 'var(--bg-surface)',
+                borderColor: 'var(--border)',
+                boxShadow: 'var(--shadow-card)',
+              }}
+            >
+              <div className="relative h-32 w-full overflow-hidden bg-white p-2">
+                <img
+                  src={meta?.image}
+                  alt={cat.type}
+                  className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
+              <div className="flex flex-1 flex-col p-4">
+                <h3 className="font-display text-lg font-semibold" style={{ color: 'var(--ink-primary)' }}>
+                  {cat.type}
+                </h3>
+                <p className="mt-1 line-clamp-2 text-xs leading-relaxed" style={{ color: 'var(--ink-secondary)' }}>
+                  {meta?.desc}
+                </p>
+                <div className="mt-auto pt-4">
+                  <div className="flex items-center justify-between text-sm font-medium">
+                    <span style={{ color: 'var(--ink-muted)' }}>Consumed</span>
+                    <span style={{ color: 'var(--ink-primary)' }}>{cat.rented} / {cat.total} units</span>
+                  </div>
+                  <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full" style={{ background: 'var(--border)' }}>
+                    <div
+                      className="h-full rounded-full transition-all"
+                      style={{
+                        width: `${cat.total > 0 ? (cat.rented / cat.total) * 100 : 0}%`,
+                        background: 'var(--accent)',
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </Link>
+          )
+        })}
+      </div>
   )
 }
