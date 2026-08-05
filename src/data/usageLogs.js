@@ -1,7 +1,7 @@
 import { differenceInCalendarDays } from 'date-fns'
-import { activeEquipment } from './equipment'
-import { genDailyLogs } from '../lib/genLogs'
-import { SIM_TODAY } from '../lib/clock'
+import { activeEquipment } from './equipment.js'
+import { genDailyLogs } from '../lib/genLogs.js'
+import { SIM_TODAY } from '../lib/clock.js'
 
 // Two units are seeded to misbehave so the geofence and fuel rules have
 // something real to catch on first load. Everything else logs normally.

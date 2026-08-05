@@ -1,10 +1,10 @@
-/* Google Font: Inter */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+/* Google Fonts: Manrope for headings/display, Inter for body & data-dense UI */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap');
 
 @import "tailwindcss";
 
 @theme {
-  --font-display: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Manrope', 'Segoe UI', system-ui, sans-serif;
   --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
   --font-data: ui-monospace, 'Roboto Mono', Consolas, monospace;
 }
@@ -27,14 +27,15 @@
   --border:        #e5e7eb;
   --border-strong: #d1d5db;
 
-  /* Brand accent */
-  --accent:      #1d4ed8;
-  --accent-dark: #1e3a8a;
+  /* Brand accent — deep indigo instead of stock blue, reads more distinctive
+     without colliding with the good/warning/critical semantic hues */
+  --accent:      #4338ca;
+  --accent-dark: #312e81;
   --accent-ink:  #ffffff;
-  --accent-wash: #eff6ff;
+  --accent-wash: #eef2ff;
 
   /* Chart */
-  --series-engine: #1d4ed8;
+  --series-engine: #4338ca;
   --series-idle:   #9ca3af;
 
   /* Status */
@@ -72,7 +73,7 @@ body {
   line-height: 1.5;
 }
 
-::selection { background: #dbeafe; }
+::selection { background: #e0e7ff; }
 button, input, select, textarea { font: inherit; color: inherit; }
 .tabular { font-variant-numeric: tabular-nums; }
 .font-data { font-family: ui-monospace, 'Roboto Mono', Consolas, monospace; }
