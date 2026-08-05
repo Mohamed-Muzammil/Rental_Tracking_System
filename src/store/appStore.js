@@ -9,6 +9,7 @@ let toastId = 0
 export const useAppStore = create((set, get) => ({
   role: null, // 'admin' | 'client'
   activeClientId: 'C001', // which client the Client dashboard is viewing
+  selectedSiteId: 'ALL', // 'ALL' or specific siteId
 
   today: SIM_TODAY,
   equipment: seedEquipment.map((e) => ({ ...e })),
@@ -17,6 +18,8 @@ export const useAppStore = create((set, get) => ({
   toasts: [],
 
   setRole: (role) => set({ role }),
+  setActiveClientId: (activeClientId) => set({ activeClientId, selectedSiteId: 'ALL' }),
+  setSelectedSiteId: (selectedSiteId) => set({ selectedSiteId }),
 
   advanceDay: () =>
     set((s) => ({ today: addDays(s.today, 1) })),
@@ -82,6 +85,55 @@ export const useAppStore = create((set, get) => ({
       ),
     }))
     get().pushToast(`Usage logged for ${equipmentId}`, 'good')
+  },
+
+  rentFromCatalog: (catalogItem, siteId) => {
+    const s = get()
+    const newId = `EQX-3${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`
+    const newEquipment = {
+      id: newId,
+      type: catalogItem.type,
+      tier: catalogItem.tier,
+      catalogId: catalogItem.id,
+      status: 'active',
+      siteId: siteId || 'S001',
+      clientId: s.activeClientId,
+      operatorId: null,
+      checkIn: format(s.today, 'yyyy-MM-dd'),
+      expectedReturn: format(addDays(s.today, 30), 'yyyy-MM-dd'),
+      avgEngineHoursPerDay: 0,
+      avgIdleHoursPerDay: 0,
+    }
+
+    set((state) => ({
+      equipment: [...state.equipment, newEquipment]
+    }))
+    
+    get().pushToast(`Successfully rented ${catalogItem.tier} ${catalogItem.type} (${newId})`, 'good')
+  },
+
+  extendRental: (equipmentId, extraDays) => {
+    set((s) => ({
+      equipment: s.equipment.map((e) => {
+        if (e.id !== equipmentId) return e
+        const currentReturn = new Date(e.expectedReturn)
+        const newReturn = format(addDays(currentReturn, extraDays), 'yyyy-MM-dd')
+        return { ...e, expectedReturn: newReturn }
+      }),
+    }))
+    get().pushToast(`Rental extended by ${extraDays} days for ${equipmentId}`, 'good')
+  },
+
+  requestReturn: (equipmentId) => {
+    const s = get()
+    set((state) => ({
+      equipment: state.equipment.map((e) =>
+        e.id === equipmentId
+          ? { ...e, expectedReturn: format(s.today, 'yyyy-MM-dd') }
+          : e
+      ),
+    }))
+    get().pushToast(`Return dispatch scheduled for ${equipmentId}`, 'warning')
   },
 
   acceptRecommendation: (equipmentId, recommendation) => {

@@ -9,6 +9,9 @@ import UsageLogging from './pages/admin/UsageLogging'
 import AlertsCenter from './pages/admin/AlertsCenter'
 import Forecasting from './pages/admin/Forecasting'
 import ClientDashboard from './pages/client/ClientDashboard'
+import ClientUsage from './pages/client/ClientUsage'
+import ClientReturns from './pages/client/ClientReturns'
+import Marketplace from './pages/client/Marketplace'
 
 export default function App() {
   return (
@@ -26,6 +29,9 @@ export default function App() {
 
       <Route path="/client" element={<ClientLayout />}>
         <Route index element={<ClientDashboard />} />
+        <Route path="usage" element={<ClientUsage />} />
+        <Route path="returns" element={<ClientReturns />} />
+        <Route path="marketplace" element={<Marketplace />} />
       </Route>
     </Routes>
   )

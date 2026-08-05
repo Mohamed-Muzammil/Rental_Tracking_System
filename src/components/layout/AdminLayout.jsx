@@ -79,18 +79,8 @@ export default function AdminLayout() {
           className="flex items-center justify-between gap-4 border-b px-6 py-3"
           style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)' }}
         >
-          <div>
-            <div className="font-display text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--ink-muted)' }}>
-              Simulated date
-            </div>
-            <div className="tabular font-data text-sm font-medium" style={{ color: 'var(--ink-primary)' }}>
-              {format(today, 'EEE, d MMM yyyy')}
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="secondary" onClick={advanceDay}>
-              <Icon name="clock" size={14} /> Advance day
-            </Button>
+          <div className="font-display text-[12px] font-bold uppercase tracking-[0.08em]" style={{ color: 'var(--ink-secondary)' }}>
+            Rental Provider Command Center
           </div>
         </header>
         <main className="min-w-0 flex-1 overflow-y-auto px-6 py-6">
