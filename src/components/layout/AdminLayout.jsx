@@ -1,10 +1,8 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { format } from 'date-fns'
 import { useMemo } from 'react'
 import { useAppStore } from '../../store/appStore'
 import { buildAlerts } from '../../lib/rules'
 import Icon from '../ui/Icon'
-import Button from '../ui/Button'
 import ToastStack from '../ui/ToastStack'
 
 const NAV = [
@@ -13,8 +11,6 @@ const NAV = [
   { to: '/admin/equipment', icon: 'truck', label: 'Equipment' },
   { to: '/admin/checkin', icon: 'swap', label: 'Check-in / Out' },
   { to: '/admin/usage', icon: 'clock', label: 'Usage Logging' },
-  { to: '/admin/alerts', icon: 'bell', label: 'Alerts' },
-  { to: '/admin/forecasting', icon: 'chevronRight', label: 'Forecasting' },
 ]
 
 export default function AdminLayout() {
@@ -22,7 +18,6 @@ export default function AdminLayout() {
   const today = useAppStore((s) => s.today)
   const equipment = useAppStore((s) => s.equipment)
   const dismissedAlertIds = useAppStore((s) => s.dismissedAlertIds)
-  const advanceDay = useAppStore((s) => s.advanceDay)
 
   const openAlertCount = useMemo(() => {
     const alerts = buildAlerts(equipment, today).filter((a) => !dismissedAlertIds.includes(a.id))
@@ -37,7 +32,7 @@ export default function AdminLayout() {
       >
         <button
           onClick={() => navigate('/')}
-          className="mr-2 shrink-0"
+          className="mr-1 shrink-0"
         >
           <span className="font-display text-[15px] font-bold uppercase tracking-[0.06em]" style={{ color: 'var(--accent)' }}>
             FleetLoop
@@ -60,31 +55,30 @@ export default function AdminLayout() {
             >
               <Icon name={item.icon} size={15} />
               {item.label}
-              {item.to === '/admin/alerts' && openAlertCount > 0 && (
-                <span
-                  className="tabular ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-none"
-                  style={{ background: 'var(--critical)', color: '#fff' }}
-                >
-                  {openAlertCount}
-                </span>
-              )}
             </NavLink>
           ))}
         </nav>
 
-        <div className="flex shrink-0 items-center gap-3">
-          <div className="text-right">
-            <div className="font-display text-[10px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--ink-muted)' }}>
-              Simulated date
-            </div>
-            <div className="tabular font-data text-[13px] font-medium" style={{ color: 'var(--ink-primary)' }}>
-              {format(today, 'EEE, d MMM yyyy')}
-            </div>
-          </div>
-          <Button variant="secondary" onClick={advanceDay}>
-            <Icon name="clock" size={14} /> Advance day
-          </Button>
-        </div>
+        {/* Alerts bell — icon only, rightmost */}
+        <NavLink
+          to="/admin/alerts"
+          className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors hover:opacity-80"
+          style={({ isActive }) => ({
+            background: isActive ? 'var(--accent-wash)' : 'transparent',
+            color: isActive ? 'var(--accent)' : 'var(--ink-secondary)',
+          })}
+          title="Alerts"
+        >
+          <Icon name="bell" size={18} />
+          {openAlertCount > 0 && (
+            <span
+              className="tabular absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold leading-none"
+              style={{ background: 'var(--critical)', color: '#fff' }}
+            >
+              {openAlertCount}
+            </span>
+          )}
+        </NavLink>
       </header>
 
       <main className="min-w-0 flex-1 overflow-y-auto px-6 py-6">
@@ -94,4 +88,5 @@ export default function AdminLayout() {
     </div>
   )
 }
+
 

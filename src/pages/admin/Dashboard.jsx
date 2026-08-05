@@ -97,10 +97,10 @@ export default function Dashboard() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-display text-xl font-semibold" style={{ color: 'var(--ink-primary)' }}>
-            Fleet Overview
+            Asset Overview
           </h1>
           <p className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
-            Live status, exceptions, and outlook across the whole fleet.
+            Live status, exceptions, and outlook across all assets.
           </p>
         </div>
         <Link to="/admin/checkin">
@@ -113,7 +113,7 @@ export default function Dashboard() {
       {/* ① KPI hero */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <StatTile
-          label="Fleet Utilization"
+          label="Asset Utilization"
           value={kpis.utilization}
           unit="%"
           hint={`${kpis.rented} of ${kpis.total} units earning`}
@@ -163,7 +163,7 @@ export default function Dashboard() {
         >
           {topAlerts.length === 0 ? (
             <p className="px-5 py-6 text-sm" style={{ color: 'var(--ink-secondary)' }}>
-              No open alerts — fleet is healthy.
+              No open alerts — all assets healthy.
             </p>
           ) : (
             <ul>

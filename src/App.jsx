@@ -8,7 +8,6 @@ import Equipment from './pages/admin/Equipment'
 import CheckInOut from './pages/admin/CheckInOut'
 import UsageLogging from './pages/admin/UsageLogging'
 import AlertsCenter from './pages/admin/AlertsCenter'
-import Forecasting from './pages/admin/Forecasting'
 import ClientDashboard from './pages/client/ClientDashboard'
 
 export default function App() {
@@ -23,7 +22,6 @@ export default function App() {
         <Route path="checkin" element={<CheckInOut />} />
         <Route path="usage" element={<UsageLogging />} />
         <Route path="alerts" element={<AlertsCenter />} />
-        <Route path="forecasting" element={<Forecasting />} />
       </Route>
 
       <Route path="/client" element={<ClientLayout />}>
