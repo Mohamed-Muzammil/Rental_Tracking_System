@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import { format } from 'date-fns'
 import { useAppStore } from '../../store/appStore'
 import { siteById } from '../../data/sites'
 import { clientById } from '../../data/clients'
@@ -27,21 +28,24 @@ export default function Equipment() {
   const equipment = useAppStore((s) => s.equipment)
   const today = useAppStore((s) => s.today)
 
-  const [query, setQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState('All')
   const [searchParams, setSearchParams] = useSearchParams()
   const typeFilter = searchParams.get('type') || 'All'
+  const clientFilter = searchParams.get('client') || null
+
   const setTypeFilter = (val) => {
     if (val === 'All') searchParams.delete('type')
     else searchParams.set('type', val)
     setSearchParams(searchParams)
   }
+  const [query, setQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('All')
   const [selectedId, setSelectedId] = useState(null)
 
   const filtered = useMemo(() => {
     return equipment
       .filter((e) => (statusFilter === 'All' ? true : e.status === STATUS_TO_FIELD[statusFilter]))
       .filter((e) => (typeFilter === 'All' ? true : e.type === typeFilter))
+      .filter((e) => (clientFilter ? e.clientId === clientFilter && e.status === 'active' : true))
       .filter((e) => {
         const q = query.trim().toLowerCase()
         if (!q) return true
@@ -109,6 +113,11 @@ export default function Equipment() {
             <option key={t}>{t}</option>
           ))}
         </select>
+        {clientFilter && (
+          <Button variant="secondary" onClick={() => { searchParams.delete('client'); setSearchParams(searchParams) }}>
+            Clear Client Filter
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
@@ -118,7 +127,7 @@ export default function Equipment() {
               <tr className="text-left" style={{ color: 'var(--ink-muted)' }}>
                 <th className="px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Unit</th>
                 <th className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Status</th>
-                <th className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Site</th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Client</th>
                 <th className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Utilization</th>
                 <th className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]" />
               </tr>
@@ -127,7 +136,7 @@ export default function Equipment() {
               {filtered.map((eq) => {
                 const isActive = eq.status === 'active'
                 const health = isActive ? healthOf(eq, today) : 'neutral'
-                const site = eq.siteId ? siteById[eq.siteId]?.name : null
+                const client = eq.clientId ? clientById[eq.clientId]?.name : null
                 return (
                   <tr
                     key={eq.id}
@@ -148,7 +157,7 @@ export default function Equipment() {
                       </StatusChip>
                     </td>
                     <td className="px-3 py-3" style={{ color: 'var(--ink-secondary)' }}>
-                      {isActive ? (site ?? 'Unassigned') : '—'}
+                      {isActive ? (client ?? 'Unassigned') : '—'}
                     </td>
                     <td className="px-3 py-3">
                       {isActive ? (
@@ -192,11 +201,29 @@ function Row({ label, value }) {
 
 function UnitDetail({ eq, today }) {
   const navigate = useNavigate()
+  const checkIn = useAppStore((s) => s.checkIn)
+  const usageLogs = useAppStore((s) => s.usageLogs)
+  
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+
   const catalog = catalogById[eq.catalogId]
   const rs = eq.status === 'active' ? returnStatus(eq, today) : null
   const util = eq.status === 'active' ? utilizationOf(eq) : null
 
   const isMaintenance = eq.status === 'maintenance'
+
+  const eqLogs = useMemo(() => {
+    let logs = usageLogs.filter((l) => l.equipmentId === eq.id)
+    if (startDate) logs = logs.filter((l) => l.date >= startDate)
+    if (endDate) logs = logs.filter((l) => l.date <= endDate)
+    return logs.sort((a, b) => b.date.localeCompare(a.date)) // newest first
+  }, [usageLogs, eq.id, startDate, endDate])
+
+  const handleAgreementToCurrent = () => {
+    if (eq.checkIn) setStartDate(eq.checkIn)
+    setEndDate(format(today, 'yyyy-MM-dd'))
+  }
 
   return (
     <div className="flex flex-col">
@@ -237,7 +264,81 @@ function UnitDetail({ eq, today }) {
       )}
 
       {!isMaintenance && (
-        <Button variant="primary" className="mt-4 justify-center" onClick={() => navigate('/admin/checkin')}>
+        <div className="mt-5 border-t pt-4" style={{ borderColor: 'var(--border)' }}>
+          <div className="mb-3 flex items-center justify-between">
+            <h4 className="font-semibold" style={{ color: 'var(--ink-primary)' }}>Daily Usage Logs</h4>
+            <Button variant="ghost" onClick={handleAgreementToCurrent} className="px-2 py-1 text-xs">
+              Agreement to Current
+            </Button>
+          </div>
+          
+          <div className="mb-4 flex items-center gap-2">
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="rounded-lg border px-2 py-1.5 text-xs outline-none"
+              style={inputStyle}
+            />
+            <span className="text-xs" style={{ color: 'var(--ink-muted)' }}>to</span>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="rounded-lg border px-2 py-1.5 text-xs outline-none"
+              style={inputStyle}
+            />
+          </div>
+
+          <div className="max-h-64 overflow-y-auto rounded-lg border" style={{ borderColor: 'var(--border)' }}>
+            <table className="w-full text-left text-xs">
+              <thead className="sticky top-0 shadow-sm" style={{ background: 'var(--bg-surface-raised)', color: 'var(--ink-secondary)' }}>
+                <tr>
+                  <th className="px-3 py-2 font-medium">Date</th>
+                  <th className="px-3 py-2 font-medium">Runtime (h)</th>
+                  <th className="px-3 py-2 font-medium">Idle (h)</th>
+                  <th className="px-3 py-2 font-medium">Fuel (L)</th>
+                  <th className="px-3 py-2 font-medium">Location</th>
+                </tr>
+              </thead>
+              <tbody>
+                {eqLogs.length > 0 ? (
+                  eqLogs.map((log) => (
+                    <tr key={log.date} className="border-t" style={{ borderColor: 'var(--border)' }}>
+                      <td className="px-3 py-2 font-data" style={{ color: 'var(--ink-primary)' }}>{log.date}</td>
+                      <td className="px-3 py-2 font-data" style={{ color: 'var(--ink-secondary)' }}>{log.engineHours}</td>
+                      <td className="px-3 py-2 font-data" style={{ color: 'var(--ink-secondary)' }}>{log.idleHours}</td>
+                      <td className="px-3 py-2 font-data" style={{ color: 'var(--ink-secondary)' }}>{log.fuelUsageL}</td>
+                      <td className="px-3 py-2" style={{ color: 'var(--ink-secondary)' }}>{eq.siteId ? siteById[eq.siteId]?.name : '—'}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="px-3 py-6 text-center text-xs" style={{ color: 'var(--ink-muted)' }}>
+                      No usage records found for this period.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {!isMaintenance && (
+        <Button 
+          variant="primary" 
+          className="mt-4 justify-center" 
+          onClick={() => {
+            if (eq.status === 'active') {
+              if (window.confirm(`Are you sure you want to check in ${eq.id}?`)) {
+                checkIn(eq.id)
+              }
+            } else {
+              navigate('/admin/checkin')
+            }
+          }}
+        >
           <Icon name="swap" size={14} /> {eq.status === 'active' ? 'Check in this unit' : 'Check out this unit'}
         </Button>
       )}

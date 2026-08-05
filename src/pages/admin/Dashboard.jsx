@@ -14,7 +14,7 @@ import Icon from '../../components/ui/Icon'
 import ForecastChart from '../../components/ui/ForecastChart'
 import CategoryAvailability from '../../components/dashboard/CategoryAvailability'
 import UtilizationLeaderboard from '../../components/dashboard/UtilizationLeaderboard'
-import AiInsights from '../../components/dashboard/AiInsights'
+
 import { demandHistory, equipmentTypes } from '../../data/demandHistory'
 import { forecastSeries } from '../../lib/forecast'
 
@@ -103,11 +103,6 @@ export default function Dashboard() {
             Live status, exceptions, and outlook across all assets.
           </p>
         </div>
-        <Link to="/admin/checkin">
-          <Button variant="primary">
-            <Icon name="plus" size={14} /> Create Rental
-          </Button>
-        </Link>
       </div>
 
       {/* ① KPI hero */}
@@ -143,8 +138,6 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* ③ AI Insights */}
-      <AiInsights equipment={equipment} active={active} today={today} categories={categories} />
 
       {/* ④ Equipment Grid */}
       <div className="mb-2">

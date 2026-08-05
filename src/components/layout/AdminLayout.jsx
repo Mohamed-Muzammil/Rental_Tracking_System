@@ -8,7 +8,6 @@ import ToastStack from '../ui/ToastStack'
 const NAV = [
   { to: '/admin', end: true, icon: 'gauge', label: 'Dashboard' },
   { to: '/admin/companies', icon: 'building', label: 'Companies' },
-  { to: '/admin/equipment', icon: 'truck', label: 'Equipment' },
   { to: '/admin/checkin', icon: 'swap', label: 'Check-in / Out' },
   { to: '/admin/usage', icon: 'clock', label: 'Usage Logging' },
 ]

@@ -44,7 +44,7 @@ export default function Companies() {
         {groups.map((g) => (
           <Link
             key={g.client.id}
-            to={`/admin/companies/${g.client.id}`}
+            to={`/admin/equipment?client=${g.client.id}`}
             className="group flex flex-col gap-3 rounded-xl border p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-lg"
             style={{
               background: 'var(--bg-surface)',
