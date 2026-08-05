@@ -117,20 +117,20 @@ export default function Companies() {
         />
       </div>
 
-      {/* Industrial Control Toolbar */}
+      {/* Industrial Control Toolbar — Pixel-Perfect Baseline Alignment */}
       <div
-        className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-white p-3.5 shadow-xs"
+        className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-white p-3 shadow-xs"
         style={{ borderColor: 'var(--border)' }}
       >
         <div className="flex flex-wrap items-center gap-3">
-          {/* Search Input */}
-          <div className="relative min-w-[240px]">
+          {/* Search Input Box (Height h-9 = 36px) */}
+          <div className="relative min-w-[280px]">
             <input
               type="text"
               placeholder="Search company, contact, or site..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-lg border px-3 py-1.5 text-xs outline-hidden font-medium"
+              className="h-9 w-full rounded-lg border px-3 text-xs outline-hidden font-medium"
               style={{
                 background: 'var(--bg-surface-raised)',
                 borderColor: 'var(--border-strong)',
@@ -139,28 +139,28 @@ export default function Companies() {
             />
           </div>
 
-          {/* Account Filter Pills */}
-          <div className="flex items-center gap-1 rounded-lg bg-slate-100 p-1 border border-slate-200 text-xs">
+          {/* Account Filter Segmented Control (Height h-9 = 36px) */}
+          <div className="flex h-9 items-center gap-1 rounded-lg bg-slate-100 p-1 border border-slate-200 text-xs">
             <button
               onClick={() => setFilterMode('all')}
-              className={`rounded-md px-3 py-1 text-xs font-bold transition-all ${
-                filterMode === 'all' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+              className={`flex h-7 items-center rounded-md px-3 text-xs font-bold transition-all ${
+                filterMode === 'all' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               All Accounts ({groups.length})
             </button>
             <button
               onClick={() => setFilterMode('highVolume')}
-              className={`rounded-md px-3 py-1 text-xs font-bold transition-all ${
-                filterMode === 'highVolume' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+              className={`flex h-7 items-center rounded-md px-3 text-xs font-bold transition-all ${
+                filterMode === 'highVolume' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               High Volume (3+ units)
             </button>
             <button
               onClick={() => setFilterMode('atRisk')}
-              className={`rounded-md px-3 py-1 text-xs font-bold transition-all ${
-                filterMode === 'atRisk' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'
+              className={`flex h-7 items-center rounded-md px-3 text-xs font-bold transition-all ${
+                filterMode === 'atRisk' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               At Risk ({groups.filter((g) => g.atRisk > 0).length})
@@ -168,23 +168,23 @@ export default function Companies() {
           </div>
         </div>
 
-        {/* View Mode Toggle */}
-        <div className="flex items-center gap-1 rounded-lg border p-1" style={{ borderColor: 'var(--border)' }}>
+        {/* View Mode Toggle (Height h-9 = 36px) */}
+        <div className="flex h-9 items-center gap-1 rounded-lg bg-slate-100 p-1 border border-slate-200 text-xs">
           <button
             onClick={() => setViewMode('grid')}
-            className={`rounded px-2.5 py-1 text-xs font-bold transition-all ${
-              viewMode === 'grid' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'
+            className={`flex h-7 items-center gap-1 rounded-md px-3 text-xs font-bold transition-all ${
+              viewMode === 'grid' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            🗃️ Grid Cards
+            <span>🗃️</span> Grid Cards
           </button>
           <button
             onClick={() => setViewMode('table')}
-            className={`rounded px-2.5 py-1 text-xs font-bold transition-all ${
-              viewMode === 'table' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'
+            className={`flex h-7 items-center gap-1 rounded-md px-3 text-xs font-bold transition-all ${
+              viewMode === 'table' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            📋 Enterprise Table
+            <span>📋</span> Enterprise Table
           </button>
         </div>
       </div>
