@@ -58,69 +58,66 @@ export default function UsageLogging() {
 function LogUsageTab() {
   const equipment = useAppStore((s) => s.equipment)
   const usageLogs = useAppStore((s) => s.usageLogs)
-  const logUsage = useAppStore((s) => s.logUsage)
 
   const active = useMemo(() => equipment.filter((e) => e.status === 'active'), [equipment])
-  const [equipmentId, setEquipmentId] = useState(active[0]?.id ?? '')
-  const [engineHours, setEngineHours] = useState('')
-  const [idleHours, setIdleHours] = useState('')
+  const [equipmentId, setEquipmentId] = useState(active[0]?.id ?? equipment[0]?.id ?? '')
 
-  const selected = active.find((e) => e.id === equipmentId)
+  const selected = active.find((e) => e.id === equipmentId) ?? equipment.find((e) => e.id === equipmentId)
   const history = useMemo(
     () => [...usageLogs.filter((l) => l.equipmentId === equipmentId)].slice(-10).map((l) => ({ ...l, date: l.date.slice(5) })),
     [usageLogs, equipmentId],
   )
 
-  const canSubmit = equipmentId && engineHours !== '' && idleHours !== ''
-
-  const submit = (e) => {
-    e.preventDefault()
-    if (!canSubmit) return
-    logUsage({
-      equipmentId,
-      engineHours: +engineHours,
-      idleHours: +idleHours,
-      fuelUsageL: +(+engineHours * 4.2).toFixed(1),
-      operatorId: selected?.operatorId ?? null,
-    })
-    setEngineHours('')
-    setIdleHours('')
-  }
+  const totalEngine = history.reduce((sum, h) => sum + h.engineHours, 0)
+  const totalIdle = history.reduce((sum, h) => sum + h.idleHours, 0)
+  const avgEfficiency = totalEngine + totalIdle > 0 ? Math.round((totalEngine / (totalEngine + totalIdle)) * 100) : 0
 
   return (
-    <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-      <Card title="Log today's usage" className="xl:col-span-1">
-        {active.length === 0 ? (
-          <p className="text-sm" style={{ color: 'var(--ink-secondary)' }}>No active rentals to log against.</p>
-        ) : (
-          <form onSubmit={submit} className="flex flex-col gap-4">
-            <label className="flex flex-col gap-1.5">
-              <span className="text-xs font-medium" style={{ color: 'var(--ink-secondary)' }}>Equipment</span>
-              <select value={equipmentId} onChange={(e) => setEquipmentId(e.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm outline-none" style={fieldStyle}>
-                {active.map((e) => (
-                  <option key={e.id} value={e.id}>{e.id} — {e.tier} {e.type}</option>
-                ))}
-              </select>
-            </label>
-            <label className="flex flex-col gap-1.5">
-              <span className="text-xs font-medium" style={{ color: 'var(--ink-secondary)' }}>Engine hours</span>
-              <input type="number" min="0" max="24" step="0.1" value={engineHours} onChange={(e) => setEngineHours(e.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm outline-none" style={fieldStyle} required />
-            </label>
-            <label className="flex flex-col gap-1.5">
-              <span className="text-xs font-medium" style={{ color: 'var(--ink-secondary)' }}>Idle hours</span>
-              <input type="number" min="0" max="24" step="0.1" value={idleHours} onChange={(e) => setIdleHours(e.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm outline-none" style={fieldStyle} required />
-            </label>
-            <div className="text-xs" style={{ color: 'var(--ink-muted)' }}>
-              Fuel usage is derived automatically (≈4.2L per engine hour).
-            </div>
-            <Button type="submit" variant="primary" disabled={!canSubmit} className="justify-center">
-              <Icon name="checkCircle" size={14} /> Save log entry
-            </Button>
-          </form>
-        )}
-      </Card>
+    <div className="flex flex-col gap-6">
+      {/* Top Vehicle Selector Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-white p-4 shadow-xs" style={{ borderColor: 'var(--border)' }}>
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 font-bold">
+            <Icon name="truck" size={20} />
+          </div>
+          <div>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Select Vehicle / Equipment</div>
+            <select
+              value={equipmentId}
+              onChange={(e) => setEquipmentId(e.target.value)}
+              className="mt-0.5 rounded-lg border px-3 py-1.5 font-display text-sm font-bold outline-hidden"
+              style={fieldStyle}
+            >
+              {equipment.map((e) => (
+                <option key={e.id} value={e.id}>
+                  {e.id} — {e.tier} {e.type} ({e.status === 'active' ? 'On Rent' : 'Available'})
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
 
-      <Card title={selected ? `${selected.id} — usage history` : 'Usage history'} className="xl:col-span-2">
+        {/* Quick Vehicle Telemetry Summary Stats */}
+        {selected && (
+          <div className="flex items-center gap-6 text-xs border-l pl-6 border-slate-200">
+            <div>
+              <div className="text-slate-400 font-medium">10-Day Runtime</div>
+              <div className="font-mono text-sm font-bold text-blue-600">{totalEngine.toFixed(1)} hrs</div>
+            </div>
+            <div>
+              <div className="text-slate-400 font-medium">10-Day Idle Time</div>
+              <div className="font-mono text-sm font-bold text-amber-600">{totalIdle.toFixed(1)} hrs</div>
+            </div>
+            <div>
+              <div className="text-slate-400 font-medium">Operational Efficiency</div>
+              <div className="font-mono text-sm font-bold text-emerald-600">{avgEfficiency}%</div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Usage History Telemetry Graph */}
+      <Card title={selected ? `${selected.id} — ${selected.tier} ${selected.type} Telemetry Graph` : 'Vehicle Telemetry Graph'}>
         <UsageHistoryChart data={history} />
       </Card>
     </div>
