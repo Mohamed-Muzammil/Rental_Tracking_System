@@ -59,12 +59,31 @@ export default function Equipment() {
 
   const selected = equipment.find((e) => e.id === selectedId) ?? null
 
+  const [showRegisterModal, setShowRegisterModal] = useState(false)
+  const [regType, setRegType] = useState('Excavator')
+  const [regTier, setRegTier] = useState('Heavy Duty')
+  const [regCost, setRegCost] = useState('350')
+  const registerEquipment = useAppStore((s) => s.registerEquipment)
+
+  const handleRegisterSubmit = (e) => {
+    e.preventDefault()
+    const newId = `EQX-2${Math.floor(40 + Math.random() * 60)}`
+    registerEquipment({
+      id: newId,
+      type: regType,
+      tier: regTier,
+      dailyCost: Number(regCost),
+      qrCode: `QR-${newId}`,
+    })
+    setShowRegisterModal(false)
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-xl font-semibold" style={{ color: 'var(--ink-primary)' }}>
-            Equipment
+            Equipment Roster & Life Cycle
           </h1>
           <p className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
             {clientFilter
@@ -72,10 +91,82 @@ export default function Equipment() {
               : `Full fleet roster — ${equipment.filter((e) => e.status === 'active').length}/${equipment.length} units currently on rent.`}
           </p>
         </div>
-        <Button variant="primary" onClick={() => navigate('/admin/checkin')}>
-          <Icon name="swap" size={14} /> Check-in / Check-out
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="secondary" onClick={() => setShowRegisterModal(true)}>
+            <Icon name="plus" size={14} /> Register New Equipment
+          </Button>
+          <Button variant="primary" onClick={() => navigate('/admin/checkin')}>
+            <Icon name="swap" size={14} /> Check-in / Check-out
+          </Button>
+        </div>
       </div>
+
+      {/* Equipment Registration Modal */}
+      {showRegisterModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
+          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl border border-slate-200">
+            <div className="flex items-center justify-between border-b pb-3 mb-4">
+              <h3 className="font-bold text-base text-slate-900">Register New Equipment Unit</h3>
+              <button onClick={() => setShowRegisterModal(false)} className="text-slate-400 hover:text-slate-600">
+                <Icon name="x" size={18} />
+              </button>
+            </div>
+            <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-4 text-xs font-medium">
+              <div>
+                <label className="block text-slate-500 uppercase text-[10px] font-bold mb-1">Equipment Category</label>
+                <select
+                  value={regType}
+                  onChange={(e) => setRegType(e.target.value)}
+                  className="w-full rounded-lg border p-2 text-sm outline-hidden"
+                  style={inputStyle}
+                >
+                  {equipmentTypes.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-500 uppercase text-[10px] font-bold mb-1">Tier / Specification</label>
+                <input
+                  type="text"
+                  value={regTier}
+                  onChange={(e) => setRegTier(e.target.value)}
+                  className="w-full rounded-lg border p-2 text-sm outline-hidden"
+                  style={inputStyle}
+                  placeholder="e.g. Heavy Duty / Compact / Standard"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-500 uppercase text-[10px] font-bold mb-1">Daily Billing Rate ($/day)</label>
+                <input
+                  type="number"
+                  value={regCost}
+                  onChange={(e) => setRegCost(e.target.value)}
+                  className="w-full rounded-lg border p-2 text-sm outline-hidden"
+                  style={inputStyle}
+                  required
+                />
+              </div>
+
+              <div className="rounded-lg bg-blue-50 p-3 border border-blue-200 text-blue-800 text-[11px]">
+                <span className="font-bold">QR Barcode Generator:</span> A unique QR barcode (`QR-EQX-${Math.floor(40+Math.random()*60)}`) will be automatically assigned to this physical machine for warehouse dispatch scanning.
+              </div>
+
+              <div className="flex items-center justify-end gap-2 border-t pt-4">
+                <Button variant="secondary" onClick={() => setShowRegisterModal(false)}>
+                  Cancel
+                </Button>
+                <Button variant="primary" type="submit">
+                  Generate Unique ID & Save
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative">

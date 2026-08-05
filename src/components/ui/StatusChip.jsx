@@ -4,7 +4,9 @@ const CONFIG = {
   good: { icon: 'checkCircle', bg: 'var(--good-wash)', fg: 'var(--good)' },
   warning: { icon: 'clock', bg: 'var(--warning-wash)', fg: 'var(--warning)' },
   serious: { icon: 'alertTriangle', bg: 'var(--serious-wash)', fg: 'var(--serious)' },
+  high: { icon: 'alertTriangle', bg: '#ffe4e6', fg: '#e11d48' },
   critical: { icon: 'alertTriangle', bg: 'var(--critical-wash)', fg: 'var(--critical)' },
+  hold: { icon: 'clock', bg: '#fef3c7', fg: '#b45309' },
   info: { icon: 'bulb', bg: 'var(--accent-wash)', fg: 'var(--accent)' },
   neutral: { icon: null, bg: 'transparent', fg: 'var(--ink-muted)' },
 }

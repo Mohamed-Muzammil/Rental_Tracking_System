@@ -13,6 +13,8 @@ import ClientUsage from './pages/client/ClientUsage'
 import ClientReturns from './pages/client/ClientReturns'
 import Marketplace from './pages/client/Marketplace'
 
+import Forecasting from './pages/admin/Forecasting'
+
 export default function App() {
   return (
     <Routes>
@@ -25,6 +27,7 @@ export default function App() {
         <Route path="checkin" element={<CheckInOut />} />
         <Route path="usage" element={<UsageLogging />} />
         <Route path="alerts" element={<AlertsCenter />} />
+        <Route path="forecasting" element={<Forecasting />} />
       </Route>
 
       <Route path="/client" element={<ClientLayout />}>

@@ -9,8 +9,10 @@ import CustomModal from '../ui/CustomModal'
 const NAV = [
   { to: '/admin', end: true, icon: 'gauge', label: 'Dashboard' },
   { to: '/admin/companies', icon: 'building', label: 'Companies' },
+  { to: '/admin/equipment', icon: 'truck', label: 'Equipment Fleet' },
   { to: '/admin/checkin', icon: 'swap', label: 'Check-in / Out' },
   { to: '/admin/usage', icon: 'clock', label: 'Usage Logging' },
+  { to: '/admin/forecasting', icon: 'trendingUp', label: 'Demand Forecasting' },
 ]
 
 export default function AdminLayout() {
