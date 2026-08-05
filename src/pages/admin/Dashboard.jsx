@@ -87,106 +87,124 @@ export default function Dashboard() {
   )
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+    <div className="flex flex-col gap-6">
+      {/* Page Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4" style={{ borderColor: 'var(--border)' }}>
         <div>
-          <h1 className="font-display text-xl font-semibold" style={{ color: 'var(--ink-primary)' }}>
-            Asset Overview
+          <h1 className="text-lg font-semibold" style={{ color: 'var(--ink-primary)' }}>
+            Fleet Operations Dashboard
           </h1>
-          <p className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
-            Live status, exceptions, and outlook across all assets.
+          <p className="text-xs mt-0.5" style={{ color: 'var(--ink-muted)' }}>
+            Live asset status, open alerts, and performance metrics across all active sites.
           </p>
         </div>
       </div>
 
-      {/* ① KPI hero */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      {/* ① KPI Metrics Row */}
+      <div className="grid grid-cols-2 gap-px sm:grid-cols-3 lg:grid-cols-5 border border-slate-200 bg-slate-200">
         <StatTile
-          label="Asset Utilization"
+          label="Fleet Utilization"
           value={kpis.utilization}
           unit="%"
-          hint={`${kpis.rented} of ${kpis.total} units earning`}
+          hint={`${kpis.rented} of ${kpis.total} units active`}
           severity={kpis.utilization >= 60 ? 'good' : 'warning'}
         />
-        <StatTile label="Currently Rented" value={kpis.rented} hint={`across ${kpis.activeSites} sites`} />
-        <StatTile label="Available Now" value={kpis.availableCount} hint="ready to rent out" />
-        <StatTile label="Overdue" value={kpis.overdue} severity={kpis.overdue ? 'critical' : 'neutral'} hint="past return date" />
-        <StatTile label="Idle / Under-utilized" value={kpis.idle} severity={kpis.idle ? 'warning' : 'neutral'} hint="below 30% usage" />
+        <StatTile label="On Rent" value={kpis.rented} hint={`${kpis.activeSites} active sites`} />
+        <StatTile label="Available" value={kpis.availableCount} hint="yard-ready inventory" />
+        <StatTile label="Overdue Returns" value={kpis.overdue} severity={kpis.overdue ? 'critical' : 'neutral'} hint="past return date" />
+        <StatTile label="Under-utilized" value={kpis.idle} severity={kpis.idle ? 'warning' : 'neutral'} hint="below 30% engine usage" />
       </div>
 
-      {/* ② Context strip */}
+      {/* ② Fleet Summary Strip */}
       <div
-        className="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-lg border px-4 py-2.5 text-sm"
-        style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)' }}
+        className="flex flex-wrap items-center divide-x border bg-white"
+        style={{ borderColor: 'var(--border)' }}
       >
         {[
-          { label: 'Total Equipment', value: kpis.total },
-          { label: 'Under Maintenance', value: kpis.maintenanceCount },
-          { label: 'Active Customers', value: `${kpis.activeCustomers} of ${clients.length}` },
-          { label: 'Active Sites', value: `${kpis.activeSites} of ${sites.length}` },
+          { label: 'Fleet Size', value: kpis.total + ' units' },
+          { label: 'In Maintenance', value: kpis.maintenanceCount + ' units' },
+          { label: 'Client Accounts', value: `${kpis.activeCustomers} / ${clients.length}` },
+          { label: 'Deployed Sites', value: `${kpis.activeSites} / ${sites.length}` },
         ].map((s) => (
-          <span key={s.label} className="flex items-center gap-1.5">
-            <span className="text-xs" style={{ color: 'var(--ink-muted)' }}>{s.label}</span>
-            <span className="tabular font-data font-medium" style={{ color: 'var(--ink-primary)' }}>{s.value}</span>
-          </span>
+          <div key={s.label} className="flex flex-col gap-0.5 px-5 py-3">
+            <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'var(--ink-muted)' }}>{s.label}</span>
+            <span className="tabular font-data text-sm font-semibold" style={{ color: 'var(--ink-primary)' }}>{s.value}</span>
+          </div>
         ))}
       </div>
 
-
-      {/* ④ Equipment Grid */}
-      <div className="mb-2">
-        <h2 className="mb-4 font-display text-[13px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--ink-secondary)' }}>
-          Asset Categories
-        </h2>
+      {/* ③ Asset Categories */}
+      <div>
+        <div className="mb-3 flex items-center gap-3">
+          <h2 className="text-[11px] font-bold uppercase tracking-widest" style={{ color: 'var(--ink-muted)' }}>Category Availability</h2>
+          <div className="flex-1 border-t" style={{ borderColor: 'var(--border)' }} />
+        </div>
         <CategoryAvailability categories={categories} />
       </div>
 
-      {/* ⑤ Alerts */}
+      {/* ④ Open Alerts */}
       <Card
-        title="Alerts"
+        title="Open Alerts & Exceptions"
         action={
-          <Link to="/admin/alerts" className="text-xs font-medium" style={{ color: 'var(--accent)' }}>
-            View all ({alerts.length})
+          <Link
+            to="/admin/alerts"
+            className="text-[11px] font-semibold uppercase tracking-wide"
+            style={{ color: 'var(--accent)' }}
+          >
+            View all ({alerts.length}) →
           </Link>
         }
         bodyClassName="p-0"
       >
         {topAlerts.length === 0 ? (
-          <p className="px-5 py-6 text-sm" style={{ color: 'var(--ink-secondary)' }}>
-            No open alerts — all assets healthy.
+          <p className="px-5 py-6 text-sm" style={{ color: 'var(--ink-muted)' }}>
+            No open alerts — fleet operating within normal parameters.
           </p>
         ) : (
-          <ul>
-            {topAlerts.map((a) => (
-              <li key={a.id} className="flex items-start gap-2.5 border-t px-5 py-2.5 first:border-t-0" style={{ borderColor: 'var(--border)' }}>
-                <StatusChip severity={a.severity}>{SEVERITY_LABEL[a.severity]}</StatusChip>
-                <span className="text-[13px] leading-snug" style={{ color: 'var(--ink-primary)' }}>{a.message}</span>
-              </li>
-            ))}
-          </ul>
+          <table className="w-full text-sm">
+            <tbody>
+              {topAlerts.map((a) => (
+                <tr key={a.id} className="border-t" style={{ borderColor: 'var(--border)' }}>
+                  <td className="w-24 px-5 py-2.5 align-middle">
+                    <StatusChip severity={a.severity}>{SEVERITY_LABEL[a.severity]}</StatusChip>
+                  </td>
+                  <td className="py-2.5 pr-5 text-[13px] align-middle" style={{ color: 'var(--ink-primary)' }}>
+                    {a.message}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </Card>
 
-      {/* ⑥ Active rentals */}
+      {/* ⑤ Active Rentals Table */}
       <Card
-        title="Active Rentals"
+        title="Active Rental Agreements"
         action={
-          <Link to="/admin/equipment" className="text-xs font-medium" style={{ color: 'var(--accent)' }}>
-            View all ({active.length})
+          <Link
+            to="/admin/equipment"
+            className="text-[11px] font-semibold uppercase tracking-wide"
+            style={{ color: 'var(--accent)' }}
+          >
+            View All ({active.length}) →
           </Link>
         }
         bodyClassName="overflow-x-auto p-0"
       >
-        <table className="w-full min-w-[840px] text-sm">
+        <table className="w-full min-w-[840px]">
           <thead>
-            <tr className="text-left" style={{ color: 'var(--ink-muted)' }}>
-              <th className="px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Equipment</th>
-              <th className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Customer</th>
-              <th className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Site</th>
-              <th className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Return</th>
-              <th className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Utilization</th>
-              <th className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Status</th>
-              <th className="px-5 py-2.5 text-right text-[11px] font-semibold uppercase tracking-[0.06em]">Actions</th>
+            <tr
+              className="text-left border-b"
+              style={{ borderColor: 'var(--border)', background: 'var(--bg-surface-raised)' }}
+            >
+              <th className="px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--ink-muted)' }}>Unit ID / Type</th>
+              <th className="px-3 py-2.5 text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--ink-muted)' }}>Client</th>
+              <th className="px-3 py-2.5 text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--ink-muted)' }}>Site</th>
+              <th className="px-3 py-2.5 text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--ink-muted)' }}>Expected Return</th>
+              <th className="px-3 py-2.5 text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--ink-muted)' }}>Engine / Idle Hrs</th>
+              <th className="px-3 py-2.5 text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--ink-muted)' }}>Return Status</th>
+              <th className="px-5 py-2.5 text-right text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--ink-muted)' }}>Action</th>
             </tr>
           </thead>
           <tbody>

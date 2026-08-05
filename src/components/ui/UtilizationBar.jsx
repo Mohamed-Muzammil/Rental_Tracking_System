@@ -1,25 +1,22 @@
-export default function UtilizationBar({ engineHours, idleHours, width = 84 }) {
+export default function UtilizationBar({ engineHours, idleHours, width = 80 }) {
   const total = engineHours + idleHours
-  const enginePct = total === 0 ? 0 : (engineHours / total) * 100
-  const idlePct = total === 0 ? 100 : 100 - enginePct
+  const enginePct = total === 0 ? 0 : Math.round((engineHours / total) * 100)
 
   return (
     <div
-      className="inline-flex items-center gap-1.5"
+      className="inline-flex flex-col gap-0.5"
       title={`Engine ${Math.round(engineHours * 10) / 10}h/day · Idle ${Math.round(idleHours * 10) / 10}h/day`}
     >
-      <div className="flex h-1.5 overflow-hidden rounded-full" style={{ width, background: 'var(--border)' }}>
-        {enginePct > 0 && (
-          <span style={{ width: `${enginePct}%`, background: 'var(--series-engine)' }} className="h-full rounded-full" />
-        )}
-        {idlePct > 0 && enginePct > 0 && <span style={{ width: 2 }} />}
-        {idlePct > 0 && (
-          <span style={{ width: `${idlePct}%`, background: 'var(--series-idle)' }} className="h-full rounded-full" />
-        )}
+      {/* Segmented bar */}
+      <div className="flex h-1.5 overflow-hidden bg-slate-100" style={{ width }}>
+        <div style={{ width: `${enginePct}%`, background: '#1d4ed8' }} />
+        <div style={{ width: `${100 - enginePct}%`, background: '#d1d5db' }} />
       </div>
-      <span className="tabular font-data text-xs" style={{ color: 'var(--ink-muted)' }}>
-        {Math.round(enginePct)}%
-      </span>
+      {/* Labels */}
+      <div className="flex justify-between text-[9px] font-medium" style={{ width, color: 'var(--ink-muted)' }}>
+        <span className="tabular">{enginePct}% eng</span>
+        <span className="tabular">{100 - enginePct}% idle</span>
+      </div>
     </div>
   )
 }

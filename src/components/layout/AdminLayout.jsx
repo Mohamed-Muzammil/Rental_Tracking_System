@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useMemo } from 'react'
+import { format } from 'date-fns'
 import { useAppStore } from '../../store/appStore'
 import { buildAlerts } from '../../lib/rules'
 import Icon from '../ui/Icon'
@@ -9,10 +10,10 @@ import CustomModal from '../ui/CustomModal'
 const NAV = [
   { to: '/admin', end: true, icon: 'gauge', label: 'Dashboard' },
   { to: '/admin/companies', icon: 'building', label: 'Companies' },
-  { to: '/admin/equipment', icon: 'truck', label: 'Equipment Fleet' },
+  { to: '/admin/equipment', icon: 'truck', label: 'Equipment' },
   { to: '/admin/checkin', icon: 'swap', label: 'Check-in / Out' },
-  { to: '/admin/usage', icon: 'clock', label: 'Usage Logging' },
-  { to: '/admin/forecasting', icon: 'trendingUp', label: 'Demand Forecasting' },
+  { to: '/admin/usage', icon: 'clock', label: 'Usage Logs' },
+  { to: '/admin/forecasting', icon: 'trendingUp', label: 'Forecasting' },
 ]
 
 export default function AdminLayout() {
@@ -26,70 +27,99 @@ export default function AdminLayout() {
     return alerts.length
   }, [equipment, today, dismissedAlertIds])
 
+  const todayLabel = format(today, 'EEE, d MMM yyyy')
+
   return (
     <div className="flex min-h-full flex-col" style={{ background: 'var(--bg-page)' }}>
+      {/* Top Application Bar */}
       <header
-        className="flex items-center gap-4 border-b px-5 py-2.5"
-        style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)' }}
+        className="flex items-center gap-0 border-b"
+        style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)', height: '52px' }}
       >
-        <button
-          onClick={() => navigate('/')}
-          className="mr-1 shrink-0"
+        {/* Brand / Logo */}
+        <div
+          className="flex h-full items-center gap-2.5 border-r px-5 shrink-0"
+          style={{ borderColor: 'var(--border)', minWidth: '200px' }}
         >
-          <span className="font-display text-[15px] font-bold uppercase tracking-[0.06em]" style={{ color: 'var(--accent)' }}>
-            FleetLoop
-          </span>
-        </button>
+          <div
+            className="flex h-7 w-7 items-center justify-center rounded"
+            style={{ background: 'var(--accent)' }}
+          >
+            <Icon name="truck" size={14} className="text-white" style={{ color: '#fff' }} />
+          </div>
+          <button
+            onClick={() => navigate('/')}
+            className="text-left"
+          >
+            <span
+              className="block text-[13px] font-bold tracking-tight leading-none"
+              style={{ color: 'var(--ink-primary)' }}
+            >
+              FleetLoop
+            </span>
+            <span className="block text-[10px] font-normal leading-none mt-0.5" style={{ color: 'var(--ink-muted)' }}>
+              Asset Management
+            </span>
+          </button>
+        </div>
 
-        <nav className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto">
+        {/* Main Navigation */}
+        <nav className="flex h-full min-w-0 flex-1 items-stretch overflow-x-auto">
           {NAV.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                `flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[13px] font-medium transition-colors ${isActive ? '' : 'hover:opacity-80'}`
+                `relative flex shrink-0 items-center gap-1.5 border-b-2 px-4 text-[13px] font-medium transition-colors ${
+                  isActive
+                    ? 'border-blue-700 text-blue-700'
+                    : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'
+                }`
               }
-              style={({ isActive }) => ({
-                background: isActive ? 'var(--accent-wash)' : 'transparent',
-                color: isActive ? 'var(--accent)' : 'var(--ink-secondary)',
-              })}
             >
-              <Icon name={item.icon} size={15} />
+              <Icon name={item.icon} size={14} />
               {item.label}
             </NavLink>
           ))}
         </nav>
 
-        {/* Alerts bell — icon only, rightmost */}
-        <NavLink
-          to="/admin/alerts"
-          className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors hover:opacity-80"
-          style={({ isActive }) => ({
-            background: isActive ? 'var(--accent-wash)' : 'transparent',
-            color: isActive ? 'var(--accent)' : 'var(--ink-secondary)',
-          })}
-          title="Alerts"
-        >
-          <Icon name="bell" size={18} />
-          {openAlertCount > 0 && (
-            <span
-              className="tabular absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold leading-none"
-              style={{ background: 'var(--critical)', color: '#fff' }}
-            >
-              {openAlertCount}
-            </span>
-          )}
-        </NavLink>
+        {/* Right: date + alerts */}
+        <div className="flex h-full items-center gap-1 border-l px-3 shrink-0" style={{ borderColor: 'var(--border)' }}>
+          <span className="mr-3 text-xs font-medium" style={{ color: 'var(--ink-muted)' }}>
+            {todayLabel}
+          </span>
+          <NavLink
+            to="/admin/alerts"
+            className={({ isActive }) =>
+              `relative flex h-8 w-8 items-center justify-center rounded transition-colors ${
+                isActive
+                  ? 'bg-blue-50 text-blue-700'
+                  : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800'
+              }`
+            }
+            title="Alerts & Incidents"
+          >
+            <Icon name="bell" size={16} />
+            {openAlertCount > 0 && (
+              <span
+                className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold leading-none"
+                style={{ background: 'var(--critical)', color: '#fff' }}
+              >
+                {openAlertCount}
+              </span>
+            )}
+          </NavLink>
+        </div>
       </header>
 
-      <main className="min-w-0 flex-1 overflow-y-auto px-6 py-6">
+      {/* Page Content */}
+      <main className="min-w-0 flex-1 overflow-y-auto" style={{ padding: '24px 32px' }}>
         <Outlet />
       </main>
+
       <ToastStack />
       <CustomModal />
     </div>
   )
 }
-
-

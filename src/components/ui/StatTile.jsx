@@ -1,49 +1,62 @@
-const STRIPE = {
-  good: '#16a34a',
-  warning: '#ca8a04',
-  serious: '#ea580c',
-  critical: '#dc2626',
-  neutral: '#cbd5e1',
+const SEVERITY_BORDER = {
+  good:     '#15803d',
+  warning:  '#b45309',
+  serious:  '#c2410c',
+  critical: '#b91c1c',
+  neutral:  '#d1d5db',
+}
+
+const SEVERITY_VALUE_COLOR = {
+  good:     '#15803d',
+  warning:  '#b45309',
+  serious:  '#c2410c',
+  critical: '#b91c1c',
+  neutral:  'var(--ink-primary)',
 }
 
 export default function StatTile({ label, value, unit, hint, severity = 'neutral' }) {
-  const stripeColor = STRIPE[severity] ?? STRIPE.neutral
-  const hasAccent = severity !== 'neutral'
+  const borderColor = SEVERITY_BORDER[severity] ?? SEVERITY_BORDER.neutral
+  const valueColor  = SEVERITY_VALUE_COLOR[severity] ?? SEVERITY_VALUE_COLOR.neutral
+  const hasAccent   = severity !== 'neutral'
 
   return (
     <div
-      className="relative flex flex-col justify-between rounded-xl border bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
+      className="relative flex flex-col gap-2 bg-white border p-4"
       style={{
         borderColor: 'var(--border)',
-        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04)',
+        borderLeft: `3px solid ${borderColor}`,
+        boxShadow: 'var(--shadow-card)',
       }}
     >
-      {/* Left border accent line if non-neutral, or subtle left border */}
+      {/* Label */}
       <div
-        className="absolute left-0 top-0 bottom-0 w-[4px] rounded-l-xl"
-        style={{
-          backgroundColor: stripeColor,
-          opacity: hasAccent ? 1 : 0.4,
-        }}
-      />
+        className="text-[11px] font-semibold uppercase tracking-widest"
+        style={{ color: 'var(--ink-muted)', letterSpacing: '0.07em' }}
+      >
+        {label}
+      </div>
 
-      <div className="pl-1">
-        <div className="font-display text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--ink-muted)' }}>
-          {label}
-        </div>
-
-        <div className="tabular mt-2 flex items-baseline gap-1 font-data text-[28px] font-medium leading-none" style={{ color: 'var(--ink-primary)' }}>
-          <span>{value}</span>
-          {unit && <span className="text-xs font-normal text-slate-400 ml-0.5">{unit}</span>}
-        </div>
-
-        {hint && (
-          <div className="mt-2 text-xs font-normal" style={{ color: 'var(--ink-secondary)' }}>
-            {hint}
-          </div>
+      {/* Value */}
+      <div className="flex items-baseline gap-1.5">
+        <span
+          className="tabular font-data text-2xl font-semibold leading-none"
+          style={{ color: hasAccent ? valueColor : 'var(--ink-primary)' }}
+        >
+          {value}
+        </span>
+        {unit && (
+          <span className="text-xs font-medium" style={{ color: 'var(--ink-muted)' }}>
+            {unit}
+          </span>
         )}
       </div>
+
+      {/* Hint */}
+      {hint && (
+        <div className="text-[12px]" style={{ color: 'var(--ink-muted)' }}>
+          {hint}
+        </div>
+      )}
     </div>
   )
 }
-
