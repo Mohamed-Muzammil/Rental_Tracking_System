@@ -248,9 +248,23 @@ export default function Dashboard() {
       <Card
         title="Demand Forecasting"
         action={
-          <span className="text-[11px]" style={{ color: 'var(--ink-muted)' }}>
-            3-month smoothed-trend projection
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px]" style={{ color: 'var(--ink-muted)' }}>
+              3-month smoothed-trend projection
+            </span>
+            <Link
+              to="/admin/forecasting"
+              className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-3 py-1 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:border-blue-300 hover:text-blue-600 transition-colors shadow-xs"
+            >
+              <Icon name="trendingUp" size={13} /> View Full Forecast
+            </Link>
+            <Link
+              to="/admin/forecasting"
+              className="inline-flex items-center gap-1 rounded-md bg-blue-600 px-3 py-1 text-xs font-bold text-white hover:bg-blue-700 transition-colors shadow-xs"
+            >
+              <Icon name="swap" size={13} /> Site Reallocation
+            </Link>
+          </div>
         }
       >
         <div className="mb-4 flex flex-wrap gap-2">

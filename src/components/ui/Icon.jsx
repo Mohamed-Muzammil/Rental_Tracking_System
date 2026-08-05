@@ -1,5 +1,6 @@
 const PATHS = {
   alertTriangle: 'M12 3.5 21.5 20h-19L12 3.5Z M12 9.5v4.25 M12 16.75h.01',
+  alert: 'M12 3.5 21.5 20h-19L12 3.5Z M12 9.5v4.25 M12 16.75h.01',
   clock: 'M12 12V7 M12 12l3.5 2 M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z',
   checkCircle: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z M8 12.5l2.5 2.5L16 9.5',
   bulb: 'M9 18h6 M10 21h4 M12 3a6 6 0 0 0-3.6 10.8c.6.46 1.1 1.2 1.2 2.2h4.8c.1-1 .6-1.74 1.2-2.2A6 6 0 0 0 12 3Z',
@@ -15,6 +16,7 @@ const PATHS = {
   search: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z M21 21l-4.35-4.35',
   plus: 'M12 5v14 M5 12h14',
   building: 'M4 21V5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v16 M14 21v-9a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v9 M8 8h.01 M8 12h.01 M8 16h.01',
+  trendingUp: 'M3 17l5.5-5.5 4 4L21 7 M15 7h6v6',
 }
 
 export default function Icon({ name, size = 16, strokeWidth = 2, className = '' }) {
