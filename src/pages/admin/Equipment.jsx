@@ -217,6 +217,25 @@ function UnitDetail({ eq, today }) {
   const util = eq.status === 'active' ? utilizationOf(eq) : null
   const isMaintenance = eq.status === 'maintenance'
 
+  const todayStr = format(today, 'yyyy-MM-dd')
+  const agreementStart = eq.checkIn || '2026-01-01'
+  const agreementEnd = eq.expectedReturn || todayStr
+
+  // Custom date validation against agreement range
+  const dateError = useMemo(() => {
+    if (presetPeriod !== 'custom') return null
+    if (customStartDate && (customStartDate < agreementStart || customStartDate > agreementEnd)) {
+      return `Date out of range! Custom start date must be between ${agreementStart} and ${agreementEnd}.`
+    }
+    if (customEndDate && (customEndDate < agreementStart || customEndDate > agreementEnd)) {
+      return `Date out of range! Custom end date must be between ${agreementStart} and ${agreementEnd}.`
+    }
+    if (customStartDate && customEndDate && customStartDate > customEndDate) {
+      return `Start date cannot be after end date.`
+    }
+    return null
+  }, [presetPeriod, customStartDate, customEndDate, agreementStart, agreementEnd])
+
   const eqLogs = useMemo(() => {
     let logs = usageLogs.filter((l) => l.equipmentId === eq.id)
     if (presetPeriod === 'agreement' && eq.checkIn) {
@@ -224,12 +243,16 @@ function UnitDetail({ eq, today }) {
     } else if (presetPeriod === '7days') {
       logs = logs.slice(-7)
     } else if (presetPeriod === 'custom') {
-      if (customStartDate) logs = logs.filter((l) => l.date >= customStartDate)
-      if (customEndDate) logs = logs.filter((l) => l.date <= customEndDate)
+      if (dateError) {
+        logs = []
+      } else {
+        if (customStartDate) logs = logs.filter((l) => l.date >= customStartDate)
+        if (customEndDate) logs = logs.filter((l) => l.date <= customEndDate)
+      }
     }
     // Always sort in ASCENDING order (earliest date to latest date)
     return logs.sort((a, b) => a.date.localeCompare(b.date))
-  }, [usageLogs, eq.id, eq.checkIn, eq.expectedReturn, presetPeriod, customStartDate, customEndDate])
+  }, [usageLogs, eq.id, eq.checkIn, eq.expectedReturn, presetPeriod, customStartDate, customEndDate, dateError])
 
   const chartData = useMemo(
     () => eqLogs.map((l) => ({ ...l, date: l.date.slice(5) })),
@@ -303,73 +326,79 @@ function UnitDetail({ eq, today }) {
             </div>
           </div>
 
-          {/* Quick Preset Filter Pills */}
-          <div className="mb-3 flex items-center gap-1.5 overflow-x-auto pb-1">
+          {/* Sleek Segmented Range Control */}
+          <div className="mb-3 flex rounded-lg bg-slate-100 p-1 border border-slate-200 text-xs">
             <button
               onClick={() => setPresetPeriod('agreement')}
-              className={`rounded-full px-2.5 py-1 text-[10px] font-bold transition-colors ${
-                presetPeriod === 'agreement'
-                  ? 'bg-blue-100 text-blue-700 border border-blue-300'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              className={`flex-1 rounded-md py-1.5 px-2 text-[11px] font-bold whitespace-nowrap transition-all ${
+                presetPeriod === 'agreement' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              Current Agreement
+              Agreement
             </button>
             <button
               onClick={() => setPresetPeriod('7days')}
-              className={`rounded-full px-2.5 py-1 text-[10px] font-bold transition-colors ${
-                presetPeriod === '7days'
-                  ? 'bg-blue-100 text-blue-700 border border-blue-300'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              className={`flex-1 rounded-md py-1.5 px-2 text-[11px] font-bold whitespace-nowrap transition-all ${
+                presetPeriod === '7days' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              Last 7 Days
+              7 Days
             </button>
             <button
               onClick={() => setPresetPeriod('all')}
-              className={`rounded-full px-2.5 py-1 text-[10px] font-bold transition-colors ${
-                presetPeriod === 'all'
-                  ? 'bg-blue-100 text-blue-700 border border-blue-300'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              className={`flex-1 rounded-md py-1.5 px-2 text-[11px] font-bold whitespace-nowrap transition-all ${
+                presetPeriod === 'all' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
               All Records
             </button>
             <button
               onClick={() => setPresetPeriod('custom')}
-              className={`rounded-full px-2.5 py-1 text-[10px] font-bold transition-colors ${
-                presetPeriod === 'custom'
-                  ? 'bg-blue-100 text-blue-700 border border-blue-300'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              className={`flex-1 rounded-md py-1.5 px-2 text-[11px] font-bold whitespace-nowrap transition-all ${
+                presetPeriod === 'custom' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              Custom Dates
+              Custom Range
             </button>
           </div>
 
-          {/* Manual Custom Date Range Inputs */}
+          {/* Manual Custom Date Range Inputs with Agreement Bounds & Error Display */}
           {presetPeriod === 'custom' && (
-            <div className="mb-3 flex items-center gap-2 rounded-lg bg-slate-50 p-2 border border-slate-200">
-              <div className="flex-1">
-                <span className="block text-[9px] font-bold text-slate-400 uppercase">From</span>
-                <input
-                  type="date"
-                  value={customStartDate}
-                  onChange={(e) => setCustomStartDate(e.target.value)}
-                  className="w-full rounded border px-2 py-1 text-xs outline-hidden bg-white"
-                  style={inputStyle}
-                />
-              </div>
-              <span className="text-xs text-slate-400 font-bold mt-3">to</span>
-              <div className="flex-1">
-                <span className="block text-[9px] font-bold text-slate-400 uppercase">To</span>
-                <input
-                  type="date"
-                  value={customEndDate}
-                  onChange={(e) => setCustomEndDate(e.target.value)}
-                  className="w-full rounded border px-2 py-1 text-xs outline-hidden bg-white"
-                  style={inputStyle}
-                />
+            <div className="mb-3 flex flex-col gap-2 rounded-lg bg-slate-50 p-2.5 border border-slate-200">
+              {dateError && (
+                <div className="flex items-center gap-1.5 rounded-md bg-rose-50 px-2.5 py-1.5 text-xs text-rose-700 font-medium border border-rose-200">
+                  <Icon name="alert" size={14} />
+                  <span>{dateError}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-2">
+                <div className="flex-1">
+                  <span className="block text-[9px] font-bold text-slate-400 uppercase mb-0.5">From Date</span>
+                  <input
+                    type="date"
+                    min={agreementStart}
+                    max={agreementEnd}
+                    value={customStartDate}
+                    onChange={(e) => setCustomStartDate(e.target.value)}
+                    className={`w-full rounded border px-2 py-1 text-xs outline-hidden bg-white ${
+                      dateError ? 'border-rose-400 focus:border-rose-500' : 'border-slate-300'
+                    }`}
+                  />
+                </div>
+                <span className="text-xs text-slate-400 font-bold mt-3">to</span>
+                <div className="flex-1">
+                  <span className="block text-[9px] font-bold text-slate-400 uppercase mb-0.5">To Date</span>
+                  <input
+                    type="date"
+                    min={agreementStart}
+                    max={agreementEnd}
+                    value={customEndDate}
+                    onChange={(e) => setCustomEndDate(e.target.value)}
+                    className={`w-full rounded border px-2 py-1 text-xs outline-hidden bg-white ${
+                      dateError ? 'border-rose-400 focus:border-rose-500' : 'border-slate-300'
+                    }`}
+                  />
+                </div>
               </div>
             </div>
           )}
