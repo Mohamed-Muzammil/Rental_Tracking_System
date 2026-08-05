@@ -1,0 +1,142 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Bahnschrift", "Barlow Semi Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-data: ui-monospace, "SFMono-Regular", "Roboto Mono", Consolas, monospace;
+}
+
+:root {
+  color-scheme: light;
+
+  --bg-page: #f5f1e8;
+  --bg-surface: #fdfbf7;
+  --bg-surface-raised: #ffffff;
+  --ink-primary: #1c1a17;
+  --ink-secondary: #5c574c;
+  --ink-muted: #918a7b;
+  --border: #e3ddce;
+  --border-strong: #cdc4b0;
+
+  --accent: #b85c2e;
+  --accent-ink: #fffaf5;
+  --accent-wash: #f3e2d4;
+
+  --series-engine: #b85c2e;
+  --series-idle: #2a78d6;
+
+  --good: #0ca30c;
+  --warning: #b8790e;
+  --serious: #c1552f;
+  --critical: #d03b3b;
+
+  --good-wash: #e3f3e0;
+  --warning-wash: #f6e9d2;
+  --serious-wash: #f7e2d6;
+  --critical-wash: #fadedd;
+
+  --shadow-card: 0 1px 2px rgba(28, 26, 23, 0.06), 0 8px 24px -12px rgba(28, 26, 23, 0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+
+    --bg-page: #15120e;
+    --bg-surface: #1e1a15;
+    --bg-surface-raised: #262019;
+    --ink-primary: #f3ede1;
+    --ink-secondary: #c7bda9;
+    --ink-muted: #8c8375;
+    --border: #34291d;
+    --border-strong: #4a3c29;
+
+    --accent: #d87f42;
+    --accent-ink: #1c1208;
+    --accent-wash: #3a2618;
+
+    --series-engine: #d87f42;
+    --series-idle: #5c9bea;
+
+    --good: #35c455;
+    --warning: #e0a930;
+    --serious: #e2795a;
+    --critical: #e2685f;
+
+    --good-wash: #17301c;
+    --warning-wash: #3a2c12;
+    --serious-wash: #392019;
+    --critical-wash: #3a1c1a;
+
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg-page: #15120e;
+  --bg-surface: #1e1a15;
+  --bg-surface-raised: #262019;
+  --ink-primary: #f3ede1;
+  --ink-secondary: #c7bda9;
+  --ink-muted: #8c8375;
+  --border: #34291d;
+  --border-strong: #4a3c29;
+
+  --accent: #d87f42;
+  --accent-ink: #1c1208;
+  --accent-wash: #3a2618;
+
+  --series-engine: #d87f42;
+  --series-idle: #5c9bea;
+
+  --good: #35c455;
+  --warning: #e0a930;
+  --serious: #e2795a;
+  --critical: #e2685f;
+
+  --good-wash: #17301c;
+  --warning-wash: #3a2c12;
+  --serious-wash: #392019;
+  --critical-wash: #3a1c1a;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--bg-page);
+  color: var(--ink-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent-wash);
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
