@@ -93,20 +93,21 @@ export const equipment = [
   },
   {
     id: 'CRN-2002', type: 'Crane', tier: 'Mobile Standard', catalogId: 'CAT-CRN-S',
-    status: 'active', siteId: 'S002', clientId: 'C001', operatorId: null,
+    status: 'active', siteId: 'PORUR', contractSiteId: 'MYLAPORE', clientId: 'C001', operatorId: null,
     checkIn: '2026-07-12', expectedReturn: '2026-08-02',
     avgEngineHoursPerDay: 0.4, avgIdleHoursPerDay: 9.1,
+    locationAnomaly: true, currentLocation: { lat: 13.0382, lng: 80.1565 },
   },
   {
     id: 'EQX-2003', type: 'Bulldozer', tier: 'Heavy', catalogId: 'CAT-BLD-H',
-    status: 'active', siteId: 'TAMBARAM', contractSiteId: 'ANNA-NAGAR', clientId: 'C002', operatorId: 'OP203',
+    status: 'active', siteId: 'VELACHERY', contractSiteId: 'GUINDY', clientId: 'C002', operatorId: 'OP203',
     checkIn: '2026-07-28', expectedReturn: '2026-08-25',
     avgEngineHoursPerDay: 6.5, avgIdleHoursPerDay: 1.0,
-    locationAnomaly: true, currentLocation: { lat: 12.9249, lng: 80.1000 },
+    locationAnomaly: true, currentLocation: { lat: 12.9759, lng: 80.2212 },
   },
   {
     id: 'EQX-2004', type: 'Excavator', tier: 'Compact', catalogId: 'CAT-EXC-C',
-    status: 'active', siteId: 'AMBATTUR', contractSiteId: 'GUINDY', clientId: 'C002', operatorId: 'OP106',
+    status: 'active', siteId: 'AMBATTUR', contractSiteId: 'ADYAR', clientId: 'C002', operatorId: 'OP106',
     checkIn: '2026-08-01', expectedReturn: '2026-08-09',
     avgEngineHoursPerDay: 4.0, avgIdleHoursPerDay: 3.5,
     locationAnomaly: true, currentLocation: { lat: 13.1143, lng: 80.1548 },
@@ -175,9 +176,10 @@ export const equipment = [
   },
   {
     id: 'GRD-2015', type: 'Grader', tier: 'Standard', catalogId: 'CAT-GRD-S',
-    status: 'active', siteId: 'S011', clientId: 'C005', operatorId: 'OP217',
+    status: 'active', siteId: 'ENNORE', contractSiteId: 'CHENNAI-CENTRAL', clientId: 'C005', operatorId: 'OP217',
     checkIn: '2026-07-16', expectedReturn: '2026-08-21',
     avgEngineHoursPerDay: 6.4, avgIdleHoursPerDay: 1.0,
+    locationAnomaly: true, currentLocation: { lat: 13.2215, lng: 80.3242 },
   },
   {
     id: 'FRK-2016', type: 'Forklift', tier: 'Heavy Duty', catalogId: 'CAT-FRK-H',

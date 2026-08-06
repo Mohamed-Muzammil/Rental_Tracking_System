@@ -7,10 +7,11 @@ import Button from '../../components/ui/Button'
 import Icon from '../../components/ui/Icon'
 import StatusChip from '../../components/ui/StatusChip'
 import WarehouseQrDispatch from '../../components/admin/WarehouseQrDispatch'
+import ContractInvoice from './ContractInvoice'
 
 const TABS = [
   { id: 'batch', label: 'Warehouse Batch Dispatch (QR Verification)', icon: 'truck' },
-  { id: 'out', label: 'Single Unit Check Out', icon: 'swap' },
+  { id: 'out', label: 'Single Unit Check Out & Contract Generation', icon: 'swap' },
   { id: 'in', label: 'Unit Check In', icon: 'checkCircle' },
 ]
 
@@ -30,7 +31,7 @@ export default function CheckInOut() {
           Yard Check-in / Check-out & QR Dispatch
         </h1>
         <p className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
-          Manage batch orders, verify physical machinery QR codes on truck loading, and process single unit check-ins.
+          Manage batch orders, generate official Rental Contracts & Tax Invoices, verify physical machinery QR codes on truck loading, and process unit check-ins.
         </p>
       </div>
 
@@ -76,18 +77,32 @@ function CheckOutForm() {
   const [clientId, setClientId] = useState('')
   const [operatorId, setOperatorId] = useState('')
   const [expectedReturn, setExpectedReturn] = useState(format(addDays(today, 14), 'yyyy-MM-dd'))
+  const [createdContract, setCreatedContract] = useState(null)
 
   const canSubmit = equipmentId && siteId && clientId && expectedReturn
 
   const submit = (e) => {
     e.preventDefault()
     if (!canSubmit) return
+    const targetEq = equipment.find((e) => e.id === equipmentId)
+    const targetClient = clientById[clientId]
+    const targetSite = sites.find((s) => s.id === siteId)
+    const orderId = `CNT-2026-${Math.floor(1000 + Math.random() * 9000)}`
+
     checkOutEquipment({ equipmentId, siteId, clientId, operatorId: operatorId.trim() || null, expectedReturn })
-    setEquipmentId('')
-    setSiteId('')
-    setClientId('')
-    setOperatorId('')
-    setExpectedReturn(format(addDays(today, 14), 'yyyy-MM-dd'))
+
+    setCreatedContract({
+      orderId,
+      client: targetClient,
+      site: targetSite,
+      units: targetEq ? [targetEq] : [],
+      checkInDate: format(today, 'yyyy-MM-dd'),
+      expectedReturn,
+    })
+  }
+
+  if (createdContract) {
+    return <ContractInvoice inlineData={createdContract} onBack={() => setCreatedContract(null)} />
   }
 
   return (
