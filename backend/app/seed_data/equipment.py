@@ -15,7 +15,7 @@ from .catalog import CATALOG_BY_TYPE
 from .clients import CLIENTS
 from .sites import SITES
 
-SIM_TODAY = date(2026, 8, 5)
+SIM_TODAY = date.today()
 EQUIPMENT_TYPES = ["Excavator", "Bulldozer", "Crane", "Grader", "Forklift", "Loader", "Roller"]
 
 _ORIGINAL: list[dict] = [

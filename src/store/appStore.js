@@ -60,9 +60,9 @@ export const useAppStore = create((set, get) => ({
     }
     set({ dataError: null })
     const [eqRes, logRes, incRes] = await Promise.all([
-      supabase.from('equipment').select('*'),
-      supabase.from('usage_logs').select('*'),
-      supabase.from('misuse_incidents').select('*'),
+      supabase.from('equipment').select('*').limit(10000),
+      supabase.from('usage_logs').select('*').limit(20000),
+      supabase.from('misuse_incidents').select('*').limit(10000),
     ])
     const failed = eqRes.error || logRes.error || incRes.error
     if (failed) {
