@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { format } from 'date-fns'
 import { useAppStore } from '../../store/appStore'
 import { siteById } from '../../data/sites'
-import { clientById } from '../../data/clients'
+import { geofenceCheck } from '../../lib/geo'
 import { catalogById } from '../../data/catalog'
 import { equipmentTypes } from '../../data/demandHistory'
 import { healthOf, returnStatus, utilizationOf } from '../../lib/rules'
@@ -29,6 +29,8 @@ const inputStyle = {
 export default function Equipment() {
   const navigate = useNavigate()
   const equipment = useAppStore((s) => s.equipment)
+  const clients = useAppStore((s) => s.clients)
+  const clientById = useMemo(() => Object.fromEntries(clients.map((c) => [c.id, c])), [clients])
   const today = useAppStore((s) => s.today)
 
   const [searchParams, setSearchParams] = useSearchParams()
@@ -298,6 +300,8 @@ export default function Equipment() {
                     <td className="px-3 py-3">
                       {eq.finePending ? (
                         <StatusChip severity="critical" icon="alertTriangle">Fine Pending</StatusChip>
+                      ) : eq.status === 'active' && geofenceCheck(eq.currentLocation || eq.current_location, eq.siteId)?.breach ? (
+                        <StatusChip severity="critical" icon="mapPin">Site Mismatch</StatusChip>
                       ) : (
                         <StatusChip
                           severity={isActive ? (isDead ? 'critical' : 'good') : eq.status === 'maintenance' ? 'warning' : 'neutral'}

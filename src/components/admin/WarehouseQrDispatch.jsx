@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react'
 import { format, addDays } from 'date-fns'
 import { useAppStore } from '../../store/appStore'
 import { sites } from '../../data/sites'
-import { clients, clientById } from '../../data/clients'
 import { equipmentTypes } from '../../data/demandHistory'
 import Card from '../ui/Card'
 import Button from '../ui/Button'
@@ -17,6 +16,8 @@ const inputStyle = {
 
 export default function WarehouseQrDispatch() {
   const equipment = useAppStore((s) => s.equipment)
+  const clients = useAppStore((s) => s.clients)
+  const clientById = useMemo(() => Object.fromEntries(clients.map(c => [c.id, c])), [clients])
   const today = useAppStore((s) => s.today)
   const batchCheckOutEquipment = useAppStore((s) => s.batchCheckOutEquipment)
   const openModal = useAppStore((s) => s.openModal)

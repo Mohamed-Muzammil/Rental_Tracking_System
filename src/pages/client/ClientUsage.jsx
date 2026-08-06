@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react'
 import { useAppStore } from '../../store/appStore'
 import { siteById } from '../../data/sites'
 import { catalogById } from '../../data/catalog'
-import { clientById } from '../../data/clients'
 import Card from '../../components/ui/Card'
 import StatTile from '../../components/ui/StatTile'
 import UtilizationBar from '../../components/ui/UtilizationBar'
@@ -15,6 +14,8 @@ export default function ClientUsage() {
   const usageLogs = useAppStore((s) => s.usageLogs)
   const activeClientId = useAppStore((s) => s.activeClientId)
   const selectedSiteId = useAppStore((s) => s.selectedSiteId)
+  const clients = useAppStore((s) => s.clients)
+  const clientById = useMemo(() => Object.fromEntries(clients.map(c => [c.id, c])), [clients])
   const client = clientById[activeClientId]
 
   const [selectedEqForLog, setSelectedEqForLog] = useState(null)

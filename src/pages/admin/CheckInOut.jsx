@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { format, addDays } from 'date-fns'
 import { useAppStore } from '../../store/appStore'
 import { sites } from '../../data/sites'
-import { clients, clientById } from '../../data/clients'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import Icon from '../../components/ui/Icon'
@@ -67,6 +66,8 @@ function CheckOutForm() {
   const equipment = useAppStore((s) => s.equipment)
   const today = useAppStore((s) => s.today)
   const checkOutEquipment = useAppStore((s) => s.checkOutEquipment)
+  const clients = useAppStore((s) => s.clients)
+  const clientById = useMemo(() => Object.fromEntries(clients.map((c) => [c.id, c])), [clients])
 
   const available = useMemo(() => equipment.filter((e) => e.status === 'completed'), [equipment])
 

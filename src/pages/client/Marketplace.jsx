@@ -1,8 +1,7 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { catalog } from '../../data/catalog'
 import { sites } from '../../data/sites'
 import { useAppStore } from '../../store/appStore'
-import { clientById } from '../../data/clients'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import StatusChip from '../../components/ui/StatusChip'
@@ -13,6 +12,8 @@ export default function Marketplace() {
   const [selectedSiteId, setSelectedSiteId] = useState('S001')
   const rentFromCatalog = useAppStore((s) => s.rentFromCatalog)
   const activeClientId = useAppStore((s) => s.activeClientId)
+  const clients = useAppStore((s) => s.clients)
+  const clientById = useMemo(() => Object.fromEntries(clients.map(c => [c.id, c])), [clients])
   const client = clientById[activeClientId]
 
   const clientSites = sites.filter((s) => client?.sites?.includes(s.id))

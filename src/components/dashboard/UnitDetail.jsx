@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import { useAppStore } from '../../store/appStore'
 import { siteById } from '../../data/sites'
-import { clientById } from '../../data/clients'
 import { catalogById } from '../../data/catalog'
 import { healthOf, utilizationOf } from '../../lib/rules'
 import StatusChip from '../ui/StatusChip'
@@ -26,6 +25,8 @@ export default function UnitDetail({ eq, today }) {
   const checkInEquipment = useAppStore((s) => s.checkInEquipment || s.checkIn)
   const usageLogs = useAppStore((s) => s.usageLogs)
   const openModal = useAppStore((s) => s.openModal)
+  const clients = useAppStore((s) => s.clients)
+  const clientById = useMemo(() => Object.fromEntries(clients.map(c => [c.id, c])), [clients])
   
   const [presetPeriod, setPresetPeriod] = useState('7days') // '7days' | 'all' | 'custom'
   const [viewMode, setViewMode] = useState('chart')

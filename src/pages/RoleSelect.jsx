@@ -1,9 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useAppStore } from '../store/appStore'
-import { equipment } from '../data/equipment'
-import { clients } from '../data/clients'
-import { sites } from '../data/sites'
 import { equipmentTypes } from '../data/demandHistory'
+import { sites } from '../data/sites'
 import Icon from '../components/ui/Icon'
 
 const OPTIONS = [
@@ -27,16 +25,18 @@ const OPTIONS = [
   },
 ]
 
-const STATS = [
-  { value: equipment.length, label: 'Fleet units tracked' },
-  { value: equipmentTypes.length, label: 'Equipment categories' },
-  { value: sites.length, label: 'Active job sites' },
-  { value: clients.length, label: 'Client accounts' },
-]
-
 export default function RoleSelect() {
   const navigate = useNavigate()
   const setRole = useAppStore((s) => s.setRole)
+  const equipment = useAppStore(s => s.equipment)
+  const clients = useAppStore(s => s.clients)
+
+  const STATS = [
+    { value: equipment.length, label: 'Fleet units tracked' },
+    { value: equipmentTypes.length, label: 'Equipment categories' },
+    { value: sites.length, label: 'Active job sites' },
+    { value: clients.length, label: 'Client accounts' },
+  ]
 
   const choose = (opt) => {
     setRole(opt.role)

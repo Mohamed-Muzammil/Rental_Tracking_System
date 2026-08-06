@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAppStore } from '../../store/appStore'
-import { clients } from '../../data/clients'
 import { catalogById } from '../../data/catalog'
 import { siteById } from '../../data/sites'
 import { healthOf, utilizationOf } from '../../lib/rules'
@@ -13,6 +12,7 @@ import StatTile from '../../components/ui/StatTile'
 
 export default function Companies() {
   const equipment = useAppStore((s) => s.equipment)
+  const clients = useAppStore((s) => s.clients)
   const today = useAppStore((s) => s.today)
 
   const [searchQuery, setSearchQuery] = useState('')
