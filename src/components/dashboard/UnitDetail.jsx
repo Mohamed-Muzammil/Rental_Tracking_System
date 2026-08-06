@@ -11,6 +11,7 @@ import Button from '../ui/Button'
 import Icon from '../ui/Icon'
 import UsageHistoryChart from '../ui/UsageHistoryChart'
 import RecommendationModal from './RecommendationModal'
+import LostConnectionModal from './LostConnectionModal'
 
 import LocationModal from './LocationModal'
 
@@ -36,6 +37,7 @@ export default function UnitDetail({ eq, today }) {
   const [customStartDate, setCustomStartDate] = useState('')
   const [customEndDate, setCustomEndDate] = useState('')
   const [showRecModal, setShowRecModal] = useState(false)
+  const [showLostConnModal, setShowLostConnModal] = useState(false)
   const [showLocationModal, setShowLocationModal] = useState(false)
 
   const catalog = catalogById[eq.catalogId]
@@ -366,9 +368,9 @@ export default function UnitDetail({ eq, today }) {
               variant="primary" 
               className="justify-center"
               style={{ background: 'var(--critical)', color: 'var(--critical-ink)' }}
-              onClick={() => navigate(`/admin/fine/${eq.id}`)}
+              onClick={() => setShowLostConnModal(true)}
             >
-              <Icon name="alertTriangle" size={14} /> Resolve Lost Unit (Issue Fine)
+              <Icon name="alertTriangle" size={14} /> Resolve Lost Unit Connection
             </Button>
           )}
           {showUtilAlert && (
@@ -408,6 +410,13 @@ export default function UnitDetail({ eq, today }) {
           eq={eq} 
           currentUtil={util} 
           onClose={() => setShowRecModal(false)} 
+        />
+      )}
+
+      {showLostConnModal && (
+        <LostConnectionModal 
+          eq={eq} 
+          onClose={() => setShowLostConnModal(false)} 
         />
       )}
     </div>
