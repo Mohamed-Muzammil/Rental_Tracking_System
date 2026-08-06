@@ -138,7 +138,7 @@ export default function WarehouseQrDispatch() {
               Yard Barcode / QR Serialized Batch Dispatch & Verification
             </h3>
             <p className="text-xs mt-0.5" style={{ color: 'var(--ink-muted)' }}>
-              Simulates real-world warehouse logistics. Physical machines have unique QR identities (`EQX-1001`, `EQX-1004`, etc.). As staff load trucks, each QR is scanned and verified against order allocation.
+              Simulates real-world warehouse logistics. Physical machines have unique QR identities (`EXC-1001`, `BLD-1004`, etc.). As staff load trucks, each QR is scanned and verified against order allocation.
             </p>
           </div>
         </div>
@@ -303,7 +303,7 @@ export default function WarehouseQrDispatch() {
                 <span className="text-xs font-bold" style={{ color: 'var(--ink-secondary)' }}>Scan Unit QR Code:</span>
                 <input
                   type="text"
-                  placeholder="e.g. EQX-1001 or EQX-1002"
+                  placeholder="e.g. EXC-1001 or BLD-2001"
                   value={manualScanInput}
                   onChange={(e) => setManualScanInput(e.target.value)}
                   className="rounded-[var(--radius-sm)] border px-3 py-1.5 text-xs font-mono font-bold uppercase outline-hidden"
@@ -327,11 +327,11 @@ export default function WarehouseQrDispatch() {
                 <div className="ml-auto flex items-center gap-1.5 text-xs">
                   <span className="text-[11px]" style={{ color: 'var(--ink-faint)' }}>Simulate Mismatch:</span>
                   <button
-                    onClick={() => handleScanUnit('EQX-9999')}
+                    onClick={() => handleScanUnit('EXC-9999')}
                     className="px-2 py-1 font-bold text-[11px] transition-opacity hover:opacity-80"
                     style={{ borderRadius: 'var(--radius-sm)', background: 'var(--critical-wash)', color: 'var(--critical)' }}
                   >
-                    Scan EQX-9999 (Wrong Unit)
+                    Scan EXC-9999 (Wrong Unit)
                   </button>
                 </div>
               </div>
