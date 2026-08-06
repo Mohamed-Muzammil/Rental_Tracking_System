@@ -101,26 +101,6 @@ export default function Dashboard() {
             Live asset status, open alerts, and performance metrics across all active sites.
           </p>
         </div>
-        <Button
-          variant="secondary"
-          onClick={async () => {
-            if (!window.confirm('Are you sure you want to reset the database to stock tables? This cannot be undone.')) return
-            try {
-              const res = await fetch('http://localhost:8000/api/admin/reset', { method: 'POST' })
-              if (!res.ok) throw new Error('Reset failed')
-              // Use store to show toast
-              useAppStore.getState().pushToast('Database reset to stock tables!', 'good')
-              // Optionally reload to fetch fresh state if frontend gets hooked up to API
-              setTimeout(() => window.location.reload(), 1500)
-            } catch (err) {
-              console.error(err)
-              useAppStore.getState().pushToast('Failed to reset database', 'critical')
-            }
-          }}
-        >
-          <Icon name="refresh" size={14} />
-          Reset Database
-        </Button>
       </div>
 
       {/* ① KPI Metrics Row */}
@@ -138,26 +118,30 @@ export default function Dashboard() {
         <StatTile label="Under-utilized" value={kpis.idle} severity={kpis.idle ? 'warning' : 'neutral'} hint="below 30% engine usage" />
       </div>
 
-      {/* ② Fleet Summary Strip */}
+      {/* ② Fleet Summary Strip — Elongated Full-Width Row */}
       <div
-        className="flex flex-wrap items-center gap-4 bg-white px-5 py-3"
+        className="grid grid-cols-2 gap-4 bg-white p-4.5 sm:grid-cols-4"
         style={{
-          borderRadius: '8px',
+          borderRadius: '10px',
           border: '1px solid var(--border)',
           boxShadow: 'var(--shadow-card)',
         }}
       >
         {[
-          { label: 'Fleet Size', value: kpis.total + ' units' },
-          { label: 'In Maintenance', value: kpis.maintenanceCount + ' units' },
-          { label: 'Client Accounts', value: `${kpis.activeCustomers} / ${clients.length}` },
-          { label: 'Deployed Sites', value: `${kpis.activeSites} / ${sites.length}` },
+          { label: 'Fleet Size', value: `${kpis.total} units` },
+          { label: 'In Maintenance', value: `${kpis.maintenanceCount} units` },
+          { label: 'Client Accounts', value: `${kpis.activeCustomers} / ${clients.length} Active` },
+          { label: 'Deployed Sites', value: `${kpis.activeSites} / ${sites.length} Locations` },
         ].map((s, i) => (
-          <div key={s.label} className="flex items-center gap-3">
-            {i > 0 && <div className="h-8 w-px" style={{ background: 'var(--border)' }} />}
+          <div key={s.label} className="flex items-center gap-3.5 px-3">
+            {i > 0 && <div className="hidden h-10 w-px sm:block -ml-3" style={{ background: 'var(--border)' }} />}
             <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'var(--ink-muted)' }}>{s.label}</span>
-              <span className="tabular font-data text-sm font-semibold" style={{ color: 'var(--ink-primary)' }}>{s.value}</span>
+              <span className="text-[11px] font-extrabold uppercase tracking-widest" style={{ color: 'var(--ink-muted)' }}>
+                {s.label}
+              </span>
+              <span className="tabular font-data text-base font-black" style={{ color: 'var(--ink-primary)' }}>
+                {s.value}
+              </span>
             </div>
           </div>
         ))}

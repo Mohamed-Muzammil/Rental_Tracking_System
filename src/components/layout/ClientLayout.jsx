@@ -125,7 +125,7 @@ export default function ClientLayout() {
       </div>
 
       {/* Page Content */}
-      <main className="min-w-0 flex-1 overflow-y-auto" style={{ padding: '24px 32px' }}>
+      <main className="min-w-0 max-w-full flex-1 overflow-x-hidden overflow-y-auto px-4 sm:px-6 py-4">
         <Outlet />
       </main>
 

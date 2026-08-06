@@ -80,6 +80,34 @@ export default function AlertsCenter() {
         </div>
       </div>
 
+      {/* Admin Plain-English Decision Guide Card */}
+      <div
+        className="rounded-xl border p-4 shadow-sm"
+        style={{
+          background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(220, 38, 38, 0.04))',
+          borderColor: 'rgba(239, 68, 68, 0.3)',
+        }}
+      >
+        <div className="flex items-start gap-3">
+          <div
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg font-bold"
+            style={{ background: '#ef4444', color: '#ffffff' }}
+          >
+            🛡️
+          </div>
+          <div>
+            <h3 className="text-sm font-bold" style={{ color: 'var(--ink-primary)' }}>
+              ADMIN ACTION GUIDE — FLEET RISK & ANOMALY RESPONSE
+            </h3>
+            <p className="mt-1 text-xs leading-relaxed" style={{ color: 'var(--ink-secondary)' }}>
+              • <strong>Geofence Mismatch (Critical):</strong> Machines operating outside contracted site boundary (e.g. <em>EQX-2025 at Tambaram</em>). Click <strong>"Resolve & Fine Client"</strong> to issue an automated fine invoice.<br />
+              • <strong>Unassigned Ignition (High):</strong> Machine started without operator RFID tag validation. Click <strong>"Issue Warning"</strong> to enforce authorized operator logs.<br />
+              • <strong>Idle Fuel Waste (Medium):</strong> Machine sitting idle for extended periods wasting fuel. Suggest rightsizing to compact models.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Industrial Hero KPI Cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatTile
