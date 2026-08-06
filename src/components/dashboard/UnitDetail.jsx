@@ -207,10 +207,10 @@ export default function UnitDetail({ eq, today }) {
               />
             </>
           ) : (
-            <Row label="Site" value={eq.siteId ? siteById[eq.siteId]?.name : 'Unassigned'} />
+            <Row label="Site" value={siteById[eq.siteId]?.name} />
           )}
-          <Row label="Client" value={eq.clientId ? clientById[eq.clientId]?.name : '—'} />
-          <Row label="Operator" value={eq.operatorId ?? 'Unassigned'} />
+          <Row label="Client" value={clientById[eq.clientId]?.name} />
+          <Row label="Operator" value={eq.operatorId} />
         </>
       )}
       {eq.status === 'active' && (

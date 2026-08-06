@@ -77,8 +77,15 @@ export default function ContractInvoice({ inlineData, onBack }) {
   const grandTotal = rentalSubtotal + telematicsFee + securityDeposit
 
   const handleIssueContract = () => {
+    pushToast(
+      `Equipment allocation complete — Rental Contract & Tax Invoice #${contractData.orderId} has been successfully issued and dispatched to ${client?.name || 'the client'}.`,
+      'good'
+    )
     setIsSent(true)
-    pushToast(`Contract & Tax Invoice #${contractData.orderId} issued and sent to ${client?.name || 'Client'}`, 'good')
+    setTimeout(() => {
+      if (onBack) onBack()
+      else navigate('/admin/checkin')
+    }, 400)
   }
 
   const handleBack = () => {

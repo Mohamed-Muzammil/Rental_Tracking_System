@@ -95,7 +95,7 @@ export default function WarehouseQrDispatch() {
       allocatedUnits: allocated,
     })
     setScannedIds(new Set())
-    setShowContract(true)
+    // Contract is issued only after 100% QR verification — do not show yet
   }
 
   // Handle Scan Action
@@ -136,6 +136,18 @@ export default function WarehouseQrDispatch() {
   const totalScanned = scannedIds.size
   const isFullyVerified = totalAllocated > 0 && totalScanned === totalAllocated
 
+  const handleResetAll = () => {
+    setShowContract(false)
+    setActiveOrder(null)
+    setScannedIds(new Set())
+    setMismatchAlert(null)
+    setManualScanInput('')
+    setClientId('C001')
+    setSiteId('S001')
+    setRequestedQuantities({ Excavator: 0, Bulldozer: 0, Crane: 0, Grader: 0, Forklift: 0, Loader: 0, Roller: 0 })
+    setExpectedReturn(format(addDays(today, 14), 'yyyy-MM-dd'))
+  }
+
   if (showContract && activeOrder) {
     return (
       <ContractInvoice
@@ -147,7 +159,7 @@ export default function WarehouseQrDispatch() {
           checkInDate: format(today, 'yyyy-MM-dd'),
           expectedReturn: activeOrder.expectedReturn,
         }}
-        onBack={() => setShowContract(false)}
+        onBack={handleResetAll}
       />
     )
   }
@@ -367,17 +379,6 @@ export default function WarehouseQrDispatch() {
                   Scan QR Code
                 </Button>
 
-                {/* Quick Simulation Buttons */}
-                <div className="ml-auto flex items-center gap-1.5 text-xs">
-                  <span className="text-[11px]" style={{ color: 'var(--ink-faint)' }}>Simulate Mismatch:</span>
-                  <button
-                    onClick={() => handleScanUnit('EXC-9999')}
-                    className="px-2 py-1 font-bold text-[11px] transition-opacity hover:opacity-80"
-                    style={{ borderRadius: 'var(--radius-sm)', background: 'var(--critical-wash)', color: 'var(--critical)' }}
-                  >
-                    Scan EXC-9999 (Wrong Unit)
-                  </button>
-                </div>
               </div>
 
               {/* Allocated Equipment QR Cards Grid */}
