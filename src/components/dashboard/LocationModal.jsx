@@ -3,6 +3,7 @@ import Icon from '../ui/Icon'
 import Button from '../ui/Button'
 import { siteById } from '../../data/sites'
 import { useAppStore } from '../../store/appStore'
+import { distanceKm } from '../../lib/geo'
 
 export default function LocationModal({ eq, onClose }) {
   const [copied, setCopied] = useState(false)
@@ -34,6 +35,9 @@ export default function LocationModal({ eq, onClose }) {
   const contractLng = contractSite?.lng ?? 80.2101
   const contractLocationName = contractSite?.locationName ?? contractSite?.name ?? 'Anna Nagar'
   const contractSiteName = contractSite?.name ?? 'Anna Nagar Metro Hub'
+
+  const rawDist = contractSite && actualSite ? distanceKm(contractSite, actualSite) : null
+  const offsetDistance = activeIncident?.distanceOffsetKm ?? (rawDist ? Math.round(rawDist * 10) / 10 : 4.5)
 
   const copyCoords = () => {
     navigator.clipboard.writeText(`${lat}, ${lng}`)
@@ -72,8 +76,13 @@ export default function LocationModal({ eq, onClose }) {
               <Icon name={isAnomaly ? 'alertTriangle' : 'mapPin'} size={20} />
             </div>
             <div>
-              <h3 className="text-base font-bold" style={{ color: 'var(--ink-primary)' }}>
-                {isAnomaly ? '🚨 Telematics Anomaly Location Report' : 'GPS Telemetry Location'}
+              <h3 className="flex items-center gap-2 text-base font-bold" style={{ color: 'var(--ink-primary)' }}>
+                <span>{isAnomaly ? '🚨 Telematics Anomaly Location Report' : 'GPS Telemetry Location'}</span>
+                {isAnomaly && (
+                  <span className="rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase bg-red-500/20 text-red-500 border border-red-500/40">
+                    🚩 ANOMALY FLAGGED
+                  </span>
+                )}
               </h3>
               <p className="text-xs" style={{ color: 'var(--ink-muted)' }}>
                 {eq.id} • {eq.type} ({eq.tier})
@@ -99,7 +108,7 @@ export default function LocationModal({ eq, onClose }) {
               style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid #ef4444', color: '#ef4444' }}
             >
               <span>🚨 SITE MISMATCH DETECTED</span>
-              <span>{activeIncident.distanceOffsetKm ?? 18.5} km Unauthorized Offset</span>
+              <span>{offsetDistance} km Unauthorized Offset</span>
             </div>
 
             {/* Original vs Current Location Comparison Grid */}

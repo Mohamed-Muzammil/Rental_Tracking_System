@@ -5,6 +5,7 @@ import { useAppStore } from '../../store/appStore'
 import { siteById } from '../../data/sites'
 import { catalogById } from '../../data/catalog'
 import { healthOf, utilizationOf } from '../../lib/rules'
+import { distanceKm } from '../../lib/geo'
 import StatusChip from '../ui/StatusChip'
 import Button from '../ui/Button'
 import Icon from '../ui/Icon'
@@ -92,6 +93,11 @@ export default function UnitDetail({ eq, today }) {
   const activeIncident = misuseIncidents.find((i) => i.equipmentId === eq.id && i.status === 'active')
   const isAnomaly = Boolean(activeIncident) || Boolean(eq.locationAnomaly) || Boolean(eq.contractSiteId && eq.contractSiteId !== eq.siteId)
 
+  const contractSiteObj = activeIncident?.contractSiteId ? siteById[activeIncident.contractSiteId] : (eq.contractSiteId ? siteById[eq.contractSiteId] : null)
+  const actualSiteObj = activeIncident?.actualSiteId ? siteById[activeIncident.actualSiteId] : (eq.siteId ? siteById[eq.siteId] : null)
+  const computedOffset = contractSiteObj && actualSiteObj ? Math.round(distanceKm(contractSiteObj, actualSiteObj) * 10) / 10 : null
+  const displayOffset = activeIncident?.distanceOffsetKm ?? computedOffset ?? 4.5
+
   return (
     <div className="flex flex-col">
       {showLocationModal && (
@@ -106,10 +112,15 @@ export default function UnitDetail({ eq, today }) {
             severity={eq.status === 'active' ? (isAnomaly ? 'critical' : isDead ? 'critical' : 'good') : isMaintenance ? 'warning' : 'neutral'}
             icon={eq.status === 'active' ? (isAnomaly ? 'alertTriangle' : isDead ? 'alertTriangle' : 'truck') : isMaintenance ? 'alertTriangle' : undefined}
           >
-            {eq.status === 'active' ? (isAnomaly ? 'Site Mismatch Anomaly' : isDead ? 'Lost Connection' : 'On Rent') : isMaintenance ? 'Maintenance' : 'Available'}
+            {eq.status === 'active' ? (isAnomaly ? '🚩 Site Mismatch Anomaly' : isDead ? 'Lost Connection' : 'On Rent') : isMaintenance ? 'Maintenance' : 'Available'}
           </StatusChip>
         )}
-        <span className="text-sm" style={{ color: 'var(--ink-secondary)' }}>{eq.tier} {eq.type}</span>
+        <span className="text-sm font-semibold" style={{ color: 'var(--ink-secondary)' }}>{eq.tier} {eq.type}</span>
+        {isAnomaly && (
+          <span className="ml-auto rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase bg-red-500/20 text-red-500 border border-red-500/40">
+            🚩 Flagged
+          </span>
+        )}
       </div>
 
       {/* Telematics Anomaly & Contract Mismatch Alert Banner */}
@@ -127,7 +138,7 @@ export default function UnitDetail({ eq, today }) {
             <span>ANOMALY DETECTED: {activeIncident?.type?.replace(/_/g, ' ') || 'SITE MISMATCH GEOFENCE BREACH'}</span>
           </div>
           <p className="mt-1 text-[11px] leading-relaxed" style={{ color: 'var(--ink-secondary)' }}>
-            {activeIncident?.details || `Contract Site Mismatch: Unit ${eq.id} contracted for Anna Nagar Metro Hub was detected operating at Tambaram Railway Yard (18.5 km outside contracted boundary).`}
+            {activeIncident?.details || `Contract Site Mismatch: Unit ${eq.id} contracted for ${contractSiteObj?.name || 'Anna Nagar Metro Hub'} was detected operating at ${actualSiteObj?.name || 'Tambaram Railway Yard'} (${displayOffset} km outside contracted boundary).`}
           </p>
         </div>
       )}
@@ -160,13 +171,13 @@ export default function UnitDetail({ eq, today }) {
             <>
               <Row
                 label="Contracted Site"
-                value={activeIncident?.contractSiteName || (eq.contractSiteId ? siteById[eq.contractSiteId]?.name : 'Anna Nagar Metro Hub')}
+                value={activeIncident?.contractSiteName || contractSiteObj?.name || 'Anna Nagar Metro Hub'}
               />
               <Row
                 label="Current GPS Location"
                 value={
                   <span className="font-bold text-red-500">
-                    {activeIncident?.actualSiteName || (eq.siteId ? siteById[eq.siteId]?.name : 'Tambaram Railway Yard')} ({activeIncident?.distanceOffsetKm ?? 18.5} km Mismatch)
+                    {activeIncident?.actualSiteName || actualSiteObj?.name || 'Tambaram Railway Yard'} ({displayOffset} km Mismatch)
                   </span>
                 }
               />

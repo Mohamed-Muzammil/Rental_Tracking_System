@@ -237,7 +237,17 @@ export default function CompanyDetail() {
                             style={{ borderColor: 'var(--border)', background: selectedId === eq.id ? 'var(--accent-wash)' : 'transparent' }}
                           >
                             <td className="px-5 py-3" style={{ borderLeft: `3px solid var(--good)` }}>
-                              <div className="font-medium" style={{ color: 'var(--ink-primary)' }}>{eq.id}</div>
+                              <div className="flex items-center gap-2 font-medium" style={{ color: 'var(--ink-primary)' }}>
+                                <span>{eq.id}</span>
+                                {(eq.locationAnomaly || (eq.contractSiteId && eq.contractSiteId !== eq.siteId)) && (
+                                  <span
+                                    className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-extrabold shadow-sm"
+                                    style={{ background: 'rgba(239, 68, 68, 0.18)', border: '1px solid #ef4444', color: '#ef4444' }}
+                                  >
+                                    🚩 ANOMALY FLAGGED
+                                  </span>
+                                )}
+                              </div>
                               <div className="text-xs" style={{ color: 'var(--ink-muted)' }}>{eq.tier} {eq.type}</div>
                             </td>
                             <td className="px-3 py-3">

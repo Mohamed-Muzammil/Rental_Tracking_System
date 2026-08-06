@@ -17,6 +17,7 @@ import Marketplace from './pages/client/Marketplace'
 import Forecasting from './pages/admin/Forecasting'
 
 import FineInvoice from './pages/admin/FineInvoice'
+import ContractInvoice from './pages/admin/ContractInvoice'
 import CompanyDetail from './pages/admin/CompanyDetail'
 
 export default function App() {
@@ -71,6 +72,7 @@ export default function App() {
         <Route path="alerts" element={<AlertsCenter />} />
         <Route path="forecasting" element={<Forecasting />} />
         <Route path="fine/:id" element={<FineInvoice />} />
+        <Route path="contract/:orderId" element={<ContractInvoice />} />
       </Route>
 
       <Route path="/client" element={<ClientLayout />}>

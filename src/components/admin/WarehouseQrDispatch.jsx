@@ -7,6 +7,7 @@ import Card from '../ui/Card'
 import Button from '../ui/Button'
 import Icon from '../ui/Icon'
 import StatusChip from '../ui/StatusChip'
+import ContractInvoice from '../../pages/admin/ContractInvoice'
 
 const inputStyle = {
   background: 'var(--bg-surface-raised)',
@@ -21,6 +22,8 @@ export default function WarehouseQrDispatch() {
   const today = useAppStore((s) => s.today)
   const batchCheckOutEquipment = useAppStore((s) => s.batchCheckOutEquipment)
   const openModal = useAppStore((s) => s.openModal)
+
+  const [showContract, setShowContract] = useState(false)
 
   // Step 1: Order Setup
   const [clientId, setClientId] = useState('C001')
@@ -77,6 +80,7 @@ export default function WarehouseQrDispatch() {
       allocatedUnits: allocated,
     })
     setScannedIds(new Set())
+    setShowContract(true)
   }
 
   // Handle Scan Action
@@ -110,14 +114,28 @@ export default function WarehouseQrDispatch() {
       clientId: activeOrder.clientId,
       expectedReturn: activeOrder.expectedReturn,
     })
-    setActiveOrder(null)
-    setScannedIds(new Set())
-    setMismatchAlert(null)
+    setShowContract(true)
   }
 
   const totalAllocated = activeOrder?.allocatedUnits.length || 0
   const totalScanned = scannedIds.size
   const isFullyVerified = totalAllocated > 0 && totalScanned === totalAllocated
+
+  if (showContract && activeOrder) {
+    return (
+      <ContractInvoice
+        inlineData={{
+          orderId: activeOrder.orderId,
+          clientId: activeOrder.clientId,
+          siteId: activeOrder.siteId,
+          units: activeOrder.allocatedUnits,
+          checkInDate: format(today, 'yyyy-MM-dd'),
+          expectedReturn: activeOrder.expectedReturn,
+        }}
+        onBack={() => setShowContract(false)}
+      />
+    )
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -126,21 +144,32 @@ export default function WarehouseQrDispatch() {
         className="border p-4"
         style={{ borderRadius: 'var(--radius-md)', borderColor: 'var(--border)', background: 'var(--bg-surface)', boxShadow: 'var(--shadow-card)' }}
       >
-        <div className="flex items-center gap-3">
-          <div
-            className="flex h-10 w-10 shrink-0 items-center justify-center"
-            style={{ borderRadius: 'var(--radius-sm)', background: 'var(--accent-wash)', color: 'var(--accent)' }}
-          >
-            <Icon name="truck" size={20} />
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div
+              className="flex h-10 w-10 shrink-0 items-center justify-center"
+              style={{ borderRadius: 'var(--radius-sm)', background: 'var(--accent-wash)', color: 'var(--accent)' }}
+            >
+              <Icon name="truck" size={20} />
+            </div>
+            <div>
+              <h3 className="font-display text-sm font-bold" style={{ color: 'var(--ink-primary)' }}>
+                Yard Barcode / QR Serialized Batch Dispatch & Verification
+              </h3>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--ink-muted)' }}>
+                Select client, site, and machinery counts to auto-allocate available yard stock, generate contract invoices, and simulate QR code truck loading verification.
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="font-display text-sm font-bold" style={{ color: 'var(--ink-primary)' }}>
-              Yard Barcode / QR Serialized Batch Dispatch & Verification
-            </h3>
-            <p className="text-xs mt-0.5" style={{ color: 'var(--ink-muted)' }}>
-              Simulates real-world warehouse logistics. Physical machines have unique QR identities (`EXC-1001`, `BLD-1004`, etc.). As staff load trucks, each QR is scanned and verified against order allocation.
-            </p>
-          </div>
+          {activeOrder && (
+            <Button
+              variant="secondary"
+              onClick={() => setShowContract(true)}
+              className="gap-2 font-bold text-xs shadow-sm shrink-0"
+            >
+              <Icon name="bulb" size={14} /> View Rental Contract & Tax Invoice
+            </Button>
+          )}
         </div>
       </div>
 
