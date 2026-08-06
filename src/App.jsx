@@ -1,4 +1,6 @@
+import { useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
+import { useAppStore } from './store/appStore'
 import RoleSelect from './pages/RoleSelect'
 import AdminLayout from './components/layout/AdminLayout'
 import ClientLayout from './components/layout/ClientLayout'
@@ -21,10 +23,42 @@ import FineInvoice from './pages/admin/FineInvoice'
 import CompanyDetail from './pages/admin/CompanyDetail'
 
 export default function App() {
-  const initializeStore = useAppStore(s => s.initializeStore)
+  const dataLoaded = useAppStore((s) => s.dataLoaded)
+  const dataError = useAppStore((s) => s.dataError)
+  const loadInitialData = useAppStore((s) => s.loadInitialData)
+
   useEffect(() => {
-    initializeStore()
-  }, [initializeStore])
+    loadInitialData()
+  }, [loadInitialData])
+
+  if (dataError) {
+    return (
+      <div className="flex min-h-full flex-col items-center justify-center gap-3 p-8 text-center" style={{ background: 'var(--bg-page)' }}>
+        <div className="text-lg font-semibold" style={{ color: 'var(--critical)' }}>
+          Couldn't load data from Supabase
+        </div>
+        <p className="max-w-md text-sm" style={{ color: 'var(--ink-secondary)' }}>
+          {dataError}
+        </p>
+        <p className="max-w-md text-xs" style={{ color: 'var(--ink-muted)' }}>
+          Check that <code>.env.local</code> has <code>VITE_SUPABASE_URL</code> and{' '}
+          <code>VITE_SUPABASE_ANON_KEY</code> set, that the schema in{' '}
+          <code>supabase/schema.sql</code> has been run in your Supabase project, and that
+          the dev server was restarted after adding the env file.
+        </p>
+      </div>
+    )
+  }
+
+  if (!dataLoaded) {
+    return (
+      <div className="flex min-h-full items-center justify-center" style={{ background: 'var(--bg-page)' }}>
+        <div className="text-sm font-medium" style={{ color: 'var(--ink-muted)' }}>
+          Loading fleet data…
+        </div>
+      </div>
+    )
+  }
 
   return (
     <Routes>

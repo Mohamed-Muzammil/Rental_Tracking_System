@@ -94,7 +94,7 @@ export default function Dashboard() {
       {/* Page Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4" style={{ borderColor: 'var(--border)' }}>
         <div>
-          <h1 className="text-lg font-semibold" style={{ color: 'var(--ink-primary)' }}>
+          <h1 className="font-display text-xl font-semibold" style={{ color: 'var(--ink-primary)' }}>
             Fleet Operations Dashboard
           </h1>
           <p className="text-xs mt-0.5" style={{ color: 'var(--ink-muted)' }}>

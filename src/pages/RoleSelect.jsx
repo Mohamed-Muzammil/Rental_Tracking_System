@@ -59,7 +59,13 @@ export default function RoleSelect() {
       </header>
 
       {/* Hero */}
-      <div className="flex flex-1 flex-col items-center px-6 py-16">
+      <div
+        className="flex flex-1 flex-col items-center px-6 py-16"
+        style={{
+          background:
+            'radial-gradient(60% 50% at 50% 0%, color-mix(in srgb, var(--accent) 8%, transparent) 0%, transparent 100%)',
+        }}
+      >
         <div className="mb-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider" style={{ background: 'var(--accent-wash)', color: 'var(--accent)' }}>
           Smart Rental Tracking System
         </div>

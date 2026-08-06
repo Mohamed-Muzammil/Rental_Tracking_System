@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import { equipmentTypes } from '../../data/demandHistory'
 import { siteById } from '../../data/sites'
-import { totalRentedHours, totalDowntimeHours } from '../../lib/reports'
+import { totalRentedHours, totalDowntimeHours, usageBySite } from '../../lib/reports'
 import Card from '../../components/ui/Card'
 import Icon from '../../components/ui/Icon'
 import UsageHistoryChart from '../../components/ui/UsageHistoryChart'
@@ -218,6 +218,7 @@ function ReportsTab() {
   const rented = useMemo(() => totalRentedHours(filteredEquipment), [filteredEquipment])
   const downtime = useMemo(() => totalDowntimeHours(filteredEquipment), [filteredEquipment])
   const efficiency = rented + downtime === 0 ? 0 : Math.round((rented / (rented + downtime)) * 100)
+  const bySite = useMemo(() => usageBySite(filteredEquipment), [filteredEquipment])
 
   return (
     <div className="flex flex-col gap-6">
@@ -319,6 +320,42 @@ function ReportsTab() {
           </div>
         </div>
       </div>
+
+      {/* Usage by Site */}
+      <Card title="Usage by Site" bodyClassName="overflow-x-auto p-0">
+        {bySite.length === 0 ? (
+          <p className="px-5 py-6 text-sm" style={{ color: 'var(--ink-secondary)' }}>
+            No active machinery matches the current filter.
+          </p>
+        ) : (
+          <table className="w-full min-w-[520px] text-sm">
+            <thead>
+              <tr className="text-left" style={{ color: 'var(--ink-muted)' }}>
+                <th className="px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Site</th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Units Deployed</th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Engine hrs/day</th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Idle hrs/day</th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]">Site Efficiency</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bySite.map((s) => {
+                const total = s.engineHours + s.idleHours
+                const eff = total > 0 ? Math.round((s.engineHours / total) * 100) : 0
+                return (
+                  <tr key={s.siteId ?? '__unassigned__'} className="border-t" style={{ borderColor: 'var(--border)' }}>
+                    <td className="px-5 py-3 font-medium" style={{ color: 'var(--ink-primary)' }}>{s.name}</td>
+                    <td className="px-3 py-3 tabular" style={{ color: 'var(--ink-secondary)' }}>{s.units}</td>
+                    <td className="tabular px-3 py-3 font-mono font-bold" style={{ color: 'var(--series-engine)' }}>{s.engineHours.toFixed(1)} h</td>
+                    <td className="tabular px-3 py-3 font-mono font-bold" style={{ color: 'var(--series-idle)' }}>{s.idleHours.toFixed(1)} h</td>
+                    <td className="tabular px-3 py-3 font-mono font-bold" style={{ color: eff >= 60 ? 'var(--good)' : 'var(--warning)' }}>{eff}%</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        )}
+      </Card>
 
       {/* Detailed Telemetry Report Table */}
       <Card

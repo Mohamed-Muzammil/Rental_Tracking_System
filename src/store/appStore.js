@@ -2,55 +2,18 @@ import { create } from 'zustand'
 import { addDays, format } from 'date-fns'
 import { SIM_TODAY } from '../lib/clock'
 import { pointNearSite } from '../lib/geo'
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient'
+import {
+  rowToEquipment,
+  equipmentToRow,
+  rowToUsageLog,
+  usageLogToRow,
+  rowToIncident,
+  incidentToRow,
+} from '../lib/db'
+import { clientById } from '../data/clients'
 
 let toastId = 0
-
-const seedIncidents = [
-  {
-    id: 'INC-101',
-    equipmentId: 'EQX-2003',
-    type: 'geofence_breach',
-    title: 'Outside Assigned Site (Geofence Violation)',
-    severity: 'critical',
-    details: 'EQX-2003 Heavy Excavator operating 4.2 km outside assigned Summit Mine bounds.',
-    anomalyScore: 92,
-    status: 'active',
-    createdAt: '2026-08-05 14:20',
-  },
-  {
-    id: 'INC-102',
-    equipmentId: 'EQX-2007',
-    type: 'excessive_idle',
-    title: 'Excessive Engine Idle Hours',
-    severity: 'medium',
-    details: 'EQX-2007 Standard Crane logged 6.5h idle time with 1.2h engine runtime.',
-    anomalyScore: 78,
-    status: 'active',
-    createdAt: '2026-08-05 11:45',
-  },
-  {
-    id: 'INC-103',
-    equipmentId: 'EQX-2012',
-    type: 'unauthorized_operator',
-    title: 'Unauthorized Operator Scan',
-    severity: 'high',
-    details: 'Operator ID OP-994 is not cleared for Heavy Duty Bulldozer EQX-2012.',
-    anomalyScore: 88,
-    status: 'active',
-    createdAt: '2026-08-04 16:10',
-  },
-  {
-    id: 'INC-104',
-    equipmentId: 'EQX-2019',
-    type: 'service_limit_exceeded',
-    title: '500-Hour Service Maintenance Required',
-    severity: 'warning',
-    details: 'Total engine runtime reached 512.4 hrs. Hydraulic fluid service overdue.',
-    anomalyScore: 65,
-    status: 'active',
-    createdAt: '2026-08-04 09:30',
-  },
-]
 
 export const useAppStore = create((set, get) => ({
   role: null, // 'admin' | 'client'
@@ -66,6 +29,36 @@ export const useAppStore = create((set, get) => ({
   dismissedAlertIds: [],
   toasts: [],
   modalConfig: null,
+
+  // Data is fetched from Supabase on boot (see App.jsx) rather than seeded
+  // from static JS, so the roster/telemetry/incidents persist and are
+  // shared across sessions instead of resetting on every reload.
+  dataLoaded: false,
+  dataError: null,
+
+  loadInitialData: async () => {
+    if (!isSupabaseConfigured) {
+      set({ dataError: 'Supabase is not configured — missing VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY.', dataLoaded: false })
+      return
+    }
+    set({ dataError: null })
+    const [eqRes, logRes, incRes] = await Promise.all([
+      supabase.from('equipment').select('*'),
+      supabase.from('usage_logs').select('*'),
+      supabase.from('misuse_incidents').select('*'),
+    ])
+    const failed = eqRes.error || logRes.error || incRes.error
+    if (failed) {
+      set({ dataError: failed.message, dataLoaded: false })
+      return
+    }
+    set({
+      equipment: eqRes.data.map(rowToEquipment),
+      usageLogs: logRes.data.map(rowToUsageLog),
+      misuseIncidents: incRes.data.map(rowToIncident),
+      dataLoaded: true,
+    })
+  },
 
   setRole: (role) => set({ role }),
   setActiveClientId: (activeClientId) => set({ activeClientId, selectedSiteId: 'ALL' }),
@@ -111,40 +104,38 @@ export const useAppStore = create((set, get) => ({
     get().pushToast(`Reminder sent for ${equipmentId}`, 'good')
   },
 
-  registerEquipment: async ({ id, type, tier, dailyCost, qrCode }) => {
+  registerEquipment: async ({ id, type, tier, catalogId, qrCode }) => {
     const newEq = {
       id: id || `EQX-${Math.floor(2030 + Math.random() * 100)}`,
       type: type || 'Excavator',
       tier: tier || 'Heavy Duty',
-      catalog_id: 'CAT-EXC-01',
-      status: 'completed',
-      site_id: null,
-      client_id: null,
-      operator_id: null,
-      check_in: null,
-      expected_return: null,
-      avg_engine_hours_per_day: 0,
-      avg_idle_hours_per_day: 0,
+      catalogId,
+      status: 'completed', // Available in warehouse yard
+      siteId: null,
+      clientId: null,
+      operatorId: null,
+      checkIn: null,
+      expectedReturn: null,
+      avgEngineHoursPerDay: 0,
+      avgIdleHoursPerDay: 0,
+      qrCode: qrCode || `QR-${id || 'NEW'}`,
     }
 
-    try {
-      const res = await fetch('http://localhost:8000/api/equipment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newEq)
-      })
-      if (!res.ok) throw new Error('Backend rejection')
-      const savedEq = await res.json()
-      set((s) => ({ equipment: [savedEq, ...s.equipment] }))
-      get().pushToast(`Registered ${savedEq.id} (${savedEq.tier} ${savedEq.type}) — Status: Available in Yard`, 'good')
-    } catch (err) {
-      console.error(err)
-      get().pushToast(`Failed to register equipment`, 'critical')
-    }
+    const { error } = await supabase.from('equipment').insert(equipmentToRow(newEq))
+    if (error) return get().pushToast(`Failed to register equipment: ${error.message}`, 'critical')
+
+    set((s) => ({ equipment: [newEq, ...s.equipment] }))
+    get().pushToast(`Registered ${newEq.id} (${newEq.tier} ${newEq.type}) — Status: Available in Yard`, 'good')
   },
 
   // Hold / Reservation Step
-  reserveEquipmentOnHold: ({ equipmentIds, clientId, siteId }) => {
+  reserveEquipmentOnHold: async ({ equipmentIds, clientId, siteId }) => {
+    const { error } = await supabase
+      .from('equipment')
+      .update({ status: 'hold', client_id: clientId, site_id: siteId })
+      .in('id', equipmentIds)
+    if (error) return get().pushToast(`Failed to reserve units: ${error.message}`, 'critical')
+
     const idSet = new Set(equipmentIds)
     set((state) => ({
       equipment: state.equipment.map((e) =>
@@ -154,71 +145,71 @@ export const useAppStore = create((set, get) => ({
     get().pushToast(`${equipmentIds.length} units set to ON HOLD (Reserved for ${clientId})`, 'good')
   },
 
-  checkOutEquipment: ({ equipmentId, siteId, clientId, operatorId, expectedReturn }) => {
-    set((s) => ({
-      equipment: s.equipment.map((e) =>
-        e.id === equipmentId
-          ? {
-              ...e,
-              status: 'active',
-              siteId,
-              clientId,
-              operatorId: operatorId || null,
-              checkIn: format(s.today, 'yyyy-MM-dd'),
-              expectedReturn,
-              avgEngineHoursPerDay: 0,
-              avgIdleHoursPerDay: 0,
-              returnRequested: false,
-            }
-          : e,
-      ),
+  checkOutEquipment: async ({ equipmentId, siteId, clientId, operatorId, expectedReturn }) => {
+    const s = get()
+    const patch = {
+      status: 'active',
+      siteId,
+      clientId,
+      operatorId: operatorId || null,
+      checkIn: format(s.today, 'yyyy-MM-dd'),
+      expectedReturn,
+      avgEngineHoursPerDay: 0,
+      avgIdleHoursPerDay: 0,
+      returnRequested: false,
+    }
+
+    const { error } = await supabase.from('equipment').update(equipmentToRow(patch)).eq('id', equipmentId)
+    if (error) return get().pushToast(`Failed to check out ${equipmentId}: ${error.message}`, 'critical')
+
+    set((state) => ({
+      equipment: state.equipment.map((e) => (e.id === equipmentId ? { ...e, ...patch } : e)),
     }))
     get().pushToast(`${equipmentId} checked out`, 'good')
   },
 
-  batchCheckOutEquipment: ({ equipmentIds, siteId, clientId, expectedReturn }) => {
+  batchCheckOutEquipment: async ({ equipmentIds, siteId, clientId, expectedReturn }) => {
     const s = get()
+    const patch = {
+      status: 'active',
+      siteId,
+      clientId,
+      operatorId: null,
+      checkIn: format(s.today, 'yyyy-MM-dd'),
+      expectedReturn,
+      avgEngineHoursPerDay: 0,
+      avgIdleHoursPerDay: 0,
+      returnRequested: false,
+    }
+
+    const { error } = await supabase.from('equipment').update(equipmentToRow(patch)).in('id', equipmentIds)
+    if (error) return get().pushToast(`Batch dispatch failed: ${error.message}`, 'critical')
+
     const idSet = new Set(equipmentIds)
     set((state) => ({
-      equipment: state.equipment.map((e) =>
-        idSet.has(e.id)
-          ? {
-              ...e,
-              status: 'active',
-              siteId,
-              clientId,
-              operatorId: null,
-              checkIn: format(s.today, 'yyyy-MM-dd'),
-              expectedReturn,
-              avgEngineHoursPerDay: 0,
-              avgIdleHoursPerDay: 0,
-              returnRequested: false,
-            }
-          : e,
-      ),
+      equipment: state.equipment.map((e) => (idSet.has(e.id) ? { ...e, ...patch } : e)),
     }))
     get().pushToast(`Batch Dispatch Verified: ${equipmentIds.length} units checked out!`, 'good')
   },
 
   // QR Return & Condition Inspection
-  inspectAndReturnEquipment: ({ equipmentId, condition, notes }) => {
+  inspectAndReturnEquipment: async ({ equipmentId, condition, notes }) => {
     const s = get()
     const isDamaged = condition === 'damaged'
     const newStatus = isDamaged ? 'maintenance' : 'completed'
+    const patch = {
+      status: newStatus,
+      checkOut: format(s.today, 'yyyy-MM-dd'),
+      operatorId: null,
+      returnRequested: false,
+      maintenanceNote: isDamaged ? notes || 'Damaged upon return inspection' : null,
+    }
+
+    const { error } = await supabase.from('equipment').update(equipmentToRow(patch)).eq('id', equipmentId)
+    if (error) return get().pushToast(`Failed to process return for ${equipmentId}: ${error.message}`, 'critical')
 
     set((state) => ({
-      equipment: state.equipment.map((e) =>
-        e.id === equipmentId
-          ? {
-              ...e,
-              status: newStatus,
-              checkOut: format(s.today, 'yyyy-MM-dd'),
-              operatorId: null,
-              returnRequested: false,
-              maintenanceNote: isDamaged ? notes || 'Damaged upon return inspection' : null,
-            }
-          : e,
-      ),
+      equipment: state.equipment.map((e) => (e.id === equipmentId ? { ...e, ...patch } : e)),
     }))
 
     if (isDamaged) {
@@ -229,7 +220,7 @@ export const useAppStore = create((set, get) => ({
   },
 
   checkInEquipment: (equipmentId) => {
-    get().inspectAndReturnEquipment({ equipmentId, condition: 'good', notes: 'Checked in' })
+    return get().inspectAndReturnEquipment({ equipmentId, condition: 'good', notes: 'Checked in' })
   },
   checkIn: (equipmentId) => get().checkInEquipment(equipmentId),
 
@@ -278,13 +269,13 @@ export const useAppStore = create((set, get) => ({
   },
 
   // Misuse Incident Engine
-  resolveMisuseIncident: ({ incidentId, actionType, notes }) => {
+  resolveMisuseIncident: async ({ incidentId, actionType, notes }) => {
+    const patch = { status: 'resolved', resolution: actionType, resolutionNotes: notes }
+    const { error } = await supabase.from('misuse_incidents').update(incidentToRow(patch)).eq('id', incidentId)
+    if (error) return get().pushToast(`Failed to resolve ${incidentId}: ${error.message}`, 'critical')
+
     set((s) => ({
-      misuseIncidents: s.misuseIncidents.map((inc) =>
-        inc.id === incidentId
-          ? { ...inc, status: 'resolved', resolution: actionType, resolutionNotes: notes }
-          : inc,
-      ),
+      misuseIncidents: s.misuseIncidents.map((inc) => (inc.id === incidentId ? { ...inc, ...patch } : inc)),
     }))
 
     const actionText =
@@ -301,18 +292,26 @@ export const useAppStore = create((set, get) => ({
     get().pushToast(`Incident ${incidentId}: ${actionText}`, actionType === 'false_alarm' ? 'good' : 'warning')
   },
 
-  logUsage: ({ equipmentId, engineHours, idleHours, fuelUsageL, operatorId, location }) => {
+  logUsage: async ({ equipmentId, engineHours, idleHours, fuelUsageL, operatorId, location }) => {
     const s = get()
     const date = format(s.today, 'yyyy-MM-dd')
     // Fall back to the assigned site centre when no position is supplied, so a
     // log entry always carries a location for the geofence rule to test.
     const eq = s.equipment.find((e) => e.id === equipmentId)
     const resolvedLocation = location ?? pointNearSite(eq?.siteId, 0)
+    const logEntry = { equipmentId, operatorId, date, engineHours, idleHours, fuelUsageL, location: resolvedLocation }
+
+    const [{ error: logErr }, { error: eqErr }] = await Promise.all([
+      supabase.from('usage_logs').upsert(usageLogToRow(logEntry), { onConflict: 'equipment_id,date' }),
+      supabase
+        .from('equipment')
+        .update({ avg_engine_hours_per_day: engineHours, avg_idle_hours_per_day: idleHours })
+        .eq('id', equipmentId),
+    ])
+    if (logErr || eqErr) return get().pushToast(`Failed to log usage for ${equipmentId}: ${(logErr || eqErr).message}`, 'critical')
+
     set((state) => ({
-      usageLogs: [
-        ...state.usageLogs,
-        { equipmentId, operatorId, date, engineHours, idleHours, fuelUsageL, location: resolvedLocation },
-      ],
+      usageLogs: [...state.usageLogs.filter((l) => !(l.equipmentId === equipmentId && l.date === date)), logEntry],
       equipment: state.equipment.map((e) =>
         e.id === equipmentId ? { ...e, avgEngineHoursPerDay: engineHours, avgIdleHoursPerDay: idleHours } : e,
       ),
@@ -325,9 +324,9 @@ export const useAppStore = create((set, get) => ({
   // stock, not grow the fleet. Only mints a new unit as a last resort, when
   // the yard genuinely has none of that tier (equivalent to a warehouse
   // order), and says so explicitly rather than pretending supply is infinite.
-  rentFromCatalog: (catalogItem, siteId) => {
+  rentFromCatalog: async (catalogItem, siteId) => {
     const s = get()
-    const dispatch = (id) => ({
+    const dispatch = () => ({
       status: 'active',
       siteId: siteId || 'S001',
       clientId: s.activeClientId,
@@ -344,10 +343,12 @@ export const useAppStore = create((set, get) => ({
     )
 
     if (availableUnit) {
+      const patch = dispatch()
+      const { error } = await supabase.from('equipment').update(equipmentToRow(patch)).eq('id', availableUnit.id)
+      if (error) return get().pushToast(`Failed to allocate ${availableUnit.id}: ${error.message}`, 'critical')
+
       set((state) => ({
-        equipment: state.equipment.map((e) =>
-          e.id === availableUnit.id ? { ...e, ...dispatch(e.id) } : e,
-        ),
+        equipment: state.equipment.map((e) => (e.id === availableUnit.id ? { ...e, ...patch } : e)),
       }))
       get().pushToast(`Allocated ${availableUnit.id} — ${catalogItem.tier} ${catalogItem.type} from yard stock`, 'good')
       return
@@ -359,20 +360,27 @@ export const useAppStore = create((set, get) => ({
       type: catalogItem.type,
       tier: catalogItem.tier,
       catalogId: catalogItem.id,
-      ...dispatch(newId),
+      ...dispatch(),
     }
+    const { error } = await supabase.from('equipment').insert(equipmentToRow(newEquipment))
+    if (error) return get().pushToast(`Failed to order new unit: ${error.message}`, 'critical')
+
     set((state) => ({ equipment: [...state.equipment, newEquipment] }))
     get().pushToast(`No yard stock for ${catalogItem.tier} ${catalogItem.type} — ordered new unit ${newId}`, 'warning')
   },
 
-  extendRental: (equipmentId, extraDays) => {
-    set((s) => ({
-      equipment: s.equipment.map((e) => {
-        if (e.id !== equipmentId) return e
-        const currentReturn = new Date(e.expectedReturn)
-        const newReturn = format(addDays(currentReturn, extraDays), 'yyyy-MM-dd')
-        return { ...e, expectedReturn: newReturn }
-      }),
+  extendRental: async (equipmentId, extraDays) => {
+    const s = get()
+    const eq = s.equipment.find((e) => e.id === equipmentId)
+    if (!eq) return
+    const currentReturn = new Date(eq.expectedReturn)
+    const newReturn = format(addDays(currentReturn, extraDays), 'yyyy-MM-dd')
+
+    const { error } = await supabase.from('equipment').update({ expected_return: newReturn }).eq('id', equipmentId)
+    if (error) return get().pushToast(`Failed to extend rental for ${equipmentId}: ${error.message}`, 'critical')
+
+    set((state) => ({
+      equipment: state.equipment.map((e) => (e.id === equipmentId ? { ...e, expectedReturn: newReturn } : e)),
     }))
     get().pushToast(`Rental extended by ${extraDays} days for ${equipmentId}`, 'good')
   },
@@ -381,22 +389,23 @@ export const useAppStore = create((set, get) => ({
   // contract's expected-return date — that was overwriting real rental terms
   // with today's date. The provider now sees an explicit alert and actions it
   // through the normal check-in flow.
-  requestReturn: (equipmentId) => {
+  requestReturn: async (equipmentId) => {
+    const { error } = await supabase.from('equipment').update({ return_requested: true }).eq('id', equipmentId)
+    if (error) return get().pushToast(`Failed to request return for ${equipmentId}: ${error.message}`, 'critical')
+
     set((state) => ({
-      equipment: state.equipment.map((e) =>
-        e.id === equipmentId ? { ...e, returnRequested: true } : e,
-      ),
+      equipment: state.equipment.map((e) => (e.id === equipmentId ? { ...e, returnRequested: true } : e)),
     }))
     get().pushToast(`Return requested for ${equipmentId} — provider notified`, 'warning')
   },
 
-  acceptRecommendation: (equipmentId, recommendation) => {
+  acceptRecommendation: async (equipmentId, recommendation) => {
+    const patch = { catalogId: recommendation.catalog.id, tier: recommendation.catalog.tier }
+    const { error } = await supabase.from('equipment').update(equipmentToRow(patch)).eq('id', equipmentId)
+    if (error) return get().pushToast(`Failed to swap ${equipmentId}: ${error.message}`, 'critical')
+
     set((s) => ({
-      equipment: s.equipment.map((e) =>
-        e.id === equipmentId
-          ? { ...e, catalogId: recommendation.catalog.id, tier: recommendation.catalog.tier }
-          : e,
-      ),
+      equipment: s.equipment.map((e) => (e.id === equipmentId ? { ...e, ...patch } : e)),
     }))
     get().pushToast(
       `${equipmentId} swapped to ${recommendation.catalog.tier} — saving $${recommendation.dailySavings}/day`,
