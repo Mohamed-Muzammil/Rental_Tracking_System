@@ -61,12 +61,28 @@ export const useAppStore = create((set, get) => ({
       return
     }
     set({ dataError: null })
-    const [eqRes, logRes, incRes] = await Promise.all([
+    const [eqRes, incRes] = await Promise.all([
       supabase.from('equipment').select('*').limit(10000),
-      supabase.from('usage_logs').select('*').limit(20000),
       supabase.from('misuse_incidents').select('*').limit(10000),
     ])
-    const failed = eqRes.error || logRes.error || incRes.error
+
+    // Paginate usage_logs to bypass the 1000-row limit
+    let allLogs = []
+    let from = 0
+    let step = 1000
+    let logError = null
+    while (true) {
+      const { data, error } = await supabase.from('usage_logs').select('*').range(from, from + step - 1)
+      if (error) {
+        logError = error
+        break
+      }
+      if (data) allLogs.push(...data)
+      if (!data || data.length < step) break
+      from += step
+    }
+
+    const failed = eqRes.error || logError || incRes.error
     if (failed) {
       // Fallback to static seed data on error so prototype remains operational
       set({
@@ -81,7 +97,7 @@ export const useAppStore = create((set, get) => ({
     }
     set({
       equipment: eqRes.data.map(rowToEquipment),
-      usageLogs: logRes.data.map(rowToUsageLog),
+      usageLogs: allLogs.map(rowToUsageLog),
       misuseIncidents: incRes.data.length ? incRes.data.map(rowToIncident) : seedIncidents,
       clients: seedClients,
       mlForecast: seedMlForecast,
