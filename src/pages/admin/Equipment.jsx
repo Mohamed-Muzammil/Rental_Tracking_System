@@ -111,13 +111,10 @@ export default function Equipment() {
   const handleRegisterSubmit = (e) => {
     e.preventDefault()
     const catalogEntry = catalogById[regCatalogId]
-    const newId = `EQX-2${Math.floor(40 + Math.random() * 60)}`
     registerEquipment({
-      id: newId,
       type: catalogEntry.type,
       tier: catalogEntry.tier,
       catalogId: catalogEntry.id,
-      qrCode: `QR-${newId}`,
     })
     setShowRegisterModal(false)
   }
@@ -197,7 +194,7 @@ export default function Equipment() {
                 className="p-3 text-[11px]"
                 style={{ borderRadius: 'var(--radius-sm)', background: 'var(--accent-wash)', border: '1px solid var(--border)', color: 'var(--accent-dark)' }}
               >
-                <span className="font-bold">QR Barcode Generator:</span> A unique QR barcode (`QR-EQX-${Math.floor(40+Math.random()*60)}`) will be automatically assigned to this physical machine for warehouse dispatch scanning.
+                <span className="font-bold">QR Barcode Generator:</span> A unique QR barcode based on the equipment series (e.g. `QR-EXC-...`) will be automatically assigned to this physical machine for warehouse dispatch scanning.
               </div>
 
               <div className="flex items-center justify-end gap-2 border-t pt-4" style={{ borderColor: 'var(--border)' }}>

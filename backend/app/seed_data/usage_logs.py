@@ -11,8 +11,8 @@ from .generate_logs import gen_daily_logs
 from .sites import SITE_BY_ID
 
 SEEDED_ANOMALIES = {
-    "EQX-2003": {"drift_km": 6.5},   # wanders outside Hillside Quarry's radius
-    "EQX-2016": {"fuel_factor": 1.8},  # burns ~80% more fuel per engine hour than expected
+    "BLD-2003": {"drift_km": 6.5},   # wanders outside Hillside Quarry's radius
+    "FRK-2016": {"fuel_factor": 1.8},  # burns ~80% more fuel per engine hour than expected
 }
 
 

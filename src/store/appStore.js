@@ -15,6 +15,16 @@ import { clientById } from '../data/clients'
 
 let toastId = 0
 
+const getPrefix = (type) => ({
+  Excavator: 'EXC',
+  Bulldozer: 'BLD',
+  Crane: 'CRN',
+  Grader: 'GRD',
+  Forklift: 'FRK',
+  Loader: 'LDR',
+  Roller: 'RLR'
+}[type] || 'EQX')
+
 export const useAppStore = create((set, get) => ({
   role: null, // 'admin' | 'client'
   activeClientId: 'C001', // which client the Client dashboard is viewing
@@ -105,9 +115,10 @@ export const useAppStore = create((set, get) => ({
   },
 
   registerEquipment: async ({ id, type, tier, catalogId, qrCode }) => {
+    const eqType = type || 'Excavator'
     const newEq = {
-      id: id || `EQX-${Math.floor(2030 + Math.random() * 100)}`,
-      type: type || 'Excavator',
+      id: id || `${getPrefix(eqType)}-${Math.floor(2030 + Math.random() * 100)}`,
+      type: eqType,
       tier: tier || 'Heavy Duty',
       catalogId,
       status: 'completed', // Available in warehouse yard
@@ -354,7 +365,7 @@ export const useAppStore = create((set, get) => ({
       return
     }
 
-    const newId = `EQX-3${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`
+    const newId = `${getPrefix(catalogItem.type)}-3${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`
     const newEquipment = {
       id: newId,
       type: catalogItem.type,

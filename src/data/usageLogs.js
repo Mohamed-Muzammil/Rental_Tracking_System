@@ -6,8 +6,8 @@ import { SIM_TODAY } from '../lib/clock.js'
 // Two units are seeded to misbehave so the geofence and fuel rules have
 // something real to catch on first load. Everything else logs normally.
 const SEEDED_ANOMALIES = {
-  'EQX-2003': { driftKm: 6.5 },   // wanders well outside Hillside Quarry's 4km radius
-  'EQX-2016': { fuelFactor: 1.8 }, // burning ~80% more fuel per engine hour than expected
+  'BLD-2003': { driftKm: 6.5 },   // wanders well outside Hillside Quarry's 4km radius
+  'FRK-2016': { fuelFactor: 1.8 }, // burning ~80% more fuel per engine hour than expected
 }
 
 // Daily usage logs for every active rental, from check-in through "today".
