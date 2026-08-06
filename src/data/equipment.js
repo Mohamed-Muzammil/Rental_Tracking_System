@@ -99,15 +99,17 @@ export const equipment = [
   },
   {
     id: 'EQX-2003', type: 'Bulldozer', tier: 'Heavy', catalogId: 'CAT-BLD-H',
-    status: 'active', siteId: 'S001', clientId: 'C002', operatorId: 'OP203',
+    status: 'active', siteId: 'TAMBARAM', contractSiteId: 'ANNA-NAGAR', clientId: 'C002', operatorId: 'OP203',
     checkIn: '2026-07-28', expectedReturn: '2026-08-25',
     avgEngineHoursPerDay: 6.5, avgIdleHoursPerDay: 1.0,
+    locationAnomaly: true, currentLocation: { lat: 12.9249, lng: 80.1000 },
   },
   {
     id: 'EQX-2004', type: 'Excavator', tier: 'Compact', catalogId: 'CAT-EXC-C',
-    status: 'active', siteId: 'S003', clientId: 'C002', operatorId: 'OP106',
+    status: 'active', siteId: 'AMBATTUR', contractSiteId: 'GUINDY', clientId: 'C002', operatorId: 'OP106',
     checkIn: '2026-08-01', expectedReturn: '2026-08-09',
     avgEngineHoursPerDay: 4.0, avgIdleHoursPerDay: 3.5,
+    locationAnomaly: true, currentLocation: { lat: 13.1143, lng: 80.1548 },
   },
   {
     id: 'EQX-2005', type: 'Grader', tier: 'Standard', catalogId: 'CAT-GRD-S',
@@ -230,6 +232,13 @@ export const equipment = [
     status: 'active', siteId: 'S002', clientId: 'C003', operatorId: 'OP225',
     checkIn: '2026-07-27', expectedReturn: '2026-08-04',
     avgEngineHoursPerDay: 1.4, avgIdleHoursPerDay: 4.9,
+  },
+  {
+    id: 'EQX-2025', type: 'Bulldozer', tier: 'Compact', catalogId: 'CAT-BLD-C',
+    status: 'active', siteId: 'TAMBARAM', contractSiteId: 'ANNA-NAGAR', clientId: 'C001', operatorId: 'OP602',
+    checkIn: '2026-07-20', expectedReturn: '2026-09-12',
+    avgEngineHoursPerDay: 5.7, avgIdleHoursPerDay: 9.2,
+    locationAnomaly: true, currentLocation: { lat: 12.9249, lng: 80.1000 },
   },
 
   // ── maintenance — in the workshop, not rentable ───────────────────────────

@@ -28,16 +28,8 @@ export default function CompanyDetail() {
   const clientById = useMemo(() => Object.fromEntries(clients.map(c => [c.id, c])), [clients])
   const client = clientById[id]
 
-  if (!client) {
-    return (
-      <div className="flex flex-col items-center justify-center p-12 text-center">
-        <h2 className="mb-2 font-display text-xl font-bold" style={{ color: 'var(--ink-primary)' }}>Company Not Found</h2>
-        <Button className="mt-4" onClick={() => navigate('/admin/companies')}>Back to Companies</Button>
-      </div>
-    )
-  }
-
   const activeAssets = useMemo(() => {
+    if (!client) return []
     let active = []
     let needsAttention = []
     
@@ -54,7 +46,16 @@ export default function CompanyDetail() {
     }
     
     return assetFilter === 'attention' ? needsAttention : active
-  }, [equipment, client.id, assetFilter])
+  }, [equipment, client, assetFilter])
+
+  if (!client) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 text-center">
+        <h2 className="mb-2 font-display text-xl font-bold" style={{ color: 'var(--ink-primary)' }}>Company Not Found</h2>
+        <Button className="mt-4" onClick={() => navigate('/admin/companies')}>Back to Companies</Button>
+      </div>
+    )
+  }
   
   const totalDailyCost = activeAssets.reduce((sum, e) => sum + (catalogById[e.catalogId]?.dailyCost || 0), 0)
 

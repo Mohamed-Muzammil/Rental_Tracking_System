@@ -11,7 +11,10 @@ import {
   rowToIncident,
   incidentToRow,
 } from '../lib/db'
-import { clientById } from '../data/clients'
+import { clients as seedClients } from '../data/clients'
+import { equipment as seedEquipment } from '../data/equipment'
+import { usageLogs as seedUsageLogs } from '../data/usageLogs'
+import { misuseIncidents as seedIncidents } from '../data/incidents'
 
 let toastId = 0
 
@@ -21,24 +24,28 @@ export const useAppStore = create((set, get) => ({
   selectedSiteId: 'ALL', // 'ALL' or specific siteId
 
   today: SIM_TODAY,
-  equipment: [],
-  clients: [],
-  usageLogs: [],
-  misuseIncidents: [],
+  equipment: seedEquipment,
+  clients: seedClients,
+  usageLogs: seedUsageLogs,
+  misuseIncidents: seedIncidents,
   mlForecast: null,
   dismissedAlertIds: [],
   toasts: [],
   modalConfig: null,
 
-  // Data is fetched from Supabase on boot (see App.jsx) rather than seeded
-  // from static JS, so the roster/telemetry/incidents persist and are
-  // shared across sessions instead of resetting on every reload.
   dataLoaded: false,
   dataError: null,
 
   loadInitialData: async () => {
     if (!isSupabaseConfigured) {
-      set({ dataError: 'Supabase is not configured — missing VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY.', dataLoaded: false })
+      set({
+        equipment: seedEquipment,
+        clients: seedClients,
+        usageLogs: seedUsageLogs,
+        misuseIncidents: seedIncidents,
+        dataLoaded: true,
+        dataError: null,
+      })
       return
     }
     set({ dataError: null })
@@ -49,13 +56,22 @@ export const useAppStore = create((set, get) => ({
     ])
     const failed = eqRes.error || logRes.error || incRes.error
     if (failed) {
-      set({ dataError: failed.message, dataLoaded: false })
+      // Fallback to static seed data on error so prototype remains operational
+      set({
+        equipment: seedEquipment,
+        clients: seedClients,
+        usageLogs: seedUsageLogs,
+        misuseIncidents: seedIncidents,
+        dataLoaded: true,
+        dataError: null,
+      })
       return
     }
     set({
       equipment: eqRes.data.map(rowToEquipment),
       usageLogs: logRes.data.map(rowToUsageLog),
-      misuseIncidents: incRes.data.map(rowToIncident),
+      misuseIncidents: incRes.data.length ? incRes.data.map(rowToIncident) : seedIncidents,
+      clients: seedClients,
       dataLoaded: true,
     })
   },

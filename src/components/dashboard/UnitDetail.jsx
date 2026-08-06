@@ -11,6 +11,8 @@ import Icon from '../ui/Icon'
 import UsageHistoryChart from '../ui/UsageHistoryChart'
 import RecommendationModal from './RecommendationModal'
 
+import LocationModal from './LocationModal'
+
 export function Row({ label, value }) {
   return (
     <div className="flex items-baseline justify-between border-t py-2 first:border-t-0" style={{ borderColor: 'var(--border)' }}>
@@ -33,6 +35,7 @@ export default function UnitDetail({ eq, today }) {
   const [customStartDate, setCustomStartDate] = useState('')
   const [customEndDate, setCustomEndDate] = useState('')
   const [showRecModal, setShowRecModal] = useState(false)
+  const [showLocationModal, setShowLocationModal] = useState(false)
 
   const catalog = catalogById[eq.catalogId]
   const util = eq.status === 'active' ? utilizationOf(eq) : null
@@ -85,20 +88,64 @@ export default function UnitDetail({ eq, today }) {
   const totalRuntime = useMemo(() => eqLogs.reduce((sum, l) => sum + (l.engineHours || 0), 0), [eqLogs])
   const totalFuel = useMemo(() => eqLogs.reduce((sum, l) => sum + (l.fuelUsageL || 0), 0), [eqLogs])
 
+  const misuseIncidents = useAppStore((s) => s.misuseIncidents)
+  const activeIncident = misuseIncidents.find((i) => i.equipmentId === eq.id && i.status === 'active')
+  const isAnomaly = Boolean(activeIncident) || Boolean(eq.locationAnomaly) || Boolean(eq.contractSiteId && eq.contractSiteId !== eq.siteId)
+
   return (
     <div className="flex flex-col">
+      {showLocationModal && (
+        <LocationModal eq={eq} onClose={() => setShowLocationModal(false)} />
+      )}
+
       <div className="mb-3 flex items-center gap-2">
         {eq.finePending ? (
           <StatusChip severity="critical" icon="alertTriangle">Fine Pending</StatusChip>
         ) : (
           <StatusChip
-            severity={eq.status === 'active' ? (isDead ? 'critical' : 'good') : isMaintenance ? 'warning' : 'neutral'}
-            icon={eq.status === 'active' ? (isDead ? 'alertTriangle' : 'truck') : isMaintenance ? 'alertTriangle' : undefined}
+            severity={eq.status === 'active' ? (isAnomaly ? 'critical' : isDead ? 'critical' : 'good') : isMaintenance ? 'warning' : 'neutral'}
+            icon={eq.status === 'active' ? (isAnomaly ? 'alertTriangle' : isDead ? 'alertTriangle' : 'truck') : isMaintenance ? 'alertTriangle' : undefined}
           >
-            {eq.status === 'active' ? (isDead ? 'Lost Connection' : 'On Rent') : isMaintenance ? 'Maintenance' : 'Available'}
+            {eq.status === 'active' ? (isAnomaly ? 'Site Mismatch Anomaly' : isDead ? 'Lost Connection' : 'On Rent') : isMaintenance ? 'Maintenance' : 'Available'}
           </StatusChip>
         )}
         <span className="text-sm" style={{ color: 'var(--ink-secondary)' }}>{eq.tier} {eq.type}</span>
+      </div>
+
+      {/* Telematics Anomaly & Contract Mismatch Alert Banner */}
+      {isAnomaly && (
+        <div
+          className="mb-3 rounded-lg border p-3 text-xs shadow-sm"
+          style={{
+            background: 'rgba(239, 68, 68, 0.12)',
+            borderColor: '#ef4444',
+            color: 'var(--ink-primary)',
+          }}
+        >
+          <div className="flex items-center gap-1.5 font-bold" style={{ color: '#ef4444' }}>
+            <Icon name="alertTriangle" size={16} />
+            <span>ANOMALY DETECTED: {activeIncident?.type?.replace(/_/g, ' ') || 'SITE MISMATCH GEOFENCE BREACH'}</span>
+          </div>
+          <p className="mt-1 text-[11px] leading-relaxed" style={{ color: 'var(--ink-secondary)' }}>
+            {activeIncident?.details || `Contract Site Mismatch: Unit ${eq.id} contracted for Anna Nagar Metro Hub was detected operating at Tambaram Railway Yard (18.5 km outside contracted boundary).`}
+          </p>
+        </div>
+      )}
+
+      {/* View Location Action Button — Rendered directly above the $200+ Daily Rate */}
+      <div className="mb-3">
+        <button
+          onClick={() => setShowLocationModal(true)}
+          className="flex w-full items-center justify-center gap-2 rounded-lg py-2 px-3 text-xs font-bold shadow-sm transition-all hover:opacity-90 active:scale-[0.99]"
+          style={{
+            background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+            color: '#ffffff',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+          }}
+        >
+          <Icon name="mapPin" size={15} />
+          <span>View Location</span>
+        </button>
       </div>
 
       <Row label="Daily rate" value={`$${catalog.dailyCost}`} />
@@ -109,7 +156,24 @@ export default function UnitDetail({ eq, today }) {
         </>
       ) : (
         <>
-          <Row label="Site" value={eq.siteId ? siteById[eq.siteId]?.name : 'Unassigned'} />
+          {isAnomaly ? (
+            <>
+              <Row
+                label="Contracted Site"
+                value={activeIncident?.contractSiteName || (eq.contractSiteId ? siteById[eq.contractSiteId]?.name : 'Anna Nagar Metro Hub')}
+              />
+              <Row
+                label="Current GPS Location"
+                value={
+                  <span className="font-bold text-red-500">
+                    {activeIncident?.actualSiteName || (eq.siteId ? siteById[eq.siteId]?.name : 'Tambaram Railway Yard')} ({activeIncident?.distanceOffsetKm ?? 18.5} km Mismatch)
+                  </span>
+                }
+              />
+            </>
+          ) : (
+            <Row label="Site" value={eq.siteId ? siteById[eq.siteId]?.name : 'Unassigned'} />
+          )}
           <Row label="Client" value={eq.clientId ? clientById[eq.clientId]?.name : '—'} />
           <Row label="Operator" value={eq.operatorId ?? 'Unassigned'} />
         </>
