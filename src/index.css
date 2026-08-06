@@ -1,10 +1,10 @@
-/* Google Font: Inter */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+/* Google Fonts: Manrope for headings/display, Inter for body & data-dense UI */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap');
 
 @import "tailwindcss";
 
 @theme {
-  --font-display: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Manrope', 'Segoe UI', system-ui, sans-serif;
   --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
   --font-data: ui-monospace, 'Roboto Mono', Consolas, monospace;
 }
@@ -27,15 +27,16 @@
   --border:        #e5e7eb; /* Gray 200 */
   --border-strong: #d1d5db; /* Gray 300 */
 
-  /* Brand accent */
-  --accent:      #2563eb; /* Blue 600 */
-  --accent-dark: #1d4ed8; /* Blue 700 */
+  /* Brand accent — deep indigo instead of stock blue, reads more distinctive
+     without colliding with the good/warning/critical semantic hues */
+  --accent:      #4338ca;
+  --accent-dark: #312e81;
   --accent-ink:  #ffffff;
-  --accent-wash: #eff6ff; /* Blue 50 */
+  --accent-wash: #eef2ff;
 
   /* Chart */
-  --series-engine: #2563eb;
-  --series-idle:   #d1d5db;
+  --series-engine: #4338ca;
+  --series-idle:   #9ca3af;
 
   /* Status */
   --good:     #16a34a; /* Green 600 */
@@ -71,7 +72,7 @@ body {
   line-height: 1.5;
 }
 
-::selection { background: #bfdbfe; }
+::selection { background: #e0e7ff; }
 button, input, select, textarea { font: inherit; color: inherit; }
 .tabular { font-variant-numeric: tabular-nums; }
 .font-data { font-family: ui-monospace, 'Roboto Mono', Consolas, monospace; }

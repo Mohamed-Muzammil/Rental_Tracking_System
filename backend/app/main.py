@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
-from .routers import admin, alerts, catalog, dashboard, equipment, incidents, ml, reference, usage
+from .routers import admin, alerts, catalog, clients, dashboard, equipment, incidents, ml, reference, usage
 from .services import ml_service
 
 logging.basicConfig(level=logging.INFO)
@@ -43,3 +43,4 @@ app.include_router(alerts.router, prefix="/api")
 app.include_router(dashboard.router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
 app.include_router(ml.router, prefix="/api")
+app.include_router(clients.router, prefix="/api")

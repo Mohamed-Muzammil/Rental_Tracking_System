@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react'
 import { useAppStore } from '../../store/appStore'
 import { siteById, sites } from '../../data/sites'
 import { catalogById } from '../../data/catalog'
-import { clientById } from '../../data/clients'
 import { returnStatus, healthOf, recommendationFor, UNDERUTILIZED_THRESHOLD } from '../../lib/rules'
 import Card from '../../components/ui/Card'
 import StatTile from '../../components/ui/StatTile'
@@ -26,6 +25,8 @@ export default function ClientDashboard() {
   const activeClientId = useAppStore((s) => s.activeClientId)
   const selectedSiteId = useAppStore((s) => s.selectedSiteId)
   const acceptRecommendation = useAppStore((s) => s.acceptRecommendation)
+  const clients = useAppStore((s) => s.clients)
+  const clientById = useMemo(() => Object.fromEntries(clients.map(c => [c.id, c])), [clients])
 
   const [selectedEqForLog, setSelectedEqForLog] = useState(null)
   const [selectedEqForExtend, setSelectedEqForExtend] = useState(null)

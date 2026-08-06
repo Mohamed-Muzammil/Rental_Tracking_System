@@ -3,8 +3,9 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { format } from 'date-fns'
 import { useAppStore } from '../../store/appStore'
 import { siteById } from '../../data/sites'
+import { geofenceCheck } from '../../lib/geo'
 import { clientById } from '../../data/clients'
-import { catalogById } from '../../data/catalog'
+import { catalogById, catalogFor } from '../../data/catalog'
 import { equipmentTypes } from '../../data/demandHistory'
 import { healthOf, returnStatus, utilizationOf } from '../../lib/rules'
 import Card from '../../components/ui/Card'
@@ -29,6 +30,8 @@ const inputStyle = {
 export default function Equipment() {
   const navigate = useNavigate()
   const equipment = useAppStore((s) => s.equipment)
+  const clients = useAppStore((s) => s.clients)
+  const clientById = useMemo(() => Object.fromEntries(clients.map((c) => [c.id, c])), [clients])
   const today = useAppStore((s) => s.today)
 
   const [searchParams, setSearchParams] = useSearchParams()
@@ -96,18 +99,24 @@ export default function Equipment() {
 
   const [showRegisterModal, setShowRegisterModal] = useState(false)
   const [regType, setRegType] = useState('Excavator')
-  const [regTier, setRegTier] = useState('Heavy Duty')
-  const [regCost, setRegCost] = useState('350')
+  const regCatalogOptions = catalogFor(regType)
+  const [regCatalogId, setRegCatalogId] = useState(regCatalogOptions[0]?.id)
   const registerEquipment = useAppStore((s) => s.registerEquipment)
+
+  const handleRegTypeChange = (type) => {
+    setRegType(type)
+    setRegCatalogId(catalogFor(type)[0]?.id)
+  }
 
   const handleRegisterSubmit = (e) => {
     e.preventDefault()
+    const catalogEntry = catalogById[regCatalogId]
     const newId = `EQX-2${Math.floor(40 + Math.random() * 60)}`
     registerEquipment({
       id: newId,
-      type: regType,
-      tier: regTier,
-      dailyCost: Number(regCost),
+      type: catalogEntry.type,
+      tier: catalogEntry.tier,
+      catalogId: catalogEntry.id,
       qrCode: `QR-${newId}`,
     })
     setShowRegisterModal(false)
@@ -157,7 +166,7 @@ export default function Equipment() {
                 <label className="block uppercase text-[10px] font-bold mb-1" style={{ color: 'var(--ink-muted)' }}>Equipment Category</label>
                 <select
                   value={regType}
-                  onChange={(e) => setRegType(e.target.value)}
+                  onChange={(e) => handleRegTypeChange(e.target.value)}
                   className="w-full rounded-[var(--radius-sm)] border p-2 text-sm outline-hidden"
                   style={inputStyle}
                 >
@@ -169,27 +178,19 @@ export default function Equipment() {
 
               <div>
                 <label className="block uppercase text-[10px] font-bold mb-1" style={{ color: 'var(--ink-muted)' }}>Tier / Specification</label>
-                <input
-                  type="text"
-                  value={regTier}
-                  onChange={(e) => setRegTier(e.target.value)}
+                <select
+                  value={regCatalogId}
+                  onChange={(e) => setRegCatalogId(e.target.value)}
                   className="w-full rounded-[var(--radius-sm)] border p-2 text-sm outline-hidden"
                   style={inputStyle}
-                  placeholder="e.g. Heavy Duty / Compact / Standard"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block uppercase text-[10px] font-bold mb-1" style={{ color: 'var(--ink-muted)' }}>Daily Billing Rate ($/day)</label>
-                <input
-                  type="number"
-                  value={regCost}
-                  onChange={(e) => setRegCost(e.target.value)}
-                  className="w-full rounded-[var(--radius-sm)] border p-2 text-sm outline-hidden"
-                  style={inputStyle}
-                  required
-                />
+                >
+                  {regCatalogOptions.map((c) => (
+                    <option key={c.id} value={c.id}>{c.tier} — ${c.dailyCost}/day</option>
+                  ))}
+                </select>
+                <p className="mt-1 text-[10px] font-normal normal-case" style={{ color: 'var(--ink-faint)' }}>
+                  Billing rate is set by your dealer catalog tier, not entered per-unit.
+                </p>
               </div>
 
               <div
@@ -298,6 +299,8 @@ export default function Equipment() {
                     <td className="px-3 py-3">
                       {eq.finePending ? (
                         <StatusChip severity="critical" icon="alertTriangle">Fine Pending</StatusChip>
+                      ) : eq.status === 'active' && geofenceCheck(eq.currentLocation || eq.current_location, eq.siteId)?.breach ? (
+                        <StatusChip severity="critical" icon="mapPin">Site Mismatch</StatusChip>
                       ) : (
                         <StatusChip
                           severity={isActive ? (isDead ? 'critical' : 'good') : eq.status === 'maintenance' ? 'warning' : 'neutral'}

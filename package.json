@@ -7,11 +7,14 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "seed": "node --env-file=.env.local scripts/seed.mjs",
+    "apply-schema": "node --env-file=.env.local scripts/apply-schema.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.1",
     "date-fns": "^4.4.0",
+    "pg": "^8.22.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.2",

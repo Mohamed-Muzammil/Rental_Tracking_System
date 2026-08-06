@@ -1,9 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useAppStore } from '../store/appStore'
-import { equipment } from '../data/equipment'
-import { clients } from '../data/clients'
-import { sites } from '../data/sites'
 import { equipmentTypes } from '../data/demandHistory'
+import { sites } from '../data/sites'
 import Icon from '../components/ui/Icon'
 
 const OPTIONS = [
@@ -27,16 +25,18 @@ const OPTIONS = [
   },
 ]
 
-const STATS = [
-  { value: equipment.length, label: 'Fleet units tracked' },
-  { value: equipmentTypes.length, label: 'Equipment categories' },
-  { value: sites.length, label: 'Active job sites' },
-  { value: clients.length, label: 'Client accounts' },
-]
-
 export default function RoleSelect() {
   const navigate = useNavigate()
   const setRole = useAppStore((s) => s.setRole)
+  const equipment = useAppStore(s => s.equipment)
+  const clients = useAppStore(s => s.clients)
+
+  const STATS = [
+    { value: equipment.length, label: 'Fleet units tracked' },
+    { value: equipmentTypes.length, label: 'Equipment categories' },
+    { value: sites.length, label: 'Active job sites' },
+    { value: clients.length, label: 'Client accounts' },
+  ]
 
   const choose = (opt) => {
     setRole(opt.role)
@@ -59,7 +59,13 @@ export default function RoleSelect() {
       </header>
 
       {/* Hero */}
-      <div className="flex flex-1 flex-col items-center px-6 py-16">
+      <div
+        className="flex flex-1 flex-col items-center px-6 py-16"
+        style={{
+          background:
+            'radial-gradient(60% 50% at 50% 0%, color-mix(in srgb, var(--accent) 8%, transparent) 0%, transparent 100%)',
+        }}
+      >
         <div className="mb-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider" style={{ background: 'var(--accent-wash)', color: 'var(--accent)' }}>
           Smart Rental Tracking System
         </div>

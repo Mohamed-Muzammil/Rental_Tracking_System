@@ -1,5 +1,5 @@
 import { addDays, format } from 'date-fns'
-import { pointNearSite } from './geo'
+import { pointNearSite } from './geo.js'
 
 export const FUEL_L_PER_ENGINE_HOUR = 4.2
 

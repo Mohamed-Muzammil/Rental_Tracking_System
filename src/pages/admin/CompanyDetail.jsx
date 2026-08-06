@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAppStore } from '../../store/appStore'
-import { clientById } from '../../data/clients'
 import { siteById } from '../../data/sites'
 import { catalogById } from '../../data/catalog'
+import { geofenceCheck } from '../../lib/geo'
 import { healthOf } from '../../lib/rules'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
@@ -24,6 +24,8 @@ export default function CompanyDetail() {
   const [selectedId, setSelectedId] = useState(null)
   const [assetFilter, setAssetFilter] = useState('all') // 'all' or 'attention'
 
+  const clients = useAppStore(s => s.clients)
+  const clientById = useMemo(() => Object.fromEntries(clients.map(c => [c.id, c])), [clients])
   const client = clientById[id]
 
   if (!client) {
@@ -36,16 +38,22 @@ export default function CompanyDetail() {
   }
 
   const activeAssets = useMemo(() => {
-    let assets = equipment.filter((e) => e.clientId === client.id && e.status === 'active')
-    if (assetFilter === 'attention') {
-      assets = assets.filter((eq) => {
-        const util = utilizationOf(eq)
-        const isDead = util < 0.1
-        const showUtilAlert = util < 0.3 || util > 0.85
-        return eq.finePending || isDead || showUtilAlert
-      })
+    let active = []
+    let needsAttention = []
+    
+    for (const eq of equipment) {
+      if (eq.clientId !== client.id || eq.status !== 'active') continue
+      active.push(eq)
+      
+      const util = utilizationOf(eq)
+      const breach = geofenceCheck(eq.currentLocation || eq.current_location, eq.siteId)?.breach
+      
+      if (eq.finePending || util < 0.1 || util < 0.3 || util > 0.85 || breach) {
+        needsAttention.push(eq)
+      }
     }
-    return assets
+    
+    return assetFilter === 'attention' ? needsAttention : active
   }, [equipment, client.id, assetFilter])
   
   const totalDailyCost = activeAssets.reduce((sum, e) => sum + (catalogById[e.catalogId]?.dailyCost || 0), 0)
@@ -234,6 +242,8 @@ export default function CompanyDetail() {
                             <td className="px-3 py-3">
                               {eq.finePending ? (
                                 <StatusChip severity="critical" icon="alertTriangle">Fine Pending</StatusChip>
+                              ) : geofenceCheck(eq.currentLocation || eq.current_location, eq.siteId)?.breach ? (
+                                <StatusChip severity="critical" icon="mapPin">Site Mismatch</StatusChip>
                               ) : (
                                 <StatusChip
                                   severity={isDead ? 'critical' : 'good'}

@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAppStore } from '../../store/appStore'
 import { siteById, sites } from '../../data/sites'
-import { clientById, clients } from '../../data/clients'
 import { buildAlerts, utilizationOf, returnStatus, UNDERUTILIZED_THRESHOLD } from '../../lib/rules'
 import { categorySummary, fleetUtilization, utilizationRanking } from '../../lib/fleet'
 import Card from '../../components/ui/Card'
@@ -33,6 +32,8 @@ export default function Dashboard() {
   const today = useAppStore((s) => s.today)
   const dismissedAlertIds = useAppStore((s) => s.dismissedAlertIds)
   const sendReminder = useAppStore((s) => s.sendReminder)
+  const clients = useAppStore((s) => s.clients)
+  const clientById = useMemo(() => Object.fromEntries(clients.map(c => [c.id, c])), [clients])
 
   const active = useMemo(() => equipment.filter((e) => e.status === 'active'), [equipment])
   const categories = useMemo(() => categorySummary(equipment), [equipment])
@@ -93,7 +94,7 @@ export default function Dashboard() {
       {/* Page Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4" style={{ borderColor: 'var(--border)' }}>
         <div>
-          <h1 className="text-lg font-semibold" style={{ color: 'var(--ink-primary)' }}>
+          <h1 className="font-display text-xl font-semibold" style={{ color: 'var(--ink-primary)' }}>
             Fleet Operations Dashboard
           </h1>
           <p className="text-xs mt-0.5" style={{ color: 'var(--ink-muted)' }}>

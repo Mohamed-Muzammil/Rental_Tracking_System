@@ -1,4 +1,4 @@
-import { siteById } from '../data/sites'
+import { siteById } from '../data/sites.js'
 
 const EARTH_RADIUS_KM = 6371
 const toRad = (deg) => (deg * Math.PI) / 180

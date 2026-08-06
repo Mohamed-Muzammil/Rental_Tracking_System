@@ -22,6 +22,7 @@ class EquipmentOut(CamelModel):
     expected_back_on: Optional[str] = None
     return_requested: bool = False
     qr_code: Optional[str] = None
+    current_location: Optional[dict] = None
 
 
 class RegisterEquipmentRequest(CamelModel):

@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react'
 import { useAppStore } from '../../store/appStore'
 import { siteById } from '../../data/sites'
 import { catalogById } from '../../data/catalog'
-import { clientById } from '../../data/clients'
 import { returnStatus, healthOf } from '../../lib/rules'
 import Card from '../../components/ui/Card'
 import StatTile from '../../components/ui/StatTile'
@@ -25,6 +24,8 @@ export default function ClientReturns() {
   const activeClientId = useAppStore((s) => s.activeClientId)
   const selectedSiteId = useAppStore((s) => s.selectedSiteId)
   const requestReturn = useAppStore((s) => s.requestReturn)
+  const clients = useAppStore((s) => s.clients)
+  const clientById = useMemo(() => Object.fromEntries(clients.map(c => [c.id, c])), [clients])
   const client = clientById[activeClientId]
 
   const [selectedEqForExtend, setSelectedEqForExtend] = useState(null)

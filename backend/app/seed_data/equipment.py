@@ -290,6 +290,18 @@ def _generate_hold(rng: random.Random, count: int, start_id: int) -> list[dict]:
     return out
 
 
+def _point_near_site(site_id: str, offset_km: float = 0) -> dict:
+    if not site_id:
+        return {"lat": None, "lng": None}
+    # find site
+    site = next((s for s in SITES if s["id"] == site_id), None)
+    if not site:
+        return {"lat": None, "lng": None}
+    return {
+        "lat": round(site["lat"] + offset_km / 111, 5),
+        "lng": site["lng"]
+    }
+
 def _build() -> list[dict]:
     rng = random.Random(20260805)  # fixed seed -> reproducible seed data across resets
     equipment = list(_ORIGINAL)
@@ -297,6 +309,24 @@ def _build() -> list[dict]:
     equipment += _generate_active(rng, 250, 25)
     equipment += _generate_maintenance(rng, 30, 5)
     equipment += _generate_hold(rng, 40, 1)
+
+    for idx, eq in enumerate(equipment):
+        site_id = eq.get("site_id")
+        if not site_id:
+            # If not assigned to a site, put it at a warehouse or null
+            eq["current_location"] = _point_near_site("S001", 0)
+            continue
+            
+        # Add deliberate mismatches for testing
+        if eq["status"] == "active" and idx in [25, 45, 80]:
+            # Completely wrong site
+            wrong_site = [s for s in SITES if s["id"] != site_id][0]["id"]
+            eq["current_location"] = _point_near_site(wrong_site, 0)
+        else:
+            # Normal location: slightly offset (e.g. -1.5km to 1.5km)
+            offset = rng.uniform(-1.5, 1.5)
+            eq["current_location"] = _point_near_site(site_id, offset)
+
     return equipment
 
 

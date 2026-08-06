@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import { useAppStore } from '../../store/appStore'
-import { clientById } from '../../data/clients'
 import { catalogById } from '../../data/catalog'
+import { useMemo } from 'react'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import Icon from '../../components/ui/Icon'
@@ -20,6 +20,9 @@ export default function FineInvoice() {
   const openModal = useAppStore((s) => s.openModal)
 
   const [isSent, setIsSent] = useState(false)
+
+  const clients = useAppStore((s) => s.clients)
+  const clientById = useMemo(() => Object.fromEntries(clients.map(c => [c.id, c])), [clients])
 
   const eq = equipment.find((e) => e.id === id)
 

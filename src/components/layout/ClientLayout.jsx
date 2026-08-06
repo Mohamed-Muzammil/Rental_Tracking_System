@@ -1,6 +1,6 @@
+import { useMemo } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAppStore } from '../../store/appStore'
-import { clients, clientById } from '../../data/clients'
 import { sites } from '../../data/sites'
 import Icon from '../ui/Icon'
 import ToastStack from '../ui/ToastStack'
@@ -25,6 +25,9 @@ export default function ClientLayout() {
   const setActiveClientId = useAppStore((s) => s.setActiveClientId)
   const selectedSiteId = useAppStore((s) => s.selectedSiteId)
   const setSelectedSiteId = useAppStore((s) => s.setSelectedSiteId)
+
+  const clients = useAppStore((s) => s.clients)
+  const clientById = useMemo(() => Object.fromEntries(clients.map(c => [c.id, c])), [clients])
 
   const activeClient = clientById[activeClientId]
   const clientSites = sites.filter((s) => activeClient?.sites?.includes(s.id))
