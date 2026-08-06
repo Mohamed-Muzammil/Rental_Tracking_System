@@ -10,8 +10,6 @@ import Equipment from './pages/admin/Equipment'
 import CheckInOut from './pages/admin/CheckInOut'
 import UsageLogging from './pages/admin/UsageLogging'
 import AlertsCenter from './pages/admin/AlertsCenter'
-import ClientDashboard from './pages/client/ClientDashboard'
-import ClientUsage from './pages/client/ClientUsage'
 import ClientReturns from './pages/client/ClientReturns'
 import Marketplace from './pages/client/Marketplace'
 import Forecasting from './pages/admin/Forecasting'
@@ -76,10 +74,9 @@ export default function App() {
       </Route>
 
       <Route path="/client" element={<ClientLayout />}>
-        <Route index element={<ClientDashboard />} />
-        <Route path="usage" element={<ClientUsage />} />
-        <Route path="returns" element={<ClientReturns />} />
-        <Route path="marketplace" element={<Marketplace />} />
+        <Route index element={<Marketplace />} />
+        <Route path="rentals" element={<ClientReturns />} />
+        <Route path="*" element={<Marketplace />} />
       </Route>
     </Routes>
   )
