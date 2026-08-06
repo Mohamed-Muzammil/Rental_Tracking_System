@@ -386,17 +386,7 @@ function ReportsTab() {
                 return (
                   <tr key={eq.id} className="border-t" style={{ borderColor: 'var(--border)' }}>
                     <td className="px-5 py-3 font-medium" style={{ color: 'var(--ink-primary)' }}>
-                      <div className="flex items-center gap-2 font-bold">
-                        <span>{eq.id}</span>
-                        {(eq.locationAnomaly || (eq.contractSiteId && eq.contractSiteId !== eq.siteId)) && (
-                          <span
-                            className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-extrabold shadow-sm"
-                            style={{ background: 'rgba(239, 68, 68, 0.18)', border: '1px solid #ef4444', color: '#ef4444' }}
-                          >
-                            🚩 ANOMALY FLAGGED
-                          </span>
-                        )}
-                      </div>
+                      <div>{eq.id}</div>
                       <div className="text-xs font-normal" style={{ color: 'var(--ink-faint)' }}>{eq.tier} {eq.type}</div>
                     </td>
                     <td className="px-3 py-3" style={{ color: 'var(--ink-secondary)' }}>{siteName}</td>

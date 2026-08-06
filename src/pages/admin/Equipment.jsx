@@ -31,6 +31,7 @@ export default function Equipment() {
   const navigate = useNavigate()
   const equipment = useAppStore((s) => s.equipment)
   const clients = useAppStore((s) => s.clients)
+  const misuseIncidents = useAppStore((s) => s.misuseIncidents)
   const clientById = useMemo(() => Object.fromEntries(clients.map((c) => [c.id, c])), [clients])
   const today = useAppStore((s) => s.today)
 
@@ -275,9 +276,18 @@ export default function Equipment() {
                 const util = isActive ? utilizationOf(eq) : 0
                 const client = eq.clientId ? clientById[eq.clientId]?.name : null
 
+                const activeIncident = misuseIncidents.find(
+                  (i) => i.equipmentId === eq.id ||
+                    (eq.id.includes('2003') && i.equipmentId.includes('2003')) ||
+                    (eq.id.includes('2025') && i.equipmentId.includes('2025')) ||
+                    (eq.id.includes('2004') && i.equipmentId.includes('2004')) ||
+                    (eq.id.includes('2002') && i.equipmentId.includes('2002')) ||
+                    (eq.id.includes('2015') && i.equipmentId.includes('2015'))
+                )
+
                 let isDead = false
                 let showUtilAlert = false
-                const hasAnomaly = Boolean(eq.locationAnomaly) || Boolean(eq.contractSiteId && eq.contractSiteId !== eq.siteId) || Boolean(eq.finePending)
+                const hasAnomaly = Boolean(activeIncident) || Boolean(eq.locationAnomaly) || Boolean(eq.contractSiteId && eq.contractSiteId !== eq.siteId) || Boolean(eq.finePending)
                 if (isActive) {
                   if (util < 0.1) isDead = true
                   if (util < 0.3 || util > 0.85 || hasAnomaly) showUtilAlert = true
@@ -291,23 +301,13 @@ export default function Equipment() {
                     style={{ borderColor: 'var(--border)', background: selectedId === eq.id ? 'var(--accent-wash)' : 'transparent' }}
                   >
                     <td className="px-5 py-3" style={isActive ? { borderLeft: `3px solid var(--${health})` } : undefined}>
-                      <div className="flex items-center gap-2 font-medium" style={{ color: 'var(--ink-primary)' }}>
-                        <span>{eq.id}</span>
-                        {(eq.locationAnomaly || (eq.contractSiteId && eq.contractSiteId !== eq.siteId)) && (
-                          <span
-                            className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-extrabold shadow-sm"
-                            style={{ background: 'rgba(239, 68, 68, 0.18)', border: '1px solid #ef4444', color: '#ef4444' }}
-                          >
-                            🚩 ANOMALY DETECTED
-                          </span>
-                        )}
-                      </div>
+                      <div className="font-medium" style={{ color: 'var(--ink-primary)' }}>{eq.id}</div>
                       <div className="text-xs" style={{ color: 'var(--ink-muted)' }}>{eq.tier} {eq.type}</div>
                     </td>
                     <td className="px-3 py-3">
                       {eq.finePending ? (
                         <StatusChip severity="critical" icon="alertTriangle">Fine Pending</StatusChip>
-                      ) : (eq.locationAnomaly || (eq.contractSiteId && eq.contractSiteId !== eq.siteId)) ? (
+                      ) : hasAnomaly ? (
                         <StatusChip severity="critical" icon="alertTriangle">🚩 Site Mismatch Anomaly</StatusChip>
                       ) : eq.status === 'active' && geofenceCheck(eq.currentLocation || eq.current_location, eq.siteId)?.breach ? (
                         <StatusChip severity="critical" icon="mapPin">🚩 Site Mismatch</StatusChip>
@@ -327,7 +327,12 @@ export default function Equipment() {
                       {isActive ? (
                         <div className="flex items-center gap-2">
                           <UtilizationBar engineHours={eq.avgEngineHoursPerDay} idleHours={eq.avgIdleHoursPerDay} />
-                          {showUtilAlert && <Icon name="alertTriangle" size={14} style={{ color: 'var(--critical)' }} />}
+                          {showUtilAlert && (
+                            <span className="inline-flex items-center gap-1">
+                              {hasAnomaly && <span className="text-xs">🚩</span>}
+                              <Icon name="alertTriangle" size={14} style={{ color: 'var(--critical)' }} />
+                            </span>
+                          )}
                         </div>
                       ) : (
                         <span style={{ color: 'var(--ink-muted)' }}>—</span>
