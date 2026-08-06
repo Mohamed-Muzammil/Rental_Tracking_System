@@ -7,8 +7,8 @@ import Card from '../ui/Card'
 
 export default function LostConnectionModal({ eq, onClose }) {
   const navigate = useNavigate()
-  const pushToast = useAppStore((s) => s.pushToast)
-  const [isProcessing, setIsProcessing] = useState(false)
+  const sendReminder = useAppStore((s) => s.sendReminder)
+  const requestReturn = useAppStore((s) => s.requestReturn)
 
   const handleIssueFine = () => {
     onClose()
@@ -17,20 +17,16 @@ export default function LostConnectionModal({ eq, onClose }) {
 
   const handlePingRequest = () => {
     setIsProcessing(true)
-    setTimeout(() => {
-      pushToast(`Ping request sent to ${eq.id}. Waiting for response...`, 'good')
-      setIsProcessing(false)
-      onClose()
-    }, 600)
+    sendReminder(eq.id, `Dealer ping on unit ${eq.id} (${eq.tier} ${eq.type}): Telemetry offline. Please verify battery, ignition status, and equipment location.`)
+    setIsProcessing(false)
+    onClose()
   }
 
   const handleRequestCheckin = () => {
     setIsProcessing(true)
-    setTimeout(() => {
-      pushToast(`Requested physical check-in of ${eq.id} from client.`, 'warning')
-      setIsProcessing(false)
-      onClose()
-    }, 600)
+    requestReturn(eq.id)
+    setIsProcessing(false)
+    onClose()
   }
 
   return (

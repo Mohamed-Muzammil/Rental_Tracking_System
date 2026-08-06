@@ -153,8 +153,36 @@ export const useAppStore = create((set, get) => ({
   dismissAlert: (alertId) =>
     set((s) => ({ dismissedAlertIds: [...s.dismissedAlertIds, alertId] })),
 
-  sendReminder: (equipmentId) => {
-    get().pushToast(`Reminder sent for ${equipmentId}`, 'good')
+  sendReminder: (equipmentId, customMessage) => {
+    const s = get()
+    const eq = s.equipment.find((e) => e.id === equipmentId)
+    if (eq && eq.clientId) {
+      get().addNotification({
+        clientId: eq.clientId,
+        type: 'ping_reminder',
+        title: `📡 Dealer Ping: Attention Required on ${eq.id}`,
+        body: customMessage || `Dealer dispatched an urgent operational ping reminder regarding unit ${eq.id} (${eq.tier} ${eq.type}) at site ${eq.siteId || 'current site'}. Please check machine telemetry and return schedule.`,
+        severity: 'warning',
+        relatedId: eq.id,
+      })
+    }
+    get().pushToast(`Ping reminder dispatched to client for ${equipmentId}`, 'good')
+  },
+
+  sendFineReminder: ({ clientId, equipmentId, amount, reason }) => {
+    const s = get()
+    const targetClientId = clientId || s.equipment.find((e) => e.id === equipmentId)?.clientId
+    if (!targetClientId) return
+
+    get().addNotification({
+      clientId: targetClientId,
+      type: 'fine_reminder',
+      title: `⚠️ Penalty & Fine Assessment: ${equipmentId || 'Contract Violation'}`,
+      body: `A penalty fine of $${(amount || 450).toLocaleString()} has been assessed by the dealer for ${reason || 'overdue return / contract violation'}. Please review your account or contact the fleet manager.`,
+      severity: 'critical',
+      relatedId: equipmentId,
+    })
+    get().pushToast(`Fine notice delivered to client ${targetClientId}`, 'critical')
   },
 
   registerEquipment: async ({ id, type, tier, catalogId, qrCode }) => {
@@ -219,7 +247,18 @@ export const useAppStore = create((set, get) => ({
     set((state) => ({
       equipment: state.equipment.map((e) => (e.id === equipmentId ? { ...e, ...patch } : e)),
     }))
-    get().pushToast(`${equipmentId} checked out`, 'good')
+
+    // Notify client of check-out & dispatch
+    get().addNotification({
+      clientId,
+      type: 'checkout_dispatched',
+      title: '🚚 Machinery Check-Out Dispatched by Dealer',
+      body: `Unit ${equipmentId} has been checked out and dispatched to your project site. Expected Return: ${expectedReturn}.`,
+      severity: 'good',
+      relatedId: equipmentId,
+    })
+
+    get().pushToast(`${equipmentId} checked out & client notified`, 'good')
   },
 
   batchCheckOutEquipment: async ({ equipmentIds, siteId, clientId, expectedReturn }) => {
@@ -243,12 +282,24 @@ export const useAppStore = create((set, get) => ({
     set((state) => ({
       equipment: state.equipment.map((e) => (idSet.has(e.id) ? { ...e, ...patch } : e)),
     }))
+
+    // Notify client of batch dispatch
+    get().addNotification({
+      clientId,
+      type: 'checkout_dispatched',
+      title: `🚚 Batch Dispatch: ${equipmentIds.length} Units On The Way`,
+      body: `Dealer has verified and dispatched ${equipmentIds.join(', ')} to your site. Expected Return: ${expectedReturn}.`,
+      severity: 'good',
+      relatedId: equipmentIds[0],
+    })
+
     get().pushToast(`Batch Dispatch Verified: ${equipmentIds.length} units checked out!`, 'good')
   },
 
   // QR Return & Condition Inspection
   inspectAndReturnEquipment: async ({ equipmentId, condition, notes }) => {
     const s = get()
+    const eq = s.equipment.find((e) => e.id === equipmentId)
     const isDamaged = condition === 'damaged'
     const newStatus = isDamaged ? 'maintenance' : 'completed'
     const patch = {
@@ -266,6 +317,20 @@ export const useAppStore = create((set, get) => ({
       equipment: state.equipment.map((e) => (e.id === equipmentId ? { ...e, ...patch } : e)),
     }))
 
+    // Notify client that check-in was received and completed
+    if (eq && eq.clientId) {
+      get().addNotification({
+        clientId: eq.clientId,
+        type: 'checkin_request',
+        title: isDamaged ? '⚠️ Equipment Check-In: Maintenance Inspection Logged' : '✅ Equipment Check-In Completed',
+        body: isDamaged
+          ? `Unit ${equipmentId} checked in at dealer yard with inspection notes: "${notes || 'Wear & tear noted'}".`
+          : `Unit ${equipmentId} successfully received, inspected, and checked into dealer yard. Rental concluded.`,
+        severity: isDamaged ? 'warning' : 'good',
+        relatedId: equipmentId,
+      })
+    }
+
     if (isDamaged) {
       get().pushToast(`Returned ${equipmentId} marked DAMAGED → Sent to Workshop Maintenance`, 'critical')
     } else {
@@ -278,28 +343,37 @@ export const useAppStore = create((set, get) => ({
   },
   checkIn: (equipmentId) => get().checkInEquipment(equipmentId),
 
-  issueFine: async (equipmentId, amount) => {
+  issueFine: async (equipmentId, amount, reason) => {
     const s = get()
     const eq = s.equipment.find(e => e.id === equipmentId)
     
     if (eq && eq.clientId) {
+      const fineTotal = amount || 25000
+      set((state) => ({
+        clients: state.clients.map(c => c.id === eq.clientId ? { ...c, fineAmount: (c.fineAmount || 0) + fineTotal } : c),
+        equipment: state.equipment.map(e => e.id === equipmentId ? { ...e, finePending: true } : e)
+      }))
+
+      // Send Fine Reminder Notification to Client
+      get().addNotification({
+        clientId: eq.clientId,
+        type: 'fine_reminder',
+        title: `⚠️ Penalty & Fine Assessment: Unit ${eq.id}`,
+        body: `Dealer has issued an official penalty fine of $${fineTotal.toLocaleString()} for unit ${eq.id} (${eq.tier} ${eq.type}). Reason: ${reason || 'Late return / Contract policy breach'}.`,
+        severity: 'critical',
+        relatedId: eq.id,
+      })
+
+      get().pushToast(`Fine formally issued and notified to ${eq.clientId}`, 'critical')
+
       try {
-        const res = await fetch(`http://localhost:8000/api/clients/${eq.clientId}/fine`, {
+        await fetch(`http://localhost:8000/api/clients/${eq.clientId}/fine`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ equipmentId, amount: amount || 25000 })
+          body: JSON.stringify({ equipmentId, amount: fineTotal })
         })
-        if (res.ok) {
-          const updatedClient = await res.json()
-          set((state) => ({
-            clients: state.clients.map(c => c.id === updatedClient.id ? updatedClient : c),
-            equipment: state.equipment.map(e => e.id === equipmentId ? { ...e, finePending: true } : e)
-          }))
-          get().pushToast(`Fine formally issued and pending for ${equipmentId}`, 'critical')
-        }
       } catch (err) {
-        console.error("Failed to issue fine", err)
-        get().pushToast("Failed to issue fine", "critical")
+        console.error("Backend fine update failed", err)
       }
     }
   },
@@ -324,24 +398,60 @@ export const useAppStore = create((set, get) => ({
 
   // Misuse Incident Engine
   resolveMisuseIncident: async ({ incidentId, actionType, notes }) => {
+    const s = get()
+    const inc = s.misuseIncidents.find((i) => i.id === incidentId)
     const patch = { status: 'resolved', resolution: actionType, resolutionNotes: notes }
     const { error } = await supabase.from('misuse_incidents').update(incidentToRow(patch)).eq('id', incidentId)
     if (error) return get().pushToast(`Failed to resolve ${incidentId}: ${error.message}`, 'critical')
 
-    set((s) => ({
-      misuseIncidents: s.misuseIncidents.map((inc) => (inc.id === incidentId ? { ...inc, ...patch } : inc)),
+    set((state) => ({
+      misuseIncidents: state.misuseIncidents.map((i) => (i.id === incidentId ? { ...i, ...patch } : i)),
     }))
+
+    // Deeply interlink with client side based on corrective action taken
+    if (inc) {
+      const eq = s.equipment.find((e) => e.id === inc.equipmentId)
+      const clientId = inc.clientId || eq?.clientId
+
+      if (actionType === 'penalty') {
+        get().issueFine(inc.equipmentId, 1500, `Telemetry Anomaly #${inc.id}: ${inc.title}`)
+      } else if (actionType === 'warn_operator') {
+        if (clientId) {
+          get().addNotification({
+            clientId,
+            type: 'ping_reminder',
+            title: `⚠️ Dealer Warning Notice: ${inc.title}`,
+            body: `Dealer has issued a formal operational warning for unit ${inc.equipmentId}: "${inc.details}". Notes: ${notes || 'Please instruct operator to stay within authorized site limits.'}`,
+            severity: 'warning',
+            relatedId: inc.equipmentId,
+          })
+        }
+      } else if (actionType === 'inspection') {
+        if (clientId) {
+          get().addNotification({
+            clientId,
+            type: 'ping_reminder',
+            title: `🔍 Field Inspector Dispatched: ${inc.equipmentId}`,
+            body: `Dealer dispatched a field technical specialist to inspect unit ${inc.equipmentId} at your project site regarding: "${inc.title}".`,
+            severity: 'info',
+            relatedId: inc.equipmentId,
+          })
+        }
+      } else if (actionType === 'recall') {
+        get().requestReturn(inc.equipmentId)
+      }
+    }
 
     const actionText =
       actionType === 'false_alarm'
         ? 'Closed as False Alarm'
         : actionType === 'warn_operator'
-        ? 'Operator Formally Warned'
+        ? 'Operator Formally Warned & Client Notified'
         : actionType === 'penalty'
-        ? 'Penalty Fee Applied'
+        ? 'Penalty Fine Implemented & Charged to Client'
         : actionType === 'inspection'
-        ? 'Field Inspector Dispatched'
-        : 'Immediate Unit Recall Requested'
+        ? 'Field Inspector Dispatched & Client Alerted'
+        : 'Immediate Unit Recall Notice Sent to Client'
 
     get().pushToast(`Incident ${incidentId}: ${actionText}`, actionType === 'false_alarm' ? 'good' : 'warning')
   },
@@ -436,6 +546,18 @@ export const useAppStore = create((set, get) => ({
     set((state) => ({
       equipment: state.equipment.map((e) => (e.id === equipmentId ? { ...e, expectedReturn: newReturn } : e)),
     }))
+
+    if (eq.clientId) {
+      get().addNotification({
+        clientId: eq.clientId,
+        type: 'deadline_warning',
+        title: `📅 Rental Extended: Unit ${equipmentId}`,
+        body: `Rental term for unit ${equipmentId} (${eq.tier} ${eq.type}) successfully extended by ${extraDays} days. New Expected Return: ${newReturn}.`,
+        severity: 'good',
+        relatedId: equipmentId,
+      })
+    }
+
     get().pushToast(`Rental extended by ${extraDays} days for ${equipmentId}`, 'good')
   },
 
@@ -444,13 +566,27 @@ export const useAppStore = create((set, get) => ({
   // with today's date. The provider now sees an explicit alert and actions it
   // through the normal check-in flow.
   requestReturn: async (equipmentId) => {
+    const s = get()
+    const eq = s.equipment.find((e) => e.id === equipmentId)
     const { error } = await supabase.from('equipment').update({ return_requested: true }).eq('id', equipmentId)
     if (error) return get().pushToast(`Failed to request return for ${equipmentId}: ${error.message}`, 'critical')
 
     set((state) => ({
       equipment: state.equipment.map((e) => (e.id === equipmentId ? { ...e, returnRequested: true } : e)),
     }))
-    get().pushToast(`Return requested for ${equipmentId} — provider notified`, 'warning')
+
+    if (eq && eq.clientId) {
+      get().addNotification({
+        clientId: eq.clientId,
+        type: 'checkin_request',
+        title: `📦 Return Scheduled & Check-In Initiated: ${equipmentId}`,
+        body: `Return dispatch QR generated for unit ${equipmentId}. Dealer yard reception has been alerted for incoming inspection.`,
+        severity: 'warning',
+        relatedId: equipmentId,
+      })
+    }
+
+    get().pushToast(`Return requested for ${equipmentId} — dealer notified`, 'warning')
   },
 
   acceptRecommendation: async (equipmentId, recommendation) => {

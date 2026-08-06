@@ -96,7 +96,19 @@ export default function ClientReturns() {
                 return (
                   <tr key={eq.id} className="border-b transition-colors hover:opacity-90" style={{ borderColor: 'var(--border)' }}>
                     <td className="px-4 py-3">
-                      <div className="font-bold" style={{ color: 'var(--ink-primary)' }}>{eq.id}</div>
+                      <div className="flex items-center gap-1.5 font-bold" style={{ color: 'var(--ink-primary)' }}>
+                        {eq.id}
+                        {eq.finePending && (
+                          <span className="rounded px-1 py-0.2 text-[9px] font-extrabold uppercase" style={{ background: 'var(--critical-wash)', color: 'var(--critical)', border: '1px solid var(--critical)' }}>
+                            Fine Assessed
+                          </span>
+                        )}
+                        {eq.returnRequested && (
+                          <span className="rounded px-1 py-0.2 text-[9px] font-extrabold uppercase" style={{ background: 'var(--good-wash)', color: 'var(--good)', border: '1px solid var(--good)' }}>
+                            Check-In Requested
+                          </span>
+                        )}
+                      </div>
                       <div className="text-[11px]" style={{ color: 'var(--ink-muted)' }}>{eq.tier} {eq.type}</div>
                     </td>
                     <td className="px-3 py-3 font-medium" style={{ color: 'var(--ink-secondary)' }}>

@@ -33,6 +33,7 @@ export default function ClientLayout() {
   const clearAllNotifications = useAppStore((s) => s.clearAllNotifications)
 
   const [notifOpen, setNotifOpen] = useState(false)
+  const [notifFilter, setNotifFilter] = useState('ALL')
   const notifRef = useRef(null)
 
   const clientById = useMemo(() => Object.fromEntries(clients.map((c) => [c.id, c])), [clients])
@@ -55,8 +56,17 @@ export default function ClientLayout() {
     return notifications.filter((n) => !n.clientId || n.clientId === activeClientId)
   }, [notifications, activeClientId])
 
+  const filteredNotifications = useMemo(() => {
+    if (notifFilter === 'ALL') return clientNotifications
+    return clientNotifications.filter((n) => n.type === notifFilter)
+  }, [clientNotifications, notifFilter])
+
   const unreadCount = useMemo(() => {
     return clientNotifications.filter((n) => !n.read).length
+  }, [clientNotifications])
+
+  const activeFineNotifs = useMemo(() => {
+    return clientNotifications.filter((n) => n.type === 'fine_reminder' && !n.read)
   }, [clientNotifications])
 
   // Close dropdown on outside click
@@ -121,7 +131,7 @@ export default function ClientLayout() {
           ))}
         </nav>
 
-        {/* Header Right Actions: Notifications & Telemetry */}
+        {/* Header Right Actions: Notifications & Status */}
         <div className="flex h-full items-center gap-2 border-l px-3 shrink-0" style={{ borderColor: 'var(--border)' }}>
           {/* Notification Bell Dropdown */}
           <div className="relative" ref={notifRef}>
@@ -134,7 +144,7 @@ export default function ClientLayout() {
               <Icon name="bell" size={15} />
               {unreadCount > 0 && (
                 <span
-                  className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold"
+                  className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold animate-pulse"
                   style={{ background: 'var(--critical)', color: '#ffffff' }}
                 >
                   {unreadCount}
@@ -144,7 +154,7 @@ export default function ClientLayout() {
 
             {notifOpen && (
               <div
-                className="absolute right-0 mt-2 w-80 sm:w-96 rounded-xl border p-0 shadow-2xl z-50 overflow-hidden"
+                className="absolute right-0 mt-2 w-80 sm:w-[420px] rounded-xl border p-0 shadow-2xl z-50 overflow-hidden"
                 style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)' }}
               >
                 <div className="flex items-center justify-between border-b px-4 py-2.5" style={{ borderColor: 'var(--border)', background: 'var(--bg-surface-raised)' }}>
@@ -163,15 +173,42 @@ export default function ClientLayout() {
                   )}
                 </div>
 
-                <div className="max-h-80 overflow-y-auto divide-y" style={{ borderColor: 'var(--border)' }}>
-                  {clientNotifications.map((n) => (
+                {/* Filter Pills */}
+                <div className="flex gap-1 border-b px-3 py-1.5 overflow-x-auto" style={{ borderColor: 'var(--border)', background: 'var(--bg-surface)' }}>
+                  {[
+                    { id: 'ALL', label: 'All' },
+                    { id: 'fine_reminder', label: '⚠️ Fines' },
+                    { id: 'ping_reminder', label: '📡 Pings' },
+                    { id: 'checkin_request', label: '✅ Check-Ins' },
+                    { id: 'deadline_warning', label: '⏰ Deadlines' },
+                  ].map((f) => (
+                    <button
+                      key={f.id}
+                      onClick={() => setNotifFilter(f.id)}
+                      className="rounded px-2 py-0.5 text-[10px] font-bold whitespace-nowrap transition-colors"
+                      style={{
+                        background: notifFilter === f.id ? 'var(--accent)' : 'var(--bg-surface-raised)',
+                        color: notifFilter === f.id ? '#ffffff' : 'var(--ink-muted)',
+                      }}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="max-h-84 overflow-y-auto divide-y" style={{ borderColor: 'var(--border)' }}>
+                  {filteredNotifications.map((n) => (
                     <div
                       key={n.id}
                       onClick={() => markNotificationRead(n.id)}
-                      className="p-3 transition-colors cursor-pointer hover:opacity-90 flex flex-col gap-1"
+                      className="p-3.5 transition-colors cursor-pointer hover:opacity-90 flex flex-col gap-1.5"
                       style={{
                         background: n.read ? 'transparent' : 'var(--bg-surface-raised)',
-                        borderLeft: n.read ? '3px solid transparent' : '3px solid var(--accent)',
+                        borderLeft: n.read
+                          ? '3px solid transparent'
+                          : n.severity === 'critical'
+                          ? '3px solid var(--critical)'
+                          : '3px solid var(--accent)',
                       }}
                     >
                       <div className="flex items-center justify-between gap-2">
@@ -183,17 +220,34 @@ export default function ClientLayout() {
                         >
                           {n.title}
                         </span>
-                        <span className="text-[9px]" style={{ color: 'var(--ink-muted)' }}>{n.createdAt}</span>
+                        <span className="text-[9px] shrink-0" style={{ color: 'var(--ink-muted)' }}>{n.createdAt}</span>
                       </div>
                       <p className="text-[11px] leading-relaxed" style={{ color: 'var(--ink-secondary)' }}>
                         {n.body}
                       </p>
+                      <div className="mt-1 flex items-center justify-between pt-1">
+                        <span className="text-[9px] uppercase font-bold tracking-wider" style={{ color: 'var(--ink-muted)' }}>
+                          Ref: {n.relatedId || n.id}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            markNotificationRead(n.id)
+                            navigate('/client/rentals')
+                            setNotifOpen(false)
+                          }}
+                          className="text-[10px] font-bold text-accent hover:underline flex items-center gap-0.5"
+                          style={{ color: 'var(--accent)' }}
+                        >
+                          View Action <Icon name="arrowRight" size={10} />
+                        </button>
+                      </div>
                     </div>
                   ))}
 
-                  {clientNotifications.length === 0 && (
+                  {filteredNotifications.length === 0 && (
                     <div className="py-8 text-center text-xs" style={{ color: 'var(--ink-muted)' }}>
-                      No new notifications from rental dealer.
+                      No notifications matching selected filter.
                     </div>
                   )}
                 </div>
@@ -255,6 +309,31 @@ export default function ClientLayout() {
           Active Deployed Units: <strong style={{ color: 'var(--ink-primary)' }}>{clientActiveFleet.length}</strong>
         </div>
       </div>
+
+      {/* Active Fine Reminder Banner */}
+      {activeFineNotifs.length > 0 && (
+        <div
+          className="flex items-center justify-between px-5 py-2.5 border-b text-xs font-medium"
+          style={{
+            background: 'var(--critical-wash)',
+            borderColor: 'var(--critical)',
+            color: 'var(--critical)',
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <Icon name="alertTriangle" size={16} />
+            <span>
+              <strong>Dealer Fine Notice:</strong> You have {activeFineNotifs.length} penalty fine assessment(s) requiring resolution.
+            </span>
+          </div>
+          <button
+            onClick={() => setNotifOpen(true)}
+            className="flex items-center gap-1 rounded-md px-3 py-1 font-bold underline transition-opacity hover:opacity-80"
+          >
+            Review Fine Details <Icon name="arrowRight" size={13} />
+          </button>
+        </div>
+      )}
 
       {/* Nearing Deadline Warning Banner */}
       {deadlineUrgentUnits.length > 0 && (

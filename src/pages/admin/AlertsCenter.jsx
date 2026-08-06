@@ -42,20 +42,30 @@ export default function AlertsCenter() {
     [misuseIncidents],
   )
 
-  const handleCorrectiveActionModal = (incident) => {
-    openModal({
-      title: `Take Corrective Action — ${incident.id}`,
-      message: `Review incident for ${incident.equipmentId}: "${incident.details}"`,
-      confirmText: 'Apply Action',
-      onConfirm: () => {
-        // Default corrective action execution
-        resolveMisuseIncident({
-          incidentId: incident.id,
-          actionType: 'penalty',
-          notes: 'Penalty fee applied & customer notified via Admin Command Console',
-        })
-      },
+  const [selectedIncidentForAction, setSelectedIncidentForAction] = useState(null)
+  const [selectedActionType, setSelectedActionType] = useState('penalty')
+  const [actionNotes, setActionNotes] = useState('')
+
+  const handleOpenCorrectiveModal = (incident) => {
+    setSelectedIncidentForAction(incident)
+    setSelectedActionType('penalty')
+    setActionNotes(
+      incident.type === 'geofence_breach'
+        ? 'Geofence perimeter violation outside contracted site. Implemented $1,500 compliance penalty.'
+        : incident.type === 'unauthorized_operator'
+        ? 'Unauthorized operator detected without certified RFID token.'
+        : 'Excessive continuous idling telemetry logged.'
+    )
+  }
+
+  const handleExecuteCorrectiveAction = () => {
+    if (!selectedIncidentForAction) return
+    resolveMisuseIncident({
+      incidentId: selectedIncidentForAction.id,
+      actionType: selectedActionType,
+      notes: actionNotes,
     })
+    setSelectedIncidentForAction(null)
   }
 
   const handleFalseAlarm = (incidentId) => {
@@ -214,7 +224,7 @@ export default function AlertsCenter() {
                     <Button variant="secondary" onClick={() => handleFalseAlarm(inc.id)} className="text-xs px-2.5 py-1">
                       False Alarm
                     </Button>
-                    <Button variant="danger" onClick={() => handleCorrectiveActionModal(inc)} className="text-xs px-3 py-1">
+                    <Button variant="danger" onClick={() => handleOpenCorrectiveModal(inc)} className="text-xs px-3 py-1">
                       Take Corrective Action
                     </Button>
                   </div>
@@ -223,6 +233,94 @@ export default function AlertsCenter() {
             </div>
           )}
         </Card>
+      )}
+
+      {/* Corrective Action Modal */}
+      {selectedIncidentForAction && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(15, 23, 42, 0.65)', backdropFilter: 'blur(3px)' }}>
+          <div
+            className="w-full max-w-md border p-6 shadow-2xl animate-in fade-in zoom-in duration-200"
+            style={{ borderRadius: 'var(--radius-lg)', background: 'var(--bg-surface)', borderColor: 'var(--border)' }}
+          >
+            <div className="flex items-center justify-between border-b pb-3 mb-4" style={{ borderColor: 'var(--border)' }}>
+              <div>
+                <h3 className="font-display text-base font-bold" style={{ color: 'var(--ink-primary)' }}>
+                  Take Corrective Action — {selectedIncidentForAction.id}
+                </h3>
+                <p className="text-xs" style={{ color: 'var(--ink-secondary)' }}>
+                  Machine: <strong>{selectedIncidentForAction.equipmentId}</strong> • Type: {selectedIncidentForAction.title}
+                </p>
+              </div>
+              <button
+                onClick={() => setSelectedIncidentForAction(null)}
+                className="flex h-7 w-7 items-center justify-center rounded-md border text-xs"
+                style={{ background: 'var(--bg-surface-raised)', borderColor: 'var(--border)', color: 'var(--ink-muted)' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <div>
+                <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--ink-primary)' }}>
+                  Select Resolution Action:
+                </label>
+                <div className="grid grid-cols-1 gap-2">
+                  {[
+                    { id: 'penalty', label: '⚠️ Assess $1,500 Fine & Bill Client', desc: 'Applies penalty fee to client account and pushes fine notification' },
+                    { id: 'warn_operator', label: '📢 Send Formal Warning & Dealer Ping', desc: 'Dispatches operational warning notice to client portal' },
+                    { id: 'inspection', label: '🔍 Dispatch Field Technical Inspector', desc: 'Alerts client of on-site technical inspection team arrival' },
+                    { id: 'recall', label: '🛑 Immediate Machine Recall & Return Request', desc: 'Demands immediate machine return to dealer yard' },
+                  ].map((act) => (
+                    <label
+                      key={act.id}
+                      onClick={() => setSelectedActionType(act.id)}
+                      className="flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-all"
+                      style={{
+                        background: selectedActionType === act.id ? 'var(--bg-surface-raised)' : 'transparent',
+                        borderColor: selectedActionType === act.id ? 'var(--accent)' : 'var(--border)',
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="actionType"
+                        checked={selectedActionType === act.id}
+                        onChange={() => setSelectedActionType(act.id)}
+                        className="mt-0.5"
+                      />
+                      <div>
+                        <div className="text-xs font-bold" style={{ color: 'var(--ink-primary)' }}>{act.label}</div>
+                        <div className="text-[11px]" style={{ color: 'var(--ink-muted)' }}>{act.desc}</div>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold mb-1" style={{ color: 'var(--ink-primary)' }}>
+                  Resolution Notes (sent to client & logged):
+                </label>
+                <textarea
+                  rows={2}
+                  value={actionNotes}
+                  onChange={(e) => setActionNotes(e.target.value)}
+                  className="w-full rounded-lg border p-2.5 text-xs outline-none"
+                  style={{ background: 'var(--bg-surface-raised)', borderColor: 'var(--border-strong)', color: 'var(--ink-primary)' }}
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t" style={{ borderColor: 'var(--border)' }}>
+                <Button variant="secondary" onClick={() => setSelectedIncidentForAction(null)} className="text-xs">
+                  Cancel
+                </Button>
+                <Button variant="danger" onClick={handleExecuteCorrectiveAction} className="text-xs">
+                  <Icon name="checkCircle" size={13} /> Execute Corrective Action
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* TAB 2: Fleet Rental & Maintenance Alerts */}
