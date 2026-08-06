@@ -15,7 +15,11 @@ import { clients as seedClients } from '../data/clients'
 import { equipment as seedEquipment } from '../data/equipment'
 import { usageLogs as seedUsageLogs } from '../data/usageLogs'
 import { misuseIncidents as seedIncidents } from '../data/incidents'
+import { seedRentalRequests } from '../data/seedRequests'
+import { seedNotifications } from '../data/seedNotifications'
 import seedMlForecast from '../data/mlForecast.json'
+
+const shortId = (prefix) => `${prefix}-${Date.now().toString(36).toUpperCase().slice(-6)}${Math.floor(Math.random() * 100)}`
 
 let toastId = 0
 
@@ -43,6 +47,10 @@ export const useAppStore = create((set, get) => ({
   dismissedAlertIds: [],
   toasts: [],
   modalConfig: null,
+
+  // Client requests & notifications
+  requests: seedRentalRequests,
+  notifications: seedNotifications,
 
   dataLoaded: false,
   dataError: null,
@@ -458,4 +466,169 @@ export const useAppStore = create((set, get) => ({
       'good',
     )
   },
+
+  // ── Notifications System ───────────────────────────────────────────────────
+  addNotification: ({ clientId, type, title, body, severity = 'info', relatedId = null }) => {
+    const s = get()
+    const notif = {
+      id: shortId('NOTIF'),
+      clientId: clientId || s.activeClientId,
+      type,
+      title,
+      body,
+      severity,
+      relatedId,
+      read: false,
+      createdAt: format(s.today, 'yyyy-MM-dd HH:mm'),
+    }
+    set((state) => ({ notifications: [notif, ...state.notifications] }))
+    return notif
+  },
+
+  markNotificationRead: (id) => {
+    set((state) => ({
+      notifications: state.notifications.map((n) => (n.id === id ? { ...n, read: true } : n)),
+    }))
+  },
+
+  clearAllNotifications: (clientId) => {
+    set((state) => ({
+      notifications: state.notifications.filter((n) => n.clientId !== clientId),
+    }))
+    get().pushToast('Notifications cleared', 'neutral')
+  },
+
+  // ── Client Order Request Workflow ──────────────────────────────────────────
+  submitRentalRequest: async ({ clientId, catalogItem, siteId, requestedStart, requestedDurationDays, quantity = 1, notes = '' }) => {
+    const s = get()
+    const targetClientId = clientId || s.activeClientId
+    const newReq = {
+      id: shortId('REQ'),
+      clientId: targetClientId,
+      type: 'new_rental',
+      equipmentId: null,
+      requestedType: catalogItem.type,
+      requestedCatalogId: catalogItem.id,
+      requestedTier: catalogItem.tier,
+      dailyRate: catalogItem.dailyCost,
+      quantity,
+      siteId: siteId || 'S001',
+      requestedStart: requestedStart || format(s.today, 'yyyy-MM-dd'),
+      requestedDurationDays: requestedDurationDays || 14,
+      notes,
+      status: 'pending',
+      dealerNotes: null,
+      createdAt: format(s.today, 'yyyy-MM-dd HH:mm'),
+    }
+
+    set((state) => ({ requests: [newReq, ...state.requests] }))
+    get().pushToast(`Order request ${newReq.id} for ${catalogItem.tier} ${catalogItem.type} sent to dealer!`, 'good')
+    return newReq
+  },
+
+  approveRentalRequest: async (requestId) => {
+    const s = get()
+    const req = s.requests.find((r) => r.id === requestId)
+    if (!req) return
+
+    // Find available yard unit of requested catalog or type
+    const availableUnit = s.equipment.find(
+      (e) => e.status === 'completed' && (e.catalogId === req.requestedCatalogId || e.type === req.requestedType),
+    )
+
+    const unitId = availableUnit
+      ? availableUnit.id
+      : `${getPrefix(req.requestedType)}-3${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`
+
+    const expectedReturn = format(addDays(new Date(req.requestedStart || s.today), req.requestedDurationDays || 14), 'yyyy-MM-dd')
+
+    // If unit existed in yard, update it; otherwise mint as active
+    if (availableUnit) {
+      const patch = {
+        status: 'active',
+        siteId: req.siteId,
+        clientId: req.clientId,
+        operatorId: null,
+        checkIn: req.requestedStart || format(s.today, 'yyyy-MM-dd'),
+        expectedReturn,
+        avgEngineHoursPerDay: 0,
+        avgIdleHoursPerDay: 0,
+        returnRequested: false,
+      }
+      set((state) => ({
+        equipment: state.equipment.map((e) => (e.id === availableUnit.id ? { ...e, ...patch } : e)),
+        requests: state.requests.map((r) =>
+          r.id === requestId ? { ...r, status: 'approved', equipmentId: unitId, dealerNotes: `Allocated unit ${unitId}` } : r,
+        ),
+      }))
+    } else {
+      const newEquipment = {
+        id: unitId,
+        type: req.requestedType,
+        tier: req.requestedTier || 'Heavy Duty',
+        catalogId: req.requestedCatalogId || 'CAT-01',
+        status: 'active',
+        siteId: req.siteId,
+        clientId: req.clientId,
+        operatorId: null,
+        checkIn: req.requestedStart || format(s.today, 'yyyy-MM-dd'),
+        expectedReturn,
+        avgEngineHoursPerDay: 0,
+        avgIdleHoursPerDay: 0,
+        returnRequested: false,
+      }
+      set((state) => ({
+        equipment: [...state.equipment, newEquipment],
+        requests: state.requests.map((r) =>
+          r.id === requestId ? { ...r, status: 'approved', equipmentId: unitId, dealerNotes: `Allocated unit ${unitId}` } : r,
+        ),
+      }))
+    }
+
+    // Instantly dispatch notification to the client portal
+    get().addNotification({
+      clientId: req.clientId,
+      type: 'order_approved',
+      title: 'Rental Request Approved by Dealer',
+      body: `Your request ${requestId} for ${req.requestedTier} ${req.requestedType} was approved. Unit ${unitId} is dispatched to your site (Return: ${expectedReturn}).`,
+      severity: 'good',
+      relatedId: unitId,
+    })
+
+    get().pushToast(`Request ${requestId} approved & unit ${unitId} dispatched!`, 'good')
+  },
+
+  rejectRentalRequest: async (requestId, reason = 'Equipment currently unavailable') => {
+    const s = get()
+    const req = s.requests.find((r) => r.id === requestId)
+
+    set((state) => ({
+      requests: state.requests.map((r) =>
+        r.id === requestId ? { ...r, status: 'rejected', dealerNotes: reason } : r,
+      ),
+    }))
+
+    if (req) {
+      get().addNotification({
+        clientId: req.clientId,
+        type: 'order_rejected',
+        title: 'Rental Request Declined',
+        body: `Your request ${requestId} for ${req.requestedTier} ${req.requestedType} was declined by dealer. Reason: "${reason}".`,
+        severity: 'critical',
+        relatedId: requestId,
+      })
+    }
+
+    get().pushToast(`Request ${requestId} declined by provider`, 'warning')
+  },
+
+  cancelRentalRequest: async (requestId) => {
+    set((state) => ({
+      requests: state.requests.map((r) =>
+        r.id === requestId ? { ...r, status: 'cancelled' } : r,
+      ),
+    }))
+    get().pushToast(`Request ${requestId} cancelled`, 'neutral')
+  },
 }))
+

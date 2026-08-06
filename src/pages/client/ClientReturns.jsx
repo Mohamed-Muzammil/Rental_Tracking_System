@@ -59,10 +59,10 @@ export default function ClientReturns() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="font-display text-xl font-bold tracking-tight" style={{ color: 'var(--ink-primary)' }}>
-          Rentals & Return Management
+          Active Machinery & Return Deadlines
         </h1>
         <p className="text-xs" style={{ color: 'var(--ink-secondary)' }}>
-          Track return deadlines, schedule return dispatches, and request rental extensions for {client?.name}.
+          Monitor deployed fleet return deadlines, receive nearing-deadline alerts, request rental duration extensions, or dispatch returns for {client?.name}.
         </p>
       </div>
 
