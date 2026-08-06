@@ -277,17 +277,13 @@ export default function Equipment() {
                 const client = eq.clientId ? clientById[eq.clientId]?.name : null
 
                 const activeIncident = misuseIncidents.find(
-                  (i) => i.equipmentId === eq.id ||
-                    (eq.id.includes('2003') && i.equipmentId.includes('2003')) ||
-                    (eq.id.includes('2025') && i.equipmentId.includes('2025')) ||
-                    (eq.id.includes('2004') && i.equipmentId.includes('2004')) ||
-                    (eq.id.includes('2002') && i.equipmentId.includes('2002')) ||
-                    (eq.id.includes('2015') && i.equipmentId.includes('2015'))
+                  (i) => i.status === 'active' && i.equipmentId === eq.id
                 )
 
                 let isDead = false
                 let showUtilAlert = false
-                const hasAnomaly = Boolean(activeIncident) || Boolean(eq.locationAnomaly) || Boolean(eq.contractSiteId && eq.contractSiteId !== eq.siteId) || Boolean(eq.finePending)
+                const liveGeoBreak = isActive && geofenceCheck(eq.currentLocation || eq.current_location, eq.siteId)?.breach
+                const hasAnomaly = Boolean(activeIncident) || Boolean(liveGeoBreak) || Boolean(eq.locationAnomaly) || Boolean(eq.contractSiteId && eq.contractSiteId !== eq.siteId) || Boolean(eq.finePending)
                 if (isActive) {
                   if (util < 0.1) isDead = true
                   if (util < 0.3 || util > 0.85 || hasAnomaly) showUtilAlert = true
@@ -309,8 +305,6 @@ export default function Equipment() {
                         <StatusChip severity="critical" icon="alertTriangle">Fine Pending</StatusChip>
                       ) : hasAnomaly ? (
                         <StatusChip severity="critical" icon="alertTriangle">🚩 Site Mismatch Anomaly</StatusChip>
-                      ) : eq.status === 'active' && geofenceCheck(eq.currentLocation || eq.current_location, eq.siteId)?.breach ? (
-                        <StatusChip severity="critical" icon="mapPin">🚩 Site Mismatch</StatusChip>
                       ) : (
                         <StatusChip
                           severity={isActive ? (isDead ? 'critical' : 'good') : eq.status === 'maintenance' ? 'warning' : 'neutral'}

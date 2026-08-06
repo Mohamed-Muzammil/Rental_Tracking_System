@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { format, addDays } from 'date-fns'
 import { useAppStore } from '../../store/appStore'
-import { sites } from '../../data/sites'
+import { sites, siteById } from '../../data/sites'
 import { equipmentTypes } from '../../data/demandHistory'
 import Card from '../ui/Card'
 import Button from '../ui/Button'
@@ -47,6 +47,21 @@ export default function WarehouseQrDispatch() {
 
   // Filter available items
   const availableEquipment = useMemo(() => equipment.filter((e) => e.status === 'completed'), [equipment])
+
+  // Filter available sites based on selected client
+  const availableSites = useMemo(() => {
+    const clientSites = clientById[clientId]?.sites || []
+    const siteObjects = new Set(clientSites.map(id => siteById[id]).filter(Boolean))
+    return Array.from(siteObjects)
+  }, [clientId, clientById])
+
+  useEffect(() => {
+    if (availableSites.length > 0 && !availableSites.find(s => s.id === siteId)) {
+      setSiteId(availableSites[0].id)
+    } else if (availableSites.length === 0) {
+      setSiteId('')
+    }
+  }, [availableSites, siteId])
 
   // Handle Order Allocation Generation
   const handleGenerateOrder = (e) => {
@@ -205,7 +220,7 @@ export default function WarehouseQrDispatch() {
                 className="mt-1 w-full rounded-[var(--radius-sm)] border px-3 py-2 font-medium text-xs outline-hidden"
                 style={inputStyle}
               >
-                {sites.map((s) => (
+                {availableSites.map((s) => (
                   <option key={s.id} value={s.id}>{s.name} ({s.region})</option>
                 ))}
               </select>
