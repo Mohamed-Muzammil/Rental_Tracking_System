@@ -17,8 +17,9 @@ export default function Forecasting() {
   const model = useMemo(() => mlModelMeta(mlForecast), [mlForecast])
   const summaries = useMemo(() => mlSummaries(mlForecast), [mlForecast])
   
-  const [type, setType] = useState(summaries[0]?.type)
-  const selected = summaries.find((s) => s.type === type) ?? summaries[0]
+  const [selectedType, setSelectedType] = useState(null)
+  const activeType = selectedType || summaries[0]?.type || 'Bulldozer'
+  const selected = summaries.find((s) => s.type === activeType) ?? summaries[0]
 
   // Ranked by absolute change, not percent: at these volumes a category can
   // swing +200% off a 2-rental baseline, which is noise dressed up as a signal.
@@ -101,11 +102,11 @@ export default function Forecasting() {
         {summaries.map((s) => (
           <button
             key={s.type}
-            onClick={() => setType(s.type)}
+            onClick={() => setSelectedType(s.type)}
             className="rounded-xl border p-3 text-left transition-transform hover:-translate-y-0.5"
             style={{
               background: 'var(--bg-surface)',
-              borderColor: type === s.type ? 'var(--accent)' : 'var(--border)',
+              borderColor: activeType === s.type ? 'var(--accent)' : 'var(--border)',
               boxShadow: 'var(--shadow-card)',
             }}
           >

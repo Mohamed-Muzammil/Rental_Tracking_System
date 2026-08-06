@@ -224,10 +224,11 @@ export default function CompanyDetail() {
                     <tbody>
                       {activeAssets.map((eq) => {
                         const util = utilizationOf(eq)
+                        const hasAnomaly = Boolean(eq.locationAnomaly) || Boolean(eq.contractSiteId && eq.contractSiteId !== eq.siteId) || Boolean(eq.finePending)
                         let isDead = false
                         let showUtilAlert = false
                         if (util < 0.1) isDead = true
-                        else if (util < 0.3 || util > 0.85) showUtilAlert = true
+                        if (util < 0.3 || util > 0.85 || hasAnomaly) showUtilAlert = true
 
                         return (
                           <tr
@@ -237,17 +238,7 @@ export default function CompanyDetail() {
                             style={{ borderColor: 'var(--border)', background: selectedId === eq.id ? 'var(--accent-wash)' : 'transparent' }}
                           >
                             <td className="px-5 py-3" style={{ borderLeft: `3px solid var(--good)` }}>
-                              <div className="flex items-center gap-2 font-medium" style={{ color: 'var(--ink-primary)' }}>
-                                <span>{eq.id}</span>
-                                {(eq.locationAnomaly || (eq.contractSiteId && eq.contractSiteId !== eq.siteId)) && (
-                                  <span
-                                    className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-extrabold shadow-sm"
-                                    style={{ background: 'rgba(239, 68, 68, 0.18)', border: '1px solid #ef4444', color: '#ef4444' }}
-                                  >
-                                    🚩 ANOMALY FLAGGED
-                                  </span>
-                                )}
-                              </div>
+                              <div className="font-medium" style={{ color: 'var(--ink-primary)' }}>{eq.id}</div>
                               <div className="text-xs" style={{ color: 'var(--ink-muted)' }}>{eq.tier} {eq.type}</div>
                             </td>
                             <td className="px-3 py-3">
@@ -267,7 +258,12 @@ export default function CompanyDetail() {
                             <td className="px-3 py-3">
                               <div className="flex items-center gap-2">
                                 <UtilizationBar engineHours={eq.avgEngineHoursPerDay} idleHours={eq.avgIdleHoursPerDay} />
-                                {showUtilAlert && <Icon name="alertTriangle" size={14} style={{ color: 'var(--critical)' }} />}
+                                {showUtilAlert && (
+                                  <span className="inline-flex items-center gap-1">
+                                    {hasAnomaly && <span className="text-xs">🚩</span>}
+                                    <Icon name="alertTriangle" size={14} style={{ color: 'var(--critical)' }} />
+                                  </span>
+                                )}
                               </div>
                             </td>
                             <td className="px-3 py-3 text-right">

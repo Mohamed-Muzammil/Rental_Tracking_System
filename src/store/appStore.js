@@ -15,6 +15,7 @@ import { clients as seedClients } from '../data/clients'
 import { equipment as seedEquipment } from '../data/equipment'
 import { usageLogs as seedUsageLogs } from '../data/usageLogs'
 import { misuseIncidents as seedIncidents } from '../data/incidents'
+import seedMlForecast from '../data/mlForecast.json'
 
 let toastId = 0
 
@@ -38,7 +39,7 @@ export const useAppStore = create((set, get) => ({
   clients: seedClients,
   usageLogs: seedUsageLogs,
   misuseIncidents: seedIncidents,
-  mlForecast: null,
+  mlForecast: seedMlForecast,
   dismissedAlertIds: [],
   toasts: [],
   modalConfig: null,
@@ -53,6 +54,7 @@ export const useAppStore = create((set, get) => ({
         clients: seedClients,
         usageLogs: seedUsageLogs,
         misuseIncidents: seedIncidents,
+        mlForecast: seedMlForecast,
         dataLoaded: true,
         dataError: null,
       })
@@ -98,6 +100,7 @@ export const useAppStore = create((set, get) => ({
       usageLogs: allLogs.map(rowToUsageLog),
       misuseIncidents: incRes.data.length ? incRes.data.map(rowToIncident) : seedIncidents,
       clients: seedClients,
+      mlForecast: seedMlForecast,
       dataLoaded: true,
     })
   },
