@@ -5,7 +5,7 @@ import { useAppStore } from '../../store/appStore'
 import { siteById } from '../../data/sites'
 import { catalogById } from '../../data/catalog'
 import { healthOf, utilizationOf } from '../../lib/rules'
-import { distanceKm } from '../../lib/geo'
+import { distanceKm, geofenceCheck } from '../../lib/geo'
 import StatusChip from '../ui/StatusChip'
 import Button from '../ui/Button'
 import Icon from '../ui/Icon'
@@ -93,12 +93,34 @@ export default function UnitDetail({ eq, today }) {
 
   const misuseIncidents = useAppStore((s) => s.misuseIncidents)
   const activeIncident = misuseIncidents.find((i) => i.equipmentId === eq.id && i.status === 'active')
-  const isAnomaly = Boolean(activeIncident) || Boolean(eq.locationAnomaly) || Boolean(eq.contractSiteId && eq.contractSiteId !== eq.siteId)
+  const liveGeoResult = eq.status === 'active' ? geofenceCheck(eq.currentLocation || eq.current_location, eq.siteId) : null
+  const liveGeoBreach = Boolean(liveGeoResult?.breach)
+  const isAnomaly = Boolean(activeIncident) || Boolean(eq.locationAnomaly) || Boolean(eq.contractSiteId && eq.contractSiteId !== eq.siteId) || liveGeoBreach
 
-  const contractSiteObj = activeIncident?.contractSiteId ? siteById[activeIncident.contractSiteId] : (eq.contractSiteId ? siteById[eq.contractSiteId] : null)
-  const actualSiteObj = activeIncident?.actualSiteId ? siteById[activeIncident.actualSiteId] : (eq.siteId ? siteById[eq.siteId] : null)
-  const computedOffset = contractSiteObj && actualSiteObj ? Math.round(distanceKm(contractSiteObj, actualSiteObj) * 10) / 10 : null
+  // For incident-based anomalies, use incident site data; for live GPS breach, use assigned site vs current location
+  const contractSiteObj = activeIncident?.contractSiteId
+    ? siteById[activeIncident.contractSiteId]
+    : eq.contractSiteId
+      ? siteById[eq.contractSiteId]
+      : liveGeoBreach
+        ? liveGeoResult.site  // assigned site is the contracted boundary
+        : null
+  const actualSiteObj = activeIncident?.actualSiteId
+    ? siteById[activeIncident.actualSiteId]
+    : eq.siteId && !liveGeoBreach
+      ? siteById[eq.siteId]
+      : null
+  const computedOffset = liveGeoBreach
+    ? Math.round(liveGeoResult.overshootKm * 10) / 10  // distance past boundary
+    : contractSiteObj && actualSiteObj
+      ? Math.round(distanceKm(contractSiteObj, actualSiteObj) * 10) / 10
+      : null
   const displayOffset = activeIncident?.distanceOffsetKm ?? computedOffset ?? 4.5
+
+  // For live GPS breach, show the actual GPS coordinates as location text
+  const liveGpsLabel = liveGeoBreach && (eq.currentLocation || eq.current_location)
+    ? `GPS (${(eq.currentLocation || eq.current_location).lat?.toFixed(4)}, ${(eq.currentLocation || eq.current_location).lng?.toFixed(4)})`
+    : null
 
   return (
     <div className="flex flex-col">
@@ -173,13 +195,13 @@ export default function UnitDetail({ eq, today }) {
             <>
               <Row
                 label="Contracted Site"
-                value={activeIncident?.contractSiteName || contractSiteObj?.name || 'Anna Nagar Metro Hub'}
+                value={activeIncident?.contractSiteName || contractSiteObj?.name || siteById[eq.siteId]?.name || 'Assigned Site'}
               />
               <Row
                 label="Current GPS Location"
                 value={
                   <span className="font-bold text-red-500">
-                    {activeIncident?.actualSiteName || actualSiteObj?.name || 'Tambaram Railway Yard'} ({displayOffset} km Mismatch)
+                    {activeIncident?.actualSiteName || actualSiteObj?.name || liveGpsLabel || 'Outside Boundary'} ({displayOffset} km Mismatch)
                   </span>
                 }
               />
