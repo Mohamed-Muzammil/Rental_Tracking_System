@@ -15,7 +15,12 @@ import ClientUsage from './pages/client/ClientUsage'
 import ClientReturns from './pages/client/ClientReturns'
 import Marketplace from './pages/client/Marketplace'
 
+import { useEffect } from 'react'
+import { useAppStore } from './store/appStore'
 import Forecasting from './pages/admin/Forecasting'
+
+import FineInvoice from './pages/admin/FineInvoice'
+import CompanyDetail from './pages/admin/CompanyDetail'
 
 export default function App() {
   const dataLoaded = useAppStore((s) => s.dataLoaded)
@@ -62,11 +67,13 @@ export default function App() {
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Dashboard />} />
         <Route path="companies" element={<Companies />} />
+        <Route path="companies/:id" element={<CompanyDetail />} />
         <Route path="equipment" element={<Equipment />} />
         <Route path="checkin" element={<CheckInOut />} />
         <Route path="usage" element={<UsageLogging />} />
         <Route path="alerts" element={<AlertsCenter />} />
         <Route path="forecasting" element={<Forecasting />} />
+        <Route path="fine/:id" element={<FineInvoice />} />
       </Route>
 
       <Route path="/client" element={<ClientLayout />}>

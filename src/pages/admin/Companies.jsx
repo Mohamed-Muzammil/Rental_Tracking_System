@@ -4,7 +4,7 @@ import { useAppStore } from '../../store/appStore'
 import { clients } from '../../data/clients'
 import { catalogById } from '../../data/catalog'
 import { siteById } from '../../data/sites'
-import { healthOf } from '../../lib/rules'
+import { healthOf, utilizationOf } from '../../lib/rules'
 import StatusChip from '../../components/ui/StatusChip'
 import UtilizationBar from '../../components/ui/UtilizationBar'
 import Icon from '../../components/ui/Icon'
@@ -34,7 +34,12 @@ export default function Companies() {
           const totalEngine = units.reduce((s, e) => s + e.avgEngineHoursPerDay, 0)
           const totalIdle = units.reduce((s, e) => s + e.avgIdleHoursPerDay, 0)
           const dailySpend = units.reduce((s, e) => s + (catalogById[e.catalogId]?.dailyCost ?? 0), 0)
-          const atRisk = units.filter((e) => ['critical', 'serious'].includes(healthOf(e, today))).length
+          const atRisk = units.filter((e) => {
+            const util = utilizationOf(e)
+            const isDead = util < 0.1
+            const showUtilAlert = !isDead && (util < 0.3 || util > 0.85)
+            return isDead || showUtilAlert
+          }).length
 
           // Machinery Breakdown (counts per category)
           const categoryCounts = {}
@@ -126,7 +131,7 @@ export default function Companies() {
           severity="good"
         />
         <StatTile
-          label="At-Risk Machinery"
+          label="Needs Attention"
           value={totalAtRiskUnits}
           unit="units flagged"
           severity={totalAtRiskUnits > 0 ? 'critical' : 'good'}
@@ -179,7 +184,7 @@ export default function Companies() {
               className="flex h-7 items-center px-3 text-xs font-bold transition-all"
               style={segmentBtnStyle(filterMode === 'atRisk')}
             >
-              At Risk ({groups.filter((g) => g.atRisk > 0).length})
+              Needs Attention ({groups.filter((g) => g.atRisk > 0).length})
             </button>
 
             <button
@@ -275,7 +280,7 @@ export default function Companies() {
           {filteredGroups.map((g) => (
             <Link
               key={g.client.id}
-              to={`/admin/equipment?client=${g.client.id}`}
+              to={`/admin/companies/${g.client.id}`}
               className="group flex flex-col justify-between border text-left transition-all hover:shadow-md"
               style={{
                 borderRadius: 'var(--radius-md)',
@@ -305,7 +310,7 @@ export default function Companies() {
                     </div>
                   </div>
                   {g.atRisk > 0 ? (
-                    <StatusChip severity="critical">{g.atRisk} at risk</StatusChip>
+                    <StatusChip severity="critical">{g.atRisk} needs attention</StatusChip>
                   ) : (
                     <StatusChip severity="good">Healthy</StatusChip>
                   )}
@@ -374,7 +379,7 @@ export default function Companies() {
                 </div>
 
                 <span className="inline-flex items-center gap-1 font-bold transition-transform group-hover:translate-x-0.5" style={{ color: 'var(--accent)' }}>
-                  View Account Fleet <Icon name="chevronRight" size={14} />
+                  View Account Profile <Icon name="chevronRight" size={14} />
                 </span>
               </div>
             </Link>
@@ -426,18 +431,18 @@ export default function Companies() {
                   </td>
                   <td className="px-3 py-3.5">
                     {g.atRisk > 0 ? (
-                      <StatusChip severity="critical">{g.atRisk} at risk</StatusChip>
+                      <StatusChip severity="critical">{g.atRisk} needs attention</StatusChip>
                     ) : (
                       <StatusChip severity="good">Healthy</StatusChip>
                     )}
                   </td>
                   <td className="px-5 py-3.5 text-right">
                     <Link
-                      to={`/admin/equipment?client=${g.client.id}`}
+                      to={`/admin/companies/${g.client.id}`}
                       className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold transition-opacity hover:opacity-80"
                       style={{ borderRadius: 'var(--radius-sm)', background: 'var(--accent-wash)', color: 'var(--accent-dark)' }}
                     >
-                      View Fleet <Icon name="chevronRight" size={12} />
+                      View Account <Icon name="chevronRight" size={12} />
                     </Link>
                   </td>
                 </tr>

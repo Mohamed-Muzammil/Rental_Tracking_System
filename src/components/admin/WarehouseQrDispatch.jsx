@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { format, addDays } from 'date-fns'
 import { useAppStore } from '../../store/appStore'
 import { sites } from '../../data/sites'
-import { clients } from '../../data/clients'
+import { clients, clientById } from '../../data/clients'
 import { equipmentTypes } from '../../data/demandHistory'
 import Card from '../ui/Card'
 import Button from '../ui/Button'
@@ -159,6 +159,12 @@ export default function WarehouseQrDispatch() {
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
+              {clientById[clientId]?.fineAmount > 0 && (
+                <div className="mt-2 text-[10px] font-bold px-2 py-1.5 rounded" style={{ background: 'var(--critical-wash)', color: 'var(--critical)' }}>
+                  <Icon name="alertTriangle" size={12} className="inline-block mr-1 -mt-0.5" />
+                  Warning: The organization has already been fined for not maintaining equipment. Please proceed at your own risk.
+                </div>
+              )}
             </div>
 
             <div>

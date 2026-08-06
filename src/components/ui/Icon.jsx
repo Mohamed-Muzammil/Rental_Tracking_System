@@ -21,7 +21,7 @@ const PATHS = {
   table: 'M4 5h16v14H4z M4 10h16 M10 5v14',
 }
 
-export default function Icon({ name, size = 16, strokeWidth = 2, className = '' }) {
+export default function Icon({ name, size = 16, strokeWidth = 2, className = '', ...props }) {
   const d = PATHS[name]
   if (!d) return null
   return (
@@ -36,6 +36,7 @@ export default function Icon({ name, size = 16, strokeWidth = 2, className = '' 
       strokeLinejoin="round"
       className={className}
       aria-hidden="true"
+      {...props}
     >
       <path d={d} />
     </svg>

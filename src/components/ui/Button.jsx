@@ -19,6 +19,11 @@ const VARIANTS = {
     color: '#ffffff',
     border: '1px solid var(--critical)',
   },
+  warning: {
+    background: 'var(--warning)',
+    color: '#ffffff',
+    border: '1px solid var(--warning)',
+  },
 }
 
 export default function Button({ as: Tag = 'button', variant = 'secondary', className = '', style, ...props }) {

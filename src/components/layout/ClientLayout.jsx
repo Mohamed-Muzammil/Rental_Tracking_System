@@ -30,10 +30,10 @@ export default function ClientLayout() {
   const clientSites = sites.filter((s) => activeClient?.sites?.includes(s.id))
 
   return (
-    <div className="flex min-h-full flex-col" style={{ background: 'var(--bg-page)' }}>
+    <div className="flex h-screen flex-col" style={{ background: 'var(--bg-page)' }}>
       {/* Top Application Bar — same structure/colors as the admin header */}
       <header
-        className="flex items-center gap-0 border-b"
+        className="flex items-center gap-0 border-b shrink-0"
         style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)', height: '52px' }}
       >
         <div

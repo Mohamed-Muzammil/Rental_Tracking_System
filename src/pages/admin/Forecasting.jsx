@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
-import { model, mlSummaries, reallocationSuggestions } from '../../lib/mlForecast'
+import { mlModelMeta, mlSummaries, reallocationSuggestions } from '../../lib/mlForecast'
 import { utilizationOf, UNDERUTILIZED_THRESHOLD } from '../../lib/rules'
 import Card from '../../components/ui/Card'
 import StatusChip from '../../components/ui/StatusChip'
@@ -12,8 +12,11 @@ import StatTile from '../../components/ui/StatTile'
 export default function Forecasting() {
   const equipment = useAppStore((s) => s.equipment)
   const pushToast = useAppStore((s) => s.pushToast)
+  const mlForecast = useAppStore((s) => s.mlForecast)
 
-  const summaries = useMemo(() => mlSummaries(), [])
+  const model = useMemo(() => mlModelMeta(mlForecast), [mlForecast])
+  const summaries = useMemo(() => mlSummaries(mlForecast), [mlForecast])
+  
   const [type, setType] = useState(summaries[0]?.type)
   const selected = summaries.find((s) => s.type === type) ?? summaries[0]
 
@@ -30,8 +33,8 @@ export default function Forecasting() {
     const idle = equipment.filter(
       (e) => e.status === 'active' && utilizationOf(e) < UNDERUTILIZED_THRESHOLD,
     )
-    return reallocationSuggestions(idle)
-  }, [equipment])
+    return reallocationSuggestions(mlForecast, idle)
+  }, [equipment, mlForecast])
 
   const handleReallocate = (r) => {
     pushToast(`Reallocation queued — ${r.unit.id} (${r.category}) from ${r.fromSite} to ${r.toSite}`, 'good')

@@ -11,6 +11,7 @@ import {
   rowToIncident,
   incidentToRow,
 } from '../lib/db'
+import { clientById } from '../data/clients'
 
 let toastId = 0
 
@@ -23,6 +24,7 @@ export const useAppStore = create((set, get) => ({
   equipment: [],
   usageLogs: [],
   misuseIncidents: [],
+  mlForecast: null,
   dismissedAlertIds: [],
   toasts: [],
   modalConfig: null,
@@ -61,6 +63,24 @@ export const useAppStore = create((set, get) => ({
   setActiveClientId: (activeClientId) => set({ activeClientId, selectedSiteId: 'ALL' }),
   setSelectedSiteId: (selectedSiteId) => set({ selectedSiteId }),
 
+  initializeStore: async () => {
+    try {
+      const [eqRes, logsRes, alertsRes, mlRes] = await Promise.all([
+        fetch('http://localhost:8000/api/equipment'),
+        fetch('http://localhost:8000/api/usage-logs'),
+        fetch('http://localhost:8000/api/incidents'),
+        fetch('http://localhost:8000/api/ml/forecast')
+      ])
+      const [equipment, usageLogs, misuseIncidents, mlForecast] = await Promise.all([
+        eqRes.json(), logsRes.json(), alertsRes.json(), mlRes.json()
+      ])
+      set({ equipment, usageLogs, misuseIncidents, mlForecast })
+    } catch (err) {
+      console.error("Failed to fetch backend state:", err)
+      get().pushToast("Failed to connect to backend", "critical")
+    }
+  },
+
   openModal: (config) => set({ modalConfig: config }),
   closeModal: () => set({ modalConfig: null }),
 
@@ -82,7 +102,6 @@ export const useAppStore = create((set, get) => ({
     get().pushToast(`Reminder sent for ${equipmentId}`, 'good')
   },
 
-  // Admin registers new physical equipment with unique ID & QR Code
   registerEquipment: async ({ id, type, tier, catalogId, qrCode }) => {
     const newEq = {
       id: id || `EQX-${Math.floor(2030 + Math.random() * 100)}`,
@@ -202,6 +221,50 @@ export const useAppStore = create((set, get) => ({
     return get().inspectAndReturnEquipment({ equipmentId, condition: 'good', notes: 'Checked in' })
   },
   checkIn: (equipmentId) => get().checkInEquipment(equipmentId),
+
+  issueFine: (equipmentId, amount) => {
+    const s = get()
+    const eq = s.equipment.find(e => e.id === equipmentId)
+    
+    if (eq && eq.clientId) {
+      const client = clientById[eq.clientId]
+      if (client) {
+        client.fineAmount = (client.fineAmount || 0) + (amount || 25000)
+        client.billingHistory = client.billingHistory || []
+        client.billingHistory.unshift({
+          id: `FINE-${equipmentId}-${Date.now().toString().slice(-4)}`,
+          date: format(s.today, 'yyyy-MM-dd'),
+          amount: amount || 25000,
+          status: 'overdue' // Default to overdue for fines to make them visible
+        })
+      }
+    }
+    
+    set((state) => ({
+      equipment: state.equipment.map((e) =>
+        e.id === equipmentId ? { ...e, finePending: true } : e
+      ),
+    }))
+    get().pushToast(`Fine formally issued and pending for ${equipmentId}`, 'critical')
+  },
+
+  payInvoice: (clientId, invoiceId) => {
+    const client = clientById[clientId]
+    if (client) {
+      const invoice = client.billingHistory.find(inv => inv.id === invoiceId)
+      if (invoice && invoice.status !== 'paid') {
+        invoice.status = 'paid'
+        if (invoice.id.startsWith('FINE-')) {
+          client.fineAmount = Math.max(0, (client.fineAmount || 0) - invoice.amount)
+          client.paidFines = (client.paidFines || 0) + invoice.amount
+        } else {
+          client.overdueAmount = Math.max(0, (client.overdueAmount || 0) - invoice.amount)
+        }
+        set((state) => ({ ...state })) // Trigger a re-render for components observing the store (even though we mutated the client object)
+        get().pushToast(`Invoice ${invoiceId} marked as paid`, 'good')
+      }
+    }
+  },
 
   // Misuse Incident Engine
   resolveMisuseIncident: async ({ incidentId, actionType, notes }) => {
